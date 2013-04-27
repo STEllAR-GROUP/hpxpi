@@ -1,0 +1,63 @@
+XPI Specification 0.9 rev74
+---------------------------
+
+General notes: 
+    Many functions are documented as 'This (can be used) ...'. 
+    Wouldn't it be more concise to use the function name instead of 'This'?
+
+    The spec documents constructor functions for different types, but no 
+    destructors. Why?
+
+    All arguments for API functions should be const-correct.
+
+3.3 High-Level Interface Routines
+
+XPI_ABORT:
+    Does the specification of XPI_abort belong into 3.2 instead?
+
+4.2.2 Derived Types
+
+XPI_TYPE_STRUCT: 
+    'XPI_Type[n] types' instead of 'XPI_Type types[n]'
+
+4.3 Parcel Continuations
+
+XPI_CONTINUE: 
+    'XPI_Type[n] types' instead of 'XPI_Type types[n]'
+
+4.4 Parcel Generation
+
+XPI_PARCEL_SET_DATA: 
+    uses MPI_Type as argument
+
+4.5 Apply
+
+XPI_APPLY: 
+    mistyped: XPI_err
+    missing: parameter 'future'
+
+4.6 Advanced
+
+XPI_PARCEL_GET_CONT_ACTION:
+    char** action: who is repsonsible for freeing the memory?
+
+XPI_PARCEL_SELECT:
+    Is this call blocking if no matching parcels are available?
+
+XPI_PARCEL_GET_CONT_ACTION:
+    char** action: who is repsonsible for freeing the memory?
+
+XPI_PARCEL_GET_DATA_TYPE:
+    XPI_Type* type: who is repsonsible for freeing the memory? If the caller 
+                    is supposed to free the memory, how?
+
+5.1 Address Space
+
+XPI_NULL:
+    does not make sense: "The NULL global virtual address is defined such that, 
+                         when compared to an address initialized with the 
+                         integer, 0."
+
+5.2 Native Interface
+
+
