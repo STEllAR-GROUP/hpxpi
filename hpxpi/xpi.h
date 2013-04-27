@@ -151,6 +151,7 @@ bool XPI_Type_equals(XPI_Type lhs, XPI_Type rhs);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Parcel Continuations [4.3]
+///////////////////////////////////////////////////////////////////////////////
 
 // When XPI threads initialize parcels, they designate the parcel's action, 
 // along with a continuation action. XPI_CONTINUE is the low level, XPI 
@@ -164,6 +165,43 @@ bool XPI_Type_equals(XPI_Type lhs, XPI_Type rhs);
 HPXPI_ATTRIBUTE_NORETURN void XPI_continue(size_t n, XPI_Type types[], void* vals[]);
 HPXPI_ATTRIBUTE_NORETURN void XPI_continue1(XPI_Type type, void* val);
 HPXPI_ATTRIBUTE_NORETURN void XPI_continueV(XPI_Type type, ...);
+
+///////////////////////////////////////////////////////////////////////////////
+// Parcel Generation [4.4]
+///////////////////////////////////////////////////////////////////////////////
+
+typedef struct XPI_Parcel { void* handle; } XPI_Parcel;
+typedef struct XPI_Addr { uint64_t msb; uint64_t lsb; } XPI_Addr;
+
+// Spec misses documentation
+XPI_Err XPI_Parcel_create(XPI_Parcel* handle);
+
+// Spec misses documentation
+XPI_Err XPI_Parcel_free(XPI_Parcel handle);
+
+// The target address must have a valid mapping at the time that 
+// XPI_PARCEL_SEND is called.
+XPI_Err XPI_Parcel_set_target(XPI_Parcel handle, XPI_Addr target);
+
+// The action must correspond to an action that was registered with the XPI 
+// runtime using XPI_PROCESS_REGISTER_ACTION prior to XPI_PARCEL_SEND being 
+// called.
+XPI_Err XPI_Parcel_set_action(XPI_Parcel handle, char* action);
+
+// The continuation target address must have a valid mapping at the time that 
+// XPI_CONTINUE is called.
+XPI_Err XPI_Parcel_set_cont_target(XPI_Parcel handle, XPI_Addr target);
+
+// The action must correspond to an action that was registered with the XPI 
+// runtime using XPI_PROCESS_REGISTER_ACTION prior to XPI_CONTINUE being called.
+XPI_Err XPI_Parcel_set_cont_action(XPI_Parcel handle, char* action);
+
+// Bind the individual action arguments to the action’s data.
+XPI_Err XPI_Parcel_set_data(XPI_Parcel handle, XPI_Type type, size_t n, 
+    void* arguments[]);
+
+// XPI_Parcel_send send a parcel.
+XPI_Err XPI_Parcel_send(XPI_Parcel handle, XPI_Addr future);
 
 #if defined(__cplusplus)
 }
