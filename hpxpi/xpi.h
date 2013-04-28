@@ -130,7 +130,7 @@ HPXPI_EXPORT XPI_Err XPI_Type_lco(XPI_Type type, XPI_Type* new_type);
 // implies that the action is a normal user action.
 HPXPI_EXPORT XPI_Err XPI_Type_global_pointer(XPI_Type type, XPI_Type* new_type);
 
-// XPI_Type_action creates an XPI TYPE representing an action. This is suitable
+// XPI_Type_action creates an XPI_TYPE representing an action. This is suitable
 // for use in either XPI_PROCESS_REGISTER_ACTION or XPI_PARCEL_SEND. Note that
 // the return type of all actions is XPI_ERR and does not need to be specified.
 // The first parameter type has special semantics in XPI. If the first parameter
@@ -326,6 +326,75 @@ HPXPI_EXPORT XPI_Err XPI_Agas_store1_sync(XPI_Addr addr, uint8_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store2_sync(XPI_Addr addr, uint16_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store4_sync(XPI_Addr addr, uint32_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store8_sync(XPI_Addr addr, uint64_t val);
+
+///////////////////////////////////////////////////////////////////////////////
+// Threads [6]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Thread_get_self can be used to get the global address corresponding to 
+// the local thread, and can be used in conjunction with the thread object API 
+// to query details of threads.
+HPXPI_EXPORT XPI_Err XPI_Thread_get_self(XPI_Addr* addr);
+
+///////////////////////////////////////////////////////////////////////////////
+// Thread Synchronization [6.1]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Thread_wait_any allows a threads execution to block until any one of the 
+// specified LCOs fires. This should behave as if it is implemented in terms of 
+// XPI_LCO_LINK, along with a scheduler transition of the thread to a depleted 
+// state (which will be reset by the threads XPI_LCO_TRIGGER_ACTION handler).
+HPXPI_EXPORT XPI_Err XPI_Thread_wait_any(size_t n, XPI_Addr lcos[], XPI_Addr* lco);
+
+// XPI_Thread_wait_all blocks until all of the LCOs in lcos have fired. This is 
+// a convenience interface to the XPI_THREAD_WAIT_ANY routine, that behaves as 
+// if it loops waiting for each LCO to fire, however it may have its own distinct 
+// implementation for performance reasons.
+HPXPI_EXPORT XPI_Err XPI_Thread_wait_all(size_t n, XPI_Addr lcos[]);
+
+// XPI_Thread_wait blocks until the LCO fires. This is a convenience interface 
+// to the XPI_THREAD_WAIT_ANY routine however it may have its own distinct 
+// implementation for performance reasons.
+HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr obj);
+
+///////////////////////////////////////////////////////////////////////////////
+// Thread Scheduling [6.2]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Thread_set_priority will set the priority for the target thread.
+
+// XPI_Err XPI_THREAD_SET_PRIORITY_ACTION(XPI_Addr address, size_t priority); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_THREAD_SET_PRIORITY_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Thread_set_priority(XPI_Addr address, size_t priority, 
+    XPI_Addr future);
+
+// XPI_Thread_set_state changes the state of the target thread.
+typedef enum XPI_Thread_State {
+    XPI_THREAD_STATE_ACTIVE,
+    XPI_THREAD_STATE_SUSPENDED,
+    XPI_THREAD_STATE_DEPLETED,
+    XPI_THREAD_STATE_TERMINATED
+} XPI_Thread_State;
+
+// XPI_Err XPI_THREAD_SET_STATE_ACTION(XPI_Addr address, XPI_Thread_state state); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_THREAD_SET_STATE_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Thread_set_state(XPI_Addr address, 
+    XPI_Thread_State state, XPI_Addr future);
+
+///////////////////////////////////////////////////////////////////////////////
+// Thread Resources [6.3]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Thread_get_process can be used to get the global address corresponding 
+// to a thread's process.
+
+// XPI_Err XPI_THREAD_GET_PROCESS_ACTION(XPI_Addr address); // CONTINUE(XPI_Addr process)
+HPXPI_EXPORT extern XPI_Type XPI_THREAD_GET_PROCESS_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Thread_get_process(XPI_Addr address, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Thread_get_process_sync(XPI_Addr address, XPI_Addr* process);
 
 #if defined(__cplusplus)
 }

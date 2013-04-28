@@ -53,6 +53,10 @@ XPI_CONTINUE:
 4.4 Parcel Generation
 ---------------------
 
+XPI_PARCEL_CREATE:
+    Who is responsible for releasing the returned parcel handle? When is it
+    safe to release it? How is it released?
+
 XPI_PARCEL_SET_DATA: 
     uses MPI_Type as argument
 
@@ -90,4 +94,15 @@ XPI_NULL:
 5.2 Native Interface
 --------------------
 
+6.2 Thread Scheduling
+---------------------
 
+XPI_Thread_State:
+    different spellings used 'XPI_Thread_State' and 'XPI_Thread_state'
+
+8.1.2 Main Process
+------------------
+
+XPI_MAIN:
+    What are the argument types passed to 'args' in 
+    'XPI_main(size_t nargs, void* args[])?' 
