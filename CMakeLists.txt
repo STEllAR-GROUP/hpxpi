@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2013 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -47,6 +47,14 @@ if(NOT MSVC)
 endif()
 
 add_subdirectory(src)
+
+###############################################################################
+hpx_option(HPXPI_BUILD_TESTS BOOL "Build HPXPI tests (default: ON)" ON ADVANCED)
+if(HPXPI_BUILD_TESTS)
+  add_hpx_pseudo_target(tests)
+  include_directories(tests)
+  add_subdirectory(tests)
+endif()
 
 ##############################################################################
 #add_hpx_pseudo_target(examples)

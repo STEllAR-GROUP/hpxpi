@@ -11,6 +11,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+
+#include <hpxpi/config/version.h>
 #include <hpxpi/config/no_return.h>
 #include <hpxpi/config/export_definitions.h>
 
@@ -20,6 +22,7 @@ extern "C" {
 
 typedef int XPI_Err;
 
+XPI_Err const XPI_SUCCESS = 0;              // success
 XPI_Err const XPI_ERR_TYPE = -1;            // the type is invalid
 XPI_Err const XPI_ERR_PARCEL = -2;          // the parcel descriptor handle is invalid
 XPI_Err const XPI_ERR_NOMEM = -3;           // not enough space to allocate memory

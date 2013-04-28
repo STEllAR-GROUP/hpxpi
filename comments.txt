@@ -1,5 +1,6 @@
+***************************
 XPI Specification 0.9 rev74
----------------------------
+***************************
 
 General notes: 
     Many functions are documented as 'This (can be used) ...'. 
@@ -10,33 +11,60 @@ General notes:
 
     All arguments for API functions should be const-correct.
 
+    Are there examples demonstrating the use of this API?
+
+3.2 Initialization and Shutdown
+-------------------------------
+
+XPI_INIT/XPI_RUN:
+    Why are those separate? Is there a use case?
+
+XPI_TERMINATE:
+    The C API calls this XPI_finalize.
+    Where does control return when this is called? Is this to be called on the 
+    same thread as XPI_RUN?
+
 3.3 High-Level Interface Routines
+---------------------------------
 
 XPI_ABORT:
     Does the specification of XPI_abort belong into 3.2 instead?
+    What happens with the 'message' parameter, where will it be printed?
+    Why does this return control to the XPI_RUN site? Does it make sense to 
+    continue if this has been called? Is there a use case?
+
 
 4.2.2 Derived Types
+-------------------
+
+    Who is responsible for releasing the data types returned from the functions
+    described here? If it's the user - how are those released?
 
 XPI_TYPE_STRUCT: 
     'XPI_Type[n] types' instead of 'XPI_Type types[n]'
 
+
 4.3 Parcel Continuations
+------------------------
 
 XPI_CONTINUE: 
     'XPI_Type[n] types' instead of 'XPI_Type types[n]'
 
 4.4 Parcel Generation
+---------------------
 
 XPI_PARCEL_SET_DATA: 
     uses MPI_Type as argument
 
 4.5 Apply
+---------
 
 XPI_APPLY: 
     mistyped: XPI_err
     missing: parameter 'future'
 
 4.6 Advanced
+------------
 
 XPI_PARCEL_GET_CONT_ACTION:
     char** action: who is repsonsible for freeing the memory?
@@ -52,6 +80,7 @@ XPI_PARCEL_GET_DATA_TYPE:
                     is supposed to free the memory, how?
 
 5.1 Address Space
+-----------------
 
 XPI_NULL:
     does not make sense: "The NULL global virtual address is defined such that, 
@@ -59,5 +88,6 @@ XPI_NULL:
                          integer, 0."
 
 5.2 Native Interface
+--------------------
 
 

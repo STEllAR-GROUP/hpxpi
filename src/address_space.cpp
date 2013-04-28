@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,14 +18,14 @@ extern "C" {
 // very large addresses.
 XPI_Err XPI_Addr_init(uint128_t address, XPI_Addr* result)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // This compares two addresses, setting result to -1, 0, or 1 if lhs is 
 // less-than, equal-to, or greater-than rhs, respectively.
 int XPI_Addr_cmp(XPI_Addr lhs, XPI_Addr rhs)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // This converts the integer into an address difference structure. Arbitrarily 
@@ -34,7 +34,7 @@ int XPI_Addr_cmp(XPI_Addr lhs, XPI_Addr rhs)
 // Differences are not valid parcel targets.
 XPI_Err XPI_Addr_Diff_init(uint128_t address, XPI_Addr_Diff* result)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // This adds two differences to produce a sum.

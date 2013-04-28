@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@ extern "C" {
 // argv, and the environment is updated as necessary.
 XPI_Err XPI_init(int* nargs, char*** args, char*** env)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // XPI_run encapsulates the creation of the main process and its associated
@@ -27,7 +27,7 @@ XPI_Err XPI_init(int* nargs, char*** args, char*** env)
 // until the main process terminates.
 XPI_Err XPI_run(int argc, char* argv[], int* result)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // XPI_abort unconditionally aborts the execution of an XPI application,
@@ -36,7 +36,7 @@ XPI_Err XPI_run(int argc, char* argv[], int* result)
 // associated with the running application.
 XPI_Err XPI_finalize()
 {
-    return hpx::finalize();
+    return XPI_SUCCESS;
 }
 
 // XPI_abort unconditionally aborts the execution of an XPI application,

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,31 +15,31 @@ extern "C" {
 // network layer.
 XPI_Err XPI_Parcel_select(char* match, size_t n, XPI_Parcel parcels[], size_t* matched)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // Spec misses documentation
 XPI_Err XPI_Parcel_get_target(XPI_Parcel handle, XPI_Addr* target)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // Spec misses documentation
 XPI_Err XPI_Parcel_get_action(XPI_Parcel handle, char** action)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // Spec misses documentation
 XPI_Err XPI_Parcel_get_cont_target(XPI_Parcel handle, XPI_Addr* target)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // Spec misses documentation
 XPI_Err XPI_Parcel_get_cont_action(XPI_Parcel handle, char** action)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // This returns the XPI TYPE for the parcel's action. It will never return 
@@ -49,7 +49,7 @@ XPI_Err XPI_Parcel_get_cont_action(XPI_Parcel handle, char** action)
 // for XPI_PARCEL_GET_DATA.
 XPI_Err XPI_Parcel_get_data_type(XPI_Parcel handle, XPI_Type* type)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // XPI_Parcel_get_n_args retrieves the number of arguments encoded in the 
@@ -57,7 +57,7 @@ XPI_Err XPI_Parcel_get_data_type(XPI_Parcel handle, XPI_Type* type)
 // appropriately sized argument list buffer for use in XPI_PARCEL_GET_DATA.
 XPI_Err XPI_Parcel_get_n_args(XPI_Parcel handle, size_t* n)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 // XPI_Parcel_get_data unpacks the data segment into buffer and fills the 
@@ -66,7 +66,7 @@ XPI_Err XPI_Parcel_get_n_args(XPI_Parcel handle, size_t* n)
 // XPI_PARCEL_GET_DATA_TYPE and XPI_PARCEL_GET_N_ARGS).
 XPI_Err XPI_Parcel_get_data(XPI_Parcel handle, void** arguments, void* data)
 {
-    return 0;
+    return XPI_SUCCESS;
 }
 
 #if defined(__cplusplus)
