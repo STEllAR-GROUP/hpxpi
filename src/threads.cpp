@@ -4,7 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpxpi/xpi.h>
-#include <hpxpi/config/version.h>
 
 #if defined(__cplusplus)
 extern "C" {

@@ -362,7 +362,7 @@ HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr obj);
 ///////////////////////////////////////////////////////////////////////////////
 
 // XPI_Thread_set_priority will set the priority for the target thread.
-
+//
 // XPI_Err XPI_THREAD_SET_PRIORITY_ACTION(XPI_Addr address, size_t priority); // CONTINUE()
 HPXPI_EXPORT extern XPI_Type XPI_THREAD_SET_PRIORITY_ACTION;
 
@@ -370,15 +370,16 @@ HPXPI_EXPORT XPI_Err XPI_Thread_set_priority(XPI_Addr address, size_t priority,
     XPI_Addr future);
 
 // XPI_Thread_set_state changes the state of the target thread.
+//
+// XPI_Err XPI_THREAD_SET_STATE_ACTION(XPI_Addr address, XPI_Thread_state state); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_THREAD_SET_STATE_ACTION;
+
 typedef enum XPI_Thread_State {
     XPI_THREAD_STATE_ACTIVE,
     XPI_THREAD_STATE_SUSPENDED,
     XPI_THREAD_STATE_DEPLETED,
     XPI_THREAD_STATE_TERMINATED
 } XPI_Thread_State;
-
-// XPI_Err XPI_THREAD_SET_STATE_ACTION(XPI_Addr address, XPI_Thread_state state); // CONTINUE()
-HPXPI_EXPORT extern XPI_Type XPI_THREAD_SET_STATE_ACTION;
 
 HPXPI_EXPORT XPI_Err XPI_Thread_set_state(XPI_Addr address, 
     XPI_Thread_State state, XPI_Addr future);
@@ -389,12 +390,118 @@ HPXPI_EXPORT XPI_Err XPI_Thread_set_state(XPI_Addr address,
 
 // XPI_Thread_get_process can be used to get the global address corresponding 
 // to a thread's process.
-
+//
 // XPI_Err XPI_THREAD_GET_PROCESS_ACTION(XPI_Addr address); // CONTINUE(XPI_Addr process)
 HPXPI_EXPORT extern XPI_Type XPI_THREAD_GET_PROCESS_ACTION;
 
 HPXPI_EXPORT XPI_Err XPI_Thread_get_process(XPI_Addr address, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Thread_get_process_sync(XPI_Addr address, XPI_Addr* process);
+
+///////////////////////////////////////////////////////////////////////////////
+// Fixed Actions [7.2.1]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_LCO_link adds the target LCO to the notification list for the source 
+// LCO. When the source LCO's predicate evaluates as true, a parcel will be 
+// generated targeting each linked LCO's trigger routine.
+//
+// XPI_Err XPI_LCO_LINK_ACTION(XPI_Addr source, XPI_Addr target); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_LCO_LINK_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_LCO_link(XPI_Addr source, XPI_Addr target, 
+    XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_LCO_link_sync(XPI_Addr source, XPI_Addr target);
+
+// XPI_LCO_unlink unlinks the target LCO from the source LCO, assuming that 
+// the target LCO has been linked. It is not an error to attempt to unlink 
+// a target that was not linked to the source.
+//
+// XPI_Err XPI_LCO_UNLINK_ACTION(XPI_Addr source, XPI_Addr target); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_LCO_UNLINK_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_LCO_unlink(XPI_Addr source, XPI_Addr target, 
+    XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_LCO_unlink_sync(XPI_Addr source, XPI_Addr target);
+
+///////////////////////////////////////////////////////////////////////////////
+// Polymorphic Actions [7.2.2]
+///////////////////////////////////////////////////////////////////////////////
+
+// This is used to initialize an LCO structure after it has been allocated 
+// by the process. The lco address must have been allocated using 
+// XPI_PROCESS_LCO_MALLOC in order to ensure that it has enough space for 
+// the XPI implementation to correctly provide the LCO properties.
+//
+// XPI_Err XPI_LCO_INIT_ACTION(XPI_Addr lco); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_LCO_INIT_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_LCO_init(XPI_Addr lco, XPI_Addr future);
+
+// XPI_LCO_fini can be used to clean up any resources before an 
+// LCO is freed using XPI_PROCESS_GLOBAL_FREE.
+//
+// XPI_Err XPI_LCO_FINI_ACTION(XPI_Addr lco); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_LCO_FINI_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_LCO_fini(XPI_Addr lco, XPI_Addr future);
+
+// XPI_LCO_trigger action triggers the LCO to potentially change 
+// state. There are special semantics with respect to the LCO trigger 
+// action; the LCO's predicate is automatically tested after the trigger 
+// executes.
+//
+// XPI_Err XPI_LCO_TRIGGER_ACTION(XPI_Addr lco); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_LCO_TRIGGER_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, XPI_Addr future);
+
+// XPI_LCO_get_size action is used to read the size, in bytes, of 
+// the LCO structure. This will not include any additional bytes 
+// allocated by the process in order to provide support for LCO
+// semantics for this object.
+//
+// XPI_Err XPI_LCO_GET_SIZE_ACTION(XPI_Addr lco); // CONTINUE(size t size)
+HPXPI_EXPORT extern XPI_Type XPI_LCO_GET_SIZE_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_LCO_get_size(XPI_Addr lco, XPI_Addr future);
+
+///////////////////////////////////////////////////////////////////////////////
+// Future [7.3]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Future_new is for future allocation. As with all LCOs, futures are
+// allocated in the global namespace. For local allocation, process can be set 
+// to XPI_NULL in which case both of these routines behave as if they are 
+// implemented with XPI_PROCESS_LCO_MALLOC_ACTION, using the parent process of 
+// the calling thread (see XPI_THREAD_GET_PROCESS) as the allocating process.
+// 
+// XPI_FUTURE_NEW_SYNC is of particular interest, as it solves the chicken-and-egg 
+// problem of needing to allocate a future in order to read the global address of 
+// the newly allocated future by hiding this process inside the library.
+//
+// XPI_Err XPI_FUTURE_NEW_ACTION(XPI_Type type); // CONTINUE(XPI_Addr address)
+HPXPI_EXPORT extern XPI_Type XPI_FUTURE_NEW_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Future_new(XPI_Type type, XPI_Type future);
+HPXPI_EXPORT XPI_Err XPI_Future_new_sync(XPI_Type type, XPI_Addr* address);
+
+// XPI_Future_get_buffer_type allows programmers to query the type of a future, 
+// to make sure that it can buffer, and correctly extract, a particular type.
+//
+// XPI_Err XPI_FUTURE_GET_BUFFER_TYPE_ACTION(XPI_Addr address); // CONTINUE(XPI_Type type)
+HPXPI_EXPORT extern XPI_Type XPI_FUTURE_GET_BUFFER_TYPE_ACTION;
+
+XPI_Err XPI_Future_get_buffer_type(XPI_Addr address, XPI_Addr future);
+XPI_Err XPI_Future_get_buffer_type_sync(XPI_Addr address, XPI_Type* type);
+
+// XPI_Future_get_value_sync, along with XPI_FUTURE_NEW_SYNC, is the second 
+// magic synchronous function related to futures. It transfers the value of 
+// the data begin buffered to the passed local address. This routine will fail 
+// if the global address of the future is not in the same synchronous
+// domain as that of the calling thread. The buffer must be large enough to 
+// receive the data described by the futures type returned by 
+// XPI_FUTURE_GET_BUFFER_TYPE.
+XPI_Err XPI_Future_get_value_sync(XPI_Addr address, void* buffer);
 
 #if defined(__cplusplus)
 }
