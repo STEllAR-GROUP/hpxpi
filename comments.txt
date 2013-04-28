@@ -155,3 +155,10 @@ XPI_Process_global_malloc:
 
 XPI_Process_pin:
     Last argument should be 'XPI_Addr future'
+
+8.4 LCO Management
+------------------
+
+Is this chapter complete? Some explanations of how user defined LCOs are supposed 
+to work would be helpful.
+

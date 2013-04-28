@@ -721,6 +721,23 @@ HPXPI_EXPORT XPI_Err XPI_Process_memcpy(XPI_Addr process, XPI_Addr from,
 HPXPI_EXPORT XPI_Err XPI_Process_memcpy_sync(XPI_Addr process, XPI_Addr from, 
     XPI_Addr to, size_t bytes, XPI_Addr* result);
 
+///////////////////////////////////////////////////////////////////////////////
+// LCO Management [8.4]
+///////////////////////////////////////////////////////////////////////////////
+
+// This action, and its corresponding asynchronous routine, deal with the 
+// special allocation requirements for LCOs. In particular, LCOs may need 
+// extra, implementation-specific space in order to implement some of the 
+// required LCO properties including strict serializability and polymorphic 
+// action handlers.
+//
+// XPI_Err XPI_PROCESS_LCO_MALLOC_ACTION(XPI_Addr process, size_t size, 
+//      XPI_LCO_Subtype_Descriptor actions); // CONTINUE(XPI_Addr address)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_LCO_MALLOC_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc(XPI_Addr process, size_t size, 
+    XPI_LCO_Subtype_Descriptor actions, XPI_Addr future);
+
 #if defined(__cplusplus)
 }
 #endif
