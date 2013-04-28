@@ -8,6 +8,8 @@ set(miscellaneous_tests
 
 set(version_FLAGS DEPENDENCIES iostreams_component)
 
+add_definitions("-DHPXPI_APPLICATION_EXPORTS")
+
 foreach(miscellaneous ${miscellaneous_tests})
   set(sources
       ${miscellaneous}.cpp)

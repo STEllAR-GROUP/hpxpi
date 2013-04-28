@@ -5,7 +5,10 @@
 
 #include <hpxpi/xpi.h>
 
+#include <hpx/include/runtime.hpp>
+
 #include <hpx/hpx_init.hpp>
+#include <hpx/hpx_start.hpp>
 #include <hpx/hpx_finalize.hpp>
 
 #if defined(__cplusplus)
@@ -18,6 +21,7 @@ extern "C" {
 // argv, and the environment is updated as necessary.
 XPI_Err XPI_init(int* nargs, char*** args, char*** env)
 {
+    // we don't do anything here
     return XPI_SUCCESS;
 }
 
@@ -27,7 +31,18 @@ XPI_Err XPI_init(int* nargs, char*** args, char*** env)
 // until the main process terminates.
 XPI_Err XPI_run(int argc, char* argv[], int* result)
 {
-    return XPI_SUCCESS;
+    try {
+        int r = hpx::init(argc, argv);
+        if (result)
+            *result = r;
+        return XPI_SUCCESS;
+    }
+    catch (hpx::exception const&) {
+        return XPI_ERR_ERROR;
+    }
+    catch (...) {
+        return XPI_ERR_ERROR;
+    }
 }
 
 // XPI_abort unconditionally aborts the execution of an XPI application,
@@ -36,6 +51,7 @@ XPI_Err XPI_run(int argc, char* argv[], int* result)
 // associated with the running application.
 XPI_Err XPI_finalize()
 {
+    // we don't do anything here
     return XPI_SUCCESS;
 }
 

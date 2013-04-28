@@ -6,6 +6,9 @@
 #include <hpxpi/xpi.h>
 #include <hpx/util/lightweight_test.hpp>
 
+bool executed_XPI_main = false;
+
+///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
     size_t major = 0;
@@ -18,9 +21,12 @@ XPI_Err XPI_main(size_t nargs, void* args[])
     HPX_TEST_EQ(minor, XPI_VERSION_MINOR);
     HPX_TEST_EQ(release, XPI_VERSION_RELEASE);
 
+    executed_XPI_main = true;
+
     return XPI_SUCCESS;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     int result = 0;
@@ -28,9 +34,11 @@ int main(int argc, char* argv[])
     XPI_init(&argc, &argv, 0);
     
     XPI_run(argc, argv, &result);
-    HPX_TEST_EQ(result, 0);
+    HPX_TEST_EQ(result, XPI_SUCCESS);
 
     XPI_finalize();
+
+    HPX_TEST(executed_XPI_main);
 
     return hpx::util::report_errors();
 }
