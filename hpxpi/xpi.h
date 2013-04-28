@@ -264,24 +264,24 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_get_data(XPI_Parcel handle, void** arguments,
 
 typedef struct uint128_t { uint64_t msb; uint64_t lsb; } uint128_t;
 
-// The NULL global virtual address is defined such that, when compared to an 
+// The NULL global virtual address is defined such that, when compared to an
 // address initialized with the integer, 0.
 HPXPI_EXPORT extern XPI_Addr XPI_NULL;
 
-// This interprets the integer as an index into the byte array representation 
-// of the global virtual address space, and initializes a structure suitable 
-// for use in the parcel subsystem. Arbitrarily large addresses cannot be 
-// generated this way, further address arithmetic will be required to produce 
+// This interprets the integer as an index into the byte array representation
+// of the global virtual address space, and initializes a structure suitable
+// for use in the parcel subsystem. Arbitrarily large addresses cannot be
+// generated this way, further address arithmetic will be required to produce
 // very large addresses.
 HPXPI_EXPORT XPI_Err XPI_Addr_init(uint128_t address, XPI_Addr* result);
 
-// This compares two addresses, setting result to -1, 0, or 1 if lhs is 
+// This compares two addresses, setting result to -1, 0, or 1 if lhs is
 // less-than, equal-to, or greater-than rhs, respectively.
 HPXPI_EXPORT int XPI_Addr_cmp(XPI_Addr lhs, XPI_Addr rhs);
 
-// This converts the integer into an address difference structure. Arbitrarily 
-// large differences cannot be generated this way, and will need to be 
-// generated using the address difference structure’s math interface. 
+// This converts the integer into an address difference structure. Arbitrarily
+// large differences cannot be generated this way, and will need to be
+// generated using the address difference structure’s math interface.
 // Differences are not valid parcel targets.
 typedef struct XPI_Addr_Diff { void* handle; } XPI_Addr_Diff;
 
@@ -290,7 +290,7 @@ HPXPI_EXPORT XPI_Err XPI_Addr_Diff_init(uint128_t address, XPI_Addr_Diff* result
 // This adds two differences to produce a sum.
 HPXPI_EXPORT XPI_Addr_Diff XPI_Addr_Diff_add(XPI_Addr_Diff lhs, XPI_Addr_Diff rhs);
 
-// This scales an address difference by a given factor, which may be a fraction. 
+// This scales an address difference by a given factor, which may be a fraction.
 // Rounding rules follow C integer rounding.
 HPXPI_EXPORT XPI_Addr_Diff XPI_Addr_Diff_mult(XPI_Addr_Diff base, float n);
 
@@ -304,8 +304,21 @@ HPXPI_EXPORT XPI_Addr XPI_Addr_add(XPI_Addr lhs, XPI_Addr_Diff offset);
 // Native Interface [5.2]
 ///////////////////////////////////////////////////////////////////////////////
 
-// Loads a value from the global address space, and forwards it to a parcel 
+// Loads a value from the global address space, and forwards it to a parcel
 // continuation, if one exists.
+
+// XPI_Err XPI_AGAS_LOAD1_ACTION(XPI_Addr addr); // CONTINUE(uint8_t val)
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_LOAD1_ACTION;
+
+// XPI_Err XPI_AGAS_LOAD2_ACTION(XPI_Addr addr); // CONTINUE(uint16_t val)
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_LOAD2_ACTION;
+
+// XPI_Err XPI_AGAS_LOAD4_ACTION(XPI_Addr addr); // CONTINUE(uint32_t val)
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_LOAD4_ACTION;
+
+// XPI_Err XPI_AGAS_LOAD8_ACTION(XPI_Addr addr); // CONTINUE(uint64_t val)
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_LOAD8_ACTION;
+
 HPXPI_EXPORT XPI_Err XPI_Agas_load1(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load2(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load4(XPI_Addr addr, XPI_Addr future);
@@ -317,6 +330,18 @@ HPXPI_EXPORT XPI_Err XPI_Agas_load4_sync(XPI_Addr addr, uint32_t* val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load8_sync(XPI_Addr addr, uint64_t* val);
 
 // Stores a value to the global address space.
+// XPI_Err XPI_AGAS_STORE1_ACTION(XPI_Addr addr, uint8_t val); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_STORE1_ACTION;
+
+// XPI_Err XPI_AGAS_STORE2_ACTION(XPI_Addr addr, uint16_t val); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_STORE2_ACTION;
+
+// XPI_Err XPI_AGAS_STORE4_ACTION(XPI_Addr addr, uint32_t val); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_STORE4_ACTION;
+
+// XPI_Err XPI_AGAS_STORE8_ACTION(XPI_Addr addr, uint64_t val); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_AGAS_STORE8_ACTION;
+
 HPXPI_EXPORT XPI_Err XPI_Agas_store1(XPI_Addr addr, uint8_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store2(XPI_Addr addr, uint16_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store4(XPI_Addr addr, uint32_t val, XPI_Addr future);
@@ -331,8 +356,8 @@ HPXPI_EXPORT XPI_Err XPI_Agas_store8_sync(XPI_Addr addr, uint64_t val);
 // Threads [6]
 ///////////////////////////////////////////////////////////////////////////////
 
-// XPI_Thread_get_self can be used to get the global address corresponding to 
-// the local thread, and can be used in conjunction with the thread object API 
+// XPI_Thread_get_self can be used to get the global address corresponding to
+// the local thread, and can be used in conjunction with the thread object API
 // to query details of threads.
 HPXPI_EXPORT XPI_Err XPI_Thread_get_self(XPI_Addr* addr);
 
@@ -340,20 +365,20 @@ HPXPI_EXPORT XPI_Err XPI_Thread_get_self(XPI_Addr* addr);
 // Thread Synchronization [6.1]
 ///////////////////////////////////////////////////////////////////////////////
 
-// XPI_Thread_wait_any allows a threads execution to block until any one of the 
-// specified LCOs fires. This should behave as if it is implemented in terms of 
-// XPI_LCO_LINK, along with a scheduler transition of the thread to a depleted 
+// XPI_Thread_wait_any allows a threads execution to block until any one of the
+// specified LCOs fires. This should behave as if it is implemented in terms of
+// XPI_LCO_LINK, along with a scheduler transition of the thread to a depleted
 // state (which will be reset by the threads XPI_LCO_TRIGGER_ACTION handler).
 HPXPI_EXPORT XPI_Err XPI_Thread_wait_any(size_t n, XPI_Addr lcos[], XPI_Addr* lco);
 
-// XPI_Thread_wait_all blocks until all of the LCOs in lcos have fired. This is 
-// a convenience interface to the XPI_THREAD_WAIT_ANY routine, that behaves as 
-// if it loops waiting for each LCO to fire, however it may have its own distinct 
+// XPI_Thread_wait_all blocks until all of the LCOs in lcos have fired. This is
+// a convenience interface to the XPI_THREAD_WAIT_ANY routine, that behaves as
+// if it loops waiting for each LCO to fire, however it may have its own distinct
 // implementation for performance reasons.
 HPXPI_EXPORT XPI_Err XPI_Thread_wait_all(size_t n, XPI_Addr lcos[]);
 
-// XPI_Thread_wait blocks until the LCO fires. This is a convenience interface 
-// to the XPI_THREAD_WAIT_ANY routine however it may have its own distinct 
+// XPI_Thread_wait blocks until the LCO fires. This is a convenience interface
+// to the XPI_THREAD_WAIT_ANY routine however it may have its own distinct
 // implementation for performance reasons.
 HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr obj);
 
@@ -366,7 +391,7 @@ HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr obj);
 // XPI_Err XPI_THREAD_SET_PRIORITY_ACTION(XPI_Addr address, size_t priority); // CONTINUE()
 HPXPI_EXPORT extern XPI_Type XPI_THREAD_SET_PRIORITY_ACTION;
 
-HPXPI_EXPORT XPI_Err XPI_Thread_set_priority(XPI_Addr address, size_t priority, 
+HPXPI_EXPORT XPI_Err XPI_Thread_set_priority(XPI_Addr address, size_t priority,
     XPI_Addr future);
 
 // XPI_Thread_set_state changes the state of the target thread.
@@ -381,14 +406,14 @@ typedef enum XPI_Thread_State {
     XPI_THREAD_STATE_TERMINATED
 } XPI_Thread_State;
 
-HPXPI_EXPORT XPI_Err XPI_Thread_set_state(XPI_Addr address, 
+HPXPI_EXPORT XPI_Err XPI_Thread_set_state(XPI_Addr address,
     XPI_Thread_State state, XPI_Addr future);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Thread Resources [6.3]
 ///////////////////////////////////////////////////////////////////////////////
 
-// XPI_Thread_get_process can be used to get the global address corresponding 
+// XPI_Thread_get_process can be used to get the global address corresponding
 // to a thread's process.
 //
 // XPI_Err XPI_THREAD_GET_PROCESS_ACTION(XPI_Addr address); // CONTINUE(XPI_Addr process)
@@ -401,25 +426,25 @@ HPXPI_EXPORT XPI_Err XPI_Thread_get_process_sync(XPI_Addr address, XPI_Addr* pro
 // Fixed Actions [7.2.1]
 ///////////////////////////////////////////////////////////////////////////////
 
-// XPI_LCO_link adds the target LCO to the notification list for the source 
-// LCO. When the source LCO's predicate evaluates as true, a parcel will be 
+// XPI_LCO_link adds the target LCO to the notification list for the source
+// LCO. When the source LCO's predicate evaluates as true, a parcel will be
 // generated targeting each linked LCO's trigger routine.
 //
 // XPI_Err XPI_LCO_LINK_ACTION(XPI_Addr source, XPI_Addr target); // CONTINUE()
 HPXPI_EXPORT extern XPI_Type XPI_LCO_LINK_ACTION;
 
-HPXPI_EXPORT XPI_Err XPI_LCO_link(XPI_Addr source, XPI_Addr target, 
+HPXPI_EXPORT XPI_Err XPI_LCO_link(XPI_Addr source, XPI_Addr target,
     XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_link_sync(XPI_Addr source, XPI_Addr target);
 
-// XPI_LCO_unlink unlinks the target LCO from the source LCO, assuming that 
-// the target LCO has been linked. It is not an error to attempt to unlink 
+// XPI_LCO_unlink unlinks the target LCO from the source LCO, assuming that
+// the target LCO has been linked. It is not an error to attempt to unlink
 // a target that was not linked to the source.
 //
 // XPI_Err XPI_LCO_UNLINK_ACTION(XPI_Addr source, XPI_Addr target); // CONTINUE()
 HPXPI_EXPORT extern XPI_Type XPI_LCO_UNLINK_ACTION;
 
-HPXPI_EXPORT XPI_Err XPI_LCO_unlink(XPI_Addr source, XPI_Addr target, 
+HPXPI_EXPORT XPI_Err XPI_LCO_unlink(XPI_Addr source, XPI_Addr target,
     XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_unlink_sync(XPI_Addr source, XPI_Addr target);
 
@@ -427,9 +452,9 @@ HPXPI_EXPORT XPI_Err XPI_LCO_unlink_sync(XPI_Addr source, XPI_Addr target);
 // Polymorphic Actions [7.2.2]
 ///////////////////////////////////////////////////////////////////////////////
 
-// This is used to initialize an LCO structure after it has been allocated 
-// by the process. The lco address must have been allocated using 
-// XPI_PROCESS_LCO_MALLOC in order to ensure that it has enough space for 
+// This is used to initialize an LCO structure after it has been allocated
+// by the process. The lco address must have been allocated using
+// XPI_PROCESS_LCO_MALLOC in order to ensure that it has enough space for
 // the XPI implementation to correctly provide the LCO properties.
 //
 // XPI_Err XPI_LCO_INIT_ACTION(XPI_Addr lco); // CONTINUE()
@@ -437,7 +462,7 @@ HPXPI_EXPORT extern XPI_Type XPI_LCO_INIT_ACTION;
 
 HPXPI_EXPORT XPI_Err XPI_LCO_init(XPI_Addr lco, XPI_Addr future);
 
-// XPI_LCO_fini can be used to clean up any resources before an 
+// XPI_LCO_fini can be used to clean up any resources before an
 // LCO is freed using XPI_PROCESS_GLOBAL_FREE.
 //
 // XPI_Err XPI_LCO_FINI_ACTION(XPI_Addr lco); // CONTINUE()
@@ -445,9 +470,9 @@ HPXPI_EXPORT extern XPI_Type XPI_LCO_FINI_ACTION;
 
 HPXPI_EXPORT XPI_Err XPI_LCO_fini(XPI_Addr lco, XPI_Addr future);
 
-// XPI_LCO_trigger action triggers the LCO to potentially change 
-// state. There are special semantics with respect to the LCO trigger 
-// action; the LCO's predicate is automatically tested after the trigger 
+// XPI_LCO_trigger action triggers the LCO to potentially change
+// state. There are special semantics with respect to the LCO trigger
+// action; the LCO's predicate is automatically tested after the trigger
 // executes.
 //
 // XPI_Err XPI_LCO_TRIGGER_ACTION(XPI_Addr lco); // CONTINUE()
@@ -455,8 +480,8 @@ HPXPI_EXPORT extern XPI_Type XPI_LCO_TRIGGER_ACTION;
 
 HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, XPI_Addr future);
 
-// XPI_LCO_get_size action is used to read the size, in bytes, of 
-// the LCO structure. This will not include any additional bytes 
+// XPI_LCO_get_size action is used to read the size, in bytes, of
+// the LCO structure. This will not include any additional bytes
 // allocated by the process in order to provide support for LCO
 // semantics for this object.
 //
@@ -470,13 +495,13 @@ HPXPI_EXPORT XPI_Err XPI_LCO_get_size(XPI_Addr lco, XPI_Addr future);
 ///////////////////////////////////////////////////////////////////////////////
 
 // XPI_Future_new is for future allocation. As with all LCOs, futures are
-// allocated in the global namespace. For local allocation, process can be set 
-// to XPI_NULL in which case both of these routines behave as if they are 
-// implemented with XPI_PROCESS_LCO_MALLOC_ACTION, using the parent process of 
+// allocated in the global namespace. For local allocation, process can be set
+// to XPI_NULL in which case both of these routines behave as if they are
+// implemented with XPI_PROCESS_LCO_MALLOC_ACTION, using the parent process of
 // the calling thread (see XPI_THREAD_GET_PROCESS) as the allocating process.
-// 
-// XPI_FUTURE_NEW_SYNC is of particular interest, as it solves the chicken-and-egg 
-// problem of needing to allocate a future in order to read the global address of 
+//
+// XPI_FUTURE_NEW_SYNC is of particular interest, as it solves the chicken-and-egg
+// problem of needing to allocate a future in order to read the global address of
 // the newly allocated future by hiding this process inside the library.
 //
 // XPI_Err XPI_FUTURE_NEW_ACTION(XPI_Type type); // CONTINUE(XPI_Addr address)
@@ -485,23 +510,216 @@ HPXPI_EXPORT extern XPI_Type XPI_FUTURE_NEW_ACTION;
 HPXPI_EXPORT XPI_Err XPI_Future_new(XPI_Type type, XPI_Type future);
 HPXPI_EXPORT XPI_Err XPI_Future_new_sync(XPI_Type type, XPI_Addr* address);
 
-// XPI_Future_get_buffer_type allows programmers to query the type of a future, 
+// XPI_Future_get_buffer_type allows programmers to query the type of a future,
 // to make sure that it can buffer, and correctly extract, a particular type.
 //
 // XPI_Err XPI_FUTURE_GET_BUFFER_TYPE_ACTION(XPI_Addr address); // CONTINUE(XPI_Type type)
 HPXPI_EXPORT extern XPI_Type XPI_FUTURE_GET_BUFFER_TYPE_ACTION;
 
-XPI_Err XPI_Future_get_buffer_type(XPI_Addr address, XPI_Addr future);
-XPI_Err XPI_Future_get_buffer_type_sync(XPI_Addr address, XPI_Type* type);
+HPXPI_EXPORT XPI_Err XPI_Future_get_buffer_type(XPI_Addr address, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Future_get_buffer_type_sync(XPI_Addr address, XPI_Type* type);
 
-// XPI_Future_get_value_sync, along with XPI_FUTURE_NEW_SYNC, is the second 
-// magic synchronous function related to futures. It transfers the value of 
-// the data begin buffered to the passed local address. This routine will fail 
+// XPI_Future_get_value_sync, along with XPI_FUTURE_NEW_SYNC, is the second
+// magic synchronous function related to futures. It transfers the value of
+// the data begin buffered to the passed local address. This routine will fail
 // if the global address of the future is not in the same synchronous
-// domain as that of the calling thread. The buffer must be large enough to 
-// receive the data described by the futures type returned by 
+// domain as that of the calling thread. The buffer must be large enough to
+// receive the data described by the futures type returned by
 // XPI_FUTURE_GET_BUFFER_TYPE.
-XPI_Err XPI_Future_get_value_sync(XPI_Addr address, void* buffer);
+HPXPI_EXPORT XPI_Err XPI_Future_get_value_sync(XPI_Addr address, void* buffer);
+
+///////////////////////////////////////////////////////////////////////////////
+// User LCOs [7.4]
+///////////////////////////////////////////////////////////////////////////////
+
+// The user LCO interface is used to describe the required action handlers,
+// and the LCO predicate specification. Note that the handler types conform
+// to the specification for LCO actions outlined in Section 4.1.4.
+
+typedef XPI_Err (*XPI_LCO_Init_Handler)(void* lco);
+typedef XPI_Err (*XPI_LCO_Fini_Handler)(void* lco);
+typedef XPI_Err (*XPI_LCO_Trigger_Handler)(void* lco, size_t n, void* args[]);
+typedef XPI_Err (*XPI_LCO_Get_Size_Handler)(void* lco);
+typedef bool (*XPI_LCO_Predicate)(void* lco);
+
+typedef struct XPI_LCO_Subtype_Descriptor {
+    XPI_LCO_Init_Handler init;
+    XPI_LCO_Fini_Handler fini;
+    XPI_LCO_Trigger_Handler trigger;
+    XPI_LCO_Get_Size_Handler get_size;
+    XPI_LCO_Predicate predicate;
+} XPI_LCO_Subtype_Descriptor;
+
+///////////////////////////////////////////////////////////////////////////////
+// Process Instantiation & Termination [8.1.1]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Process_create_child creates a child process. This child will have its
+// parent process set to the passed process, and its designated result value
+// may be written to the result future. If no result is required by the
+// instantiating thread, i.e., the process is being instantiated only for its
+// side effects, then result should be set to XPI_NULL.
+//
+// XPI_Err XPI_PROCESS_CREATE_CHILD_ACTION(XPI_Addr process, char* initial,
+//     XPI_Type type, size_t nargs, void* args[], XPI_Addr result); // CONTINUE(XPI_Addr child)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_CREATE_CHILD_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_create_child(XPI_Addr process, char* initial,
+    XPI_Type type, size_t nargs, void* args[], XPI_Addr result, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_create_child_sync(XPI_Addr process, char* initial,
+    XPI_Type type, size_t nargs, void* args[], XPI_Addr result, XPI_Addr* child);
+
+// XPI_Process_get_result gets the designated result for a process, in the form
+// of a future. The is the future that is passed into XPI_PROCESS_CREATE_CHILD,
+// and can be XPI_NULL if this was not set.
+//
+// XPI_Err XPI_PROCESS_GET_RESULT_ACTION(XPI_Addr process); // CONTINUE(XPI_Addr result)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_GET_RESULT_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_get_result(XPI_Addr process, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_get_result_sync(XPI_Addr process, XPI_Addr* result);
+
+// XPI_Process_terminate unconditionally terminates the target process. This
+// terminates execution of any threads. XPI_PROCESS_TERMINATE_ACTION or
+// XPI_PROCESS_TERMINATE may be performed by a thread in the context of the
+// to-be-terminated process, however performing any additional operations within
+// the context of this thread's execution results in implementation-defined
+// behavior, as does using XPI_PROCESS_TERMINATE_SYNC from within the context
+// of the to-beterminated process.
+//
+// XPI_Err XPI_PROCESS_TERMINATE_ACTION(XPI_Addr process); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_TERMINATE_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_terminate(XPI_Addr process, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_terminate_sync(XPI_Addr process);
+
+///////////////////////////////////////////////////////////////////////////////
+// The Main Process [8.1.2]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_main is not implemented by XPI. It merely describes the action that
+// XPI applications are required to provide as the initial action for the
+// main process.
+XPI_Err XPI_main(size_t nargs, void* args[]);
+
+///////////////////////////////////////////////////////////////////////////////
+// Hierarchy Inspection [8.1.3]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Process_get_parent gets the address of a processes' parent process. The
+// main process will return XPI_NULL. An orphaned process will return the address
+// of the main process.
+//
+// XPI_Err XPI_PROCESS_GET_PARENT_ACTION(XPI_Addr process); // CONTINUE(XPI_Addr parent)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_GET_PARENT_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_get_parent(XPI_Addr process, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_get_parent_sync(XPI_Addr process, XPI_Addr* parent);
+
+// This retrieves the number of children for a process.
+//
+// XPI_Err XPI_PROCESS_GET_N_CHILDREN_ACTION(XPI_Addr process); // CONTINUE(size_t n)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_GET_N_CHILDREN_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_get_n_children(XPI_Addr process, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_get_n_children_sync(XPI_Addr process, size_t* n);
+
+// XPI_Process_get_child retrieves the i-th child of a process. If i is out of the
+// range of valid child indices, this will return XPI_NULL.
+//
+// XPI_Err XPI_PROCESS_GET_CHILD(XPI_Addr process, size_t i); // CONTINUE(XPI_Addr child)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_GET_CHILD;
+
+HPXPI_EXPORT XPI_Err XPI_Process_get_child(XPI_Addr process, size_t i,
+    XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_get_child_sync(XPI_Addr process, size_t i,
+    XPI_Addr* child);
+
+///////////////////////////////////////////////////////////////////////////////
+// Action Management [8.2]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_Process_register_action registers an action with the runtime. It must be
+// performed in order to send parcels to the action. It must be performed in a
+// native C thread run on each locality, and may be performed as part of a static
+// constructor.
+//
+// XPI_Err XPI_PROCESS_REGISTER_ACTION_ACTION(XPI_Addr process, char* id,
+//     void* function, XPI Type type, size t stack); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_REGISTER_ACTION_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_register_action(XPI_Addr process, char* id,
+    void* function, XPI_Type type, size_t stack, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_register_action_sync(XPI_Addr process,
+    char* id, void* function, XPI_Type type, size_t stack);
+
+///////////////////////////////////////////////////////////////////////////////
+// Memory Management [8.3]
+///////////////////////////////////////////////////////////////////////////////
+
+// Allocates a size-byte region in global memory. The distribution parameter
+// provides a hint to the implementation of how this allocation should be
+// initially distributed.
+//
+// XPI_Err XPI_PROCESS_GLOBAL_MALLOC_ACTION(XPI_Addr process, size_t size,
+//     XPI_Distribution distribution); // CONTINUE(XPI_Addr address);
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_GLOBAL_MALLOC_ACTION;
+
+typedef struct XPI_Distribution { void* handle; } XPI_Distribution;
+
+HPXPI_EXPORT XPI_Err XPI_Process_global_malloc(XPI_Addr process, size_t size,
+    XPI_Distribution distribution, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_global_malloc_sync(XPI_Addr process,
+    size_t size, XPI_Distribution distribution, XPI_Addr* address);
+
+// XPI_Process_global_free frees a region of globally allocated memory. The
+// address must be the result of an XPI_PROCESS_GLOBAL_MALLOC_ACTION call.
+// This call is asynchronous, however the future can be used to wait until
+// the operation has completed globally. It is not an error to free XPI_NULL.
+//
+// XPI_Err XPI_PROCESS_GLOBAL_FREE_ACTION(XPI_Addr process, 
+//      XPI_Addr address); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_GLOBAL_FREE_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_global_free(XPI_Addr process, XPI_Addr address,
+    XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_global_free_sync(XPI_Addr process,
+    XPI_Addr address);
+
+// Pins a global address range. The entire range should be part of a single
+// allocation, and resident locally.
+//
+// XPI_Err XPI_PROCESS_PIN_ACTION(XPI_Addr process, XPI_Addr base, 
+//      XPI_Addr_Diff extent); // CONTINUE(void address)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_PIN_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_pin(XPI_Addr process, XPI_Addr base,
+    XPI_Addr_Diff extent, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_pin_sync(XPI_Addr process, XPI_Addr base,
+    XPI_Addr_Diff extent, void** result);
+
+// This action releases a previously pinned region to the system. The address 
+// must correspond to the global base address of a previously pinned region.
+//
+// XPI_Err XPI_PROCESS_UNPIN_ACTION(XPI_Addr process, XPI_Addr address); // CONTINUE()
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_UNPIN_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_unpin(XPI_Addr process, XPI_Addr address, 
+    XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_unpin_sync(XPI_Addr process, XPI_Addr address);
+
+// XPI_Process_memcpy copies bytes in the global address space asynchronously. 
+// The from and to ranges may overlap. The future provides strong ordering if 
+// needed.
+//
+// XPI_Err XPI_PROCESS_MEMCPY_ACTION(XPI_Addr process, XPI_Addr from, 
+//      XPI_Addr to, size_t bytes); // CONTINUE(XPI Addr from)
+HPXPI_EXPORT extern XPI_Type XPI_PROCESS_MEMCPY_ACTION;
+
+HPXPI_EXPORT XPI_Err XPI_Process_memcpy(XPI_Addr process, XPI_Addr from, 
+    XPI_Addr to, size_t bytes, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_memcpy_sync(XPI_Addr process, XPI_Addr from, 
+    XPI_Addr to, size_t bytes, XPI_Addr* result);
 
 #if defined(__cplusplus)
 }

@@ -101,6 +101,9 @@ XPI_NULL:
 5.2 Native Interface
 --------------------
 
+    Why isn't there a 16 byte operation (for uint128_t) defined, even if the
+    specification explicitly refers to uin128_t in some places?
+
 6.2 Thread Scheduling
 ---------------------
 
@@ -120,9 +123,35 @@ XPI_Future_new:
     The docs mention a process the future is allocated with. But the API 
     functions do not accept any process.
 
+7.4 User LCOs
+-------------
+
+XPI_LCO_Predicate:
+    erroneous specification 'typedef bool (*XPI_Predicate)(void* lco);'
+
+
 8.1.2 Main Process
 ------------------
 
 XPI_MAIN:
     What are the argument types passed to 'args' in 
     'XPI_main(size_t nargs, void* args[])?' 
+
+8.2. Action Management
+----------------------
+
+XPI_PROCESS_REGISTER_ACTION_ACTION:
+    typo 'xhar* id'
+
+8.3 Memory Management
+---------------------
+
+XPI_Distribution:
+    Will this be specified or is this implementation defined?
+
+XPI_Process_global_malloc:
+    The text says that this operation is currently synchronous only, nevertheless
+    both versions are given.
+
+XPI_Process_pin:
+    Last argument should be 'XPI_Addr future'
