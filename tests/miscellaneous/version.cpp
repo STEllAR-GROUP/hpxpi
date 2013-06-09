@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     int result = 0;
 
     HPX_TEST_EQ(XPI_init(&argc, &argv, 0), XPI_SUCCESS);
-    
+
     HPX_TEST_EQ(XPI_run(argc, argv, &result), XPI_SUCCESS);
     HPX_TEST_EQ(result, XPI_SUCCESS);
 

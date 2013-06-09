@@ -45,10 +45,8 @@ XPI_Err XPI_run(int argc, char* argv[], int* result)
     }
 }
 
-// XPI_abort unconditionally aborts the execution of an XPI application,
-// returning control to the XPI_run site with the result set to the passed
-// code, and optionally printing the message. This should clean up resources
-// associated with the running application.
+// XPI_finalize terminates the execution of the XPI runtime, releasing resources
+// acquired in XPI_init and XPI_run.
 XPI_Err XPI_finalize()
 {
     // we don't do anything here
