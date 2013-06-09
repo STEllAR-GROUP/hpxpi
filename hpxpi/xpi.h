@@ -22,12 +22,15 @@ extern "C" {
 
 typedef int XPI_Err;
 
+///////////////////////////////////////////////////////////////////////////////
+// XPI Error Codes [Appendix B]
+///////////////////////////////////////////////////////////////////////////////
 XPI_Err const XPI_SUCCESS = 0;              // success
 XPI_Err const XPI_ERR_ERROR = -1;           // generic error
-XPI_Err const XPI_ERR_TYPE = -2;            // the type is invalid
-XPI_Err const XPI_ERR_PARCEL = -3;          // the parcel descriptor handle is invalid
-XPI_Err const XPI_ERR_NOMEM = -4;           // not enough space to allocate memory
-XPI_Err const XPI_ERR_ADDR = -5;            // the target global address is invalid
+XPI_Err const XPI_ERR_INV_TYPE = -2;        // the type is invalid
+XPI_Err const XPI_ERR_INV_PARCEL = -3;      // the parcel descriptor handle is invalid
+XPI_Err const XPI_ERR_NO_MEM = -4;          // not enough space to allocate memory
+XPI_Err const XPI_ERR_INV_ADDR = -5;        // the target global address is invalid
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization and Shutdown [3.2]
@@ -105,7 +108,13 @@ HPXPI_EXPORT extern XPI_Type XPI_SIZE_T;             // size_t
 ///////////////////////////////////////////////////////////////////////////////
 // Derived types [4.2.2]
 
-// Spec misses documentation
+// Given an intrinsic or derived type, XPI TYPE CONTIGUOUS will create a new
+// type that replicates the type as a sequence of count contiguous instances.
+//
+// XPI_Type old;        // old type handle, already constructed
+// XPI_Type new;        // new type handle
+// size t count;        // number of replications of old required
+// contiguous type construction
 HPXPI_EXPORT XPI_Err XPI_Type_contiguous(size_t count, XPI_Type old, XPI_Type* new_type);
 
 // Spec misses documentation
@@ -165,6 +174,10 @@ HPXPI_EXPORT bool XPI_Type_equals(XPI_Type lhs, XPI_Type rhs);
 // simple scalar values and can use XPI_continue1 directly for this purpose.
 // Finally, XPI continueV allows an XPI_VOID terminated list of (type, val)
 // pairs to be passed as varargs parameters.
+// When XPI threads initialize parcels, they designate the parcel's action,
+// along with a continuation action. XPI CONTINUE is the low level, XPI 
+// intrinsic function that an action uses to communicate with it's dynamically 
+// specified continuation action.
 HPXPI_EXPORT HPXPI_ATTRIBUTE_NORETURN void XPI_continue(size_t n,
     XPI_Type types[], void* vals[]);
 HPXPI_EXPORT HPXPI_ATTRIBUTE_NORETURN void XPI_continue1(XPI_Type type, void* val);
@@ -211,7 +224,7 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel handle, XPI_Addr future);
 // Apply [4.5]
 ///////////////////////////////////////////////////////////////////////////////
 
-// XPI APPLY encapsulates the steps required to assemble and send a parcel and
+// XPI_APPLY encapsulates the steps required to assemble and send a parcel and
 // continuation to effect a remote-procedure call. If the action has a type
 // registered with XPI_PROCESSREGISTER_ACTION then the type argument should be
 // set to XPI VOID. If the action does not continue a value, or if the continued

@@ -1,8 +1,8 @@
-***************************
-XPI Specification 0.9 rev74
+****************************
+XPI Specification 0.9 rev176*
 ***************************
 
-General notes: 
+General notes:
     Many functions are documented as 'This (can be used) ...'. 
     Wouldn't it be more concise to use the function name instead of 'This'?
 
@@ -12,10 +12,6 @@ General notes:
     All arguments for API functions should be const-correct.
 
     Are there examples demonstrating the use of this API?
-
-    The C-API is called C-ABI throughout the document. This spec does not
-    define an ABI (binary interface) but relies on the compilers ABI. It
-    defines an API instead. It might be confusing to use the term C-ABI.
 
     What are the criteria for providing a '_sync' overload for an API 
     function?
@@ -47,16 +43,6 @@ XPI_ABORT:
     Who is responsible for releasing the data types returned from the functions
     described here? If it's the user - how are those released?
 
-XPI_TYPE_STRUCT: 
-    'XPI_Type[n] types' instead of 'XPI_Type types[n]'
-
-
-4.3 Parcel Continuations
-------------------------
-
-XPI_CONTINUE: 
-    'XPI_Type[n] types' instead of 'XPI_Type types[n]'
-
 4.4 Parcel Generation
 ---------------------
 
@@ -64,15 +50,11 @@ XPI_PARCEL_CREATE:
     Who is responsible for releasing the returned parcel handle? When is it
     safe to release it? How is it released?
 
-XPI_PARCEL_SET_DATA: 
-    uses MPI_Type as argument
-
 4.5 Apply
 ---------
 
 XPI_APPLY: 
-    mistyped: XPI_err
-    missing: parameter 'future'
+    missing: parameter 'future' has been erroneuously added to _sync version, 
 
 4.6 Advanced
 ------------
@@ -104,17 +86,11 @@ XPI_NULL:
     Why isn't there a 16 byte operation (for uint128_t) defined, even if the
     specification explicitly refers to uin128_t in some places?
 
-6.2 Thread Scheduling
----------------------
-
-XPI_Thread_State:
-    different spellings used 'XPI_Thread_State' and 'XPI_Thread_state'
-
 7.2 LCOs
 --------
 
 XPI_LCO_fini:
-    This is the only ABI function which uses an abbreviation in its name.
+    This is the only API function which uses an abbreviation in its name.
 
 7.3 Futures
 -----------
@@ -123,25 +99,12 @@ XPI_Future_new:
     The docs mention a process the future is allocated with. But the API 
     functions do not accept any process.
 
-7.4 User LCOs
--------------
-
-XPI_LCO_Predicate:
-    erroneous specification 'typedef bool (*XPI_Predicate)(void* lco);'
-
-
 8.1.2 Main Process
 ------------------
 
 XPI_MAIN:
     What are the argument types passed to 'args' in 
     'XPI_main(size_t nargs, void* args[])?' 
-
-8.2. Action Management
-----------------------
-
-XPI_PROCESS_REGISTER_ACTION_ACTION:
-    typo 'xhar* id'
 
 8.3 Memory Management
 ---------------------
