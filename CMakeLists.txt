@@ -41,6 +41,10 @@ include_directories(${hpxpi_SOURCE_DIR})
 if(NOT MSVC)  
   hpx_include(CompilerFlags)
 
+  if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    set(hpx_LIBRARIES ${hpx_LIBRARIES} dl)
+  endif()
+
   # Necessary on Linux because of our current strategy wrt to hpx_init
   hpx_use_flag_if_available(-fPIC LANGUAGES C)
   hpx_use_flag_if_available(-pie LANGUAGES C)
