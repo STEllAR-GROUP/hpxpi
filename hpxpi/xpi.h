@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013 Hartmut Kaiser, Alexander Duchene
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,12 @@
 #if !defined(HPXPI_H_APR_27_2013_1135AM)
 #define HPXPI_H_APR_27_2013_1135AM
 
+#ifdef __cplusplus
+#include <cstdint>
+using std::size_t;
+#else
 #include <stdint.h>
+#endif
 
 #include <hpxpi/config/version.h>
 #include <hpxpi/config/no_return.h>
