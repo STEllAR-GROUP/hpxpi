@@ -8,9 +8,11 @@
 
 #ifdef __cplusplus
 #include <cstdint>
+#include <cstddef>
 using std::size_t;
 #else
 #include <stdint.h>
+#include <stddef.h>
 #endif
 
 #include <hpxpi/config/version.h>
