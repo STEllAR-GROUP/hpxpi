@@ -11,10 +11,17 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_finalize.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpxpi
+{
+    int xpi_main_wrapper(int argc, char** argv, XPI_Err (*XPI_main_)(size_t, void**));
+}
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
 // XPI_init initializes the XPI runtime, using the passed arguments and the
 // environment. C applications usually simply forward pointers to argc, argv,
 // and envp (if available). XPI specific arguments are removed from argc and
@@ -29,12 +36,19 @@ XPI_Err XPI_init(int* nargs, char*** args, char*** env)
 // initial thread, XPI_main. XPI_run also manages the future required for
 // XPI_main to return a value. This routine is synchronous, and will not return
 // until the main process terminates.
-XPI_Err XPI_run(int argc, char* argv[], int* result)
+XPI_Err XPI_run_internal(int argc, char** argv, int* result,
+    XPI_Err (*XPI_main_)(size_t, void*[]))
 {
     try {
-        int r = hpx::init(argc, argv);
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
+        int r = hpx::init(hpx::util::bind(hpxpi::xpi_main_wrapper, _1, _2, XPI_main_),
+            "XPI application", argc, argv);
+
         if (result)
             *result = r;
+
         return XPI_SUCCESS;
     }
     catch (hpx::exception const&) {

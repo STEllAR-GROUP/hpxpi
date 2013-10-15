@@ -6,6 +6,8 @@
 #if !defined(HPXPI_H_APR_27_2013_1135AM)
 #define HPXPI_H_APR_27_2013_1135AM
 
+#include <hpx/config/defines.hpp>
+
 #ifdef __cplusplus
 #include <cstdint>
 #include <cstddef>
@@ -40,6 +42,15 @@ XPI_Err const XPI_ERR_NO_MEM = -4;          // not enough space to allocate memo
 XPI_Err const XPI_ERR_INV_ADDR = -5;        // the target global address is invalid
 
 ///////////////////////////////////////////////////////////////////////////////
+// The Main Process [8.1.2]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_main is not implemented by XPI. It merely describes the action that
+// XPI applications are required to provide as the initial action for the
+// main process.
+XPI_Err XPI_main(size_t nargs, void** args);
+
+///////////////////////////////////////////////////////////////////////////////
 // Initialization and Shutdown [3.2]
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +64,14 @@ HPXPI_EXPORT XPI_Err XPI_init(int* nargs, char*** args, char*** env);
 // initial thread, XPI_main. XPI_run also manages the future required for
 // XPI_main to return a value. This routine is synchronous, and will not return
 // until the main process terminates.
-HPXPI_EXPORT XPI_Err XPI_run(int argc, char* argv[], int* result);
+
+HPXPI_EXPORT XPI_Err XPI_run_internal(int argc, char** argv, int* result,
+    XPI_Err (*XPI_main_)(size_t, void**));
+
+inline XPI_Err XPI_run(int argc, char** argv, int* result)
+{
+    return XPI_run_internal(argc, argv, result, &XPI_main);
+}
 
 // XPI_finalize terminates the execution of the XPI runtime, releasing resources
 // acquired in XPI_init and XPI_run.
@@ -613,15 +631,6 @@ HPXPI_EXPORT extern XPI_Type XPI_PROCESS_TERMINATE_ACTION;
 
 HPXPI_EXPORT XPI_Err XPI_Process_terminate(XPI_Addr process, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Process_terminate_sync(XPI_Addr process);
-
-///////////////////////////////////////////////////////////////////////////////
-// The Main Process [8.1.2]
-///////////////////////////////////////////////////////////////////////////////
-
-// XPI_main is not implemented by XPI. It merely describes the action that
-// XPI applications are required to provide as the initial action for the
-// main process.
-HPXPI_APPLICATION_EXPORT XPI_Err XPI_main(size_t nargs, void* args[]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hierarchy Inspection [8.1.3]
