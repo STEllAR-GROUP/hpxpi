@@ -32,6 +32,17 @@ extern "C" {
 typedef int XPI_Err;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Action Management [3.4]
+///////////////////////////////////////////////////////////////////////////////
+typedef XPI_Err (*XPI_Action)(void* args) /** CONT(...) **/;
+
+//Register an action with the runtime, must be done at all localities
+XPI_Err XPI_register_action_with_key(XPI_Action action, char* key);
+#define XPI_register_action(act) XPI_register_action_with_key(act, #act)
+
+// Previous definitions from pre 237 spec, to be updated as implemented
+
+///////////////////////////////////////////////////////////////////////////////
 // XPI Error Codes [Appendix B]
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err const XPI_SUCCESS = 0;              // success
@@ -664,24 +675,6 @@ HPXPI_EXPORT XPI_Err XPI_Process_get_child(XPI_Addr process, size_t i,
     XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Process_get_child_sync(XPI_Addr process, size_t i,
     XPI_Addr* child);
-
-///////////////////////////////////////////////////////////////////////////////
-// Action Management [8.2]
-///////////////////////////////////////////////////////////////////////////////
-
-// XPI_Process_register_action registers an action with the runtime. It must be
-// performed in order to send parcels to the action. It must be performed in a
-// native C thread run on each locality, and may be performed as part of a static
-// constructor.
-//
-// XPI_Err XPI_PROCESS_REGISTER_ACTION_ACTION(XPI_Addr process, char* id,
-//     void* function, XPI Type type, size t stack); // CONTINUE()
-HPXPI_EXPORT extern XPI_Type XPI_PROCESS_REGISTER_ACTION_ACTION;
-
-HPXPI_EXPORT XPI_Err XPI_Process_register_action(XPI_Addr process, char* id,
-    void* function, XPI_Type type, size_t stack, XPI_Addr future);
-HPXPI_EXPORT XPI_Err XPI_Process_register_action_sync(XPI_Addr process,
-    char* id, void* function, XPI_Type type, size_t stack);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Memory Management [8.3]
