@@ -47,6 +47,8 @@ action_registry registry;
 
 extern "C" {
 
+    XPI_Addr XPI_NULL = {0};
+
     // XPI_version queries the specification version number that the XPI 
     // implementation conforms to.
     void XPI_version(size_t* major, size_t* minor, size_t* release)
@@ -131,8 +133,25 @@ extern "C" {
         return XPI_SUCCESS;
     }
 
-    //XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr){
-    //}
+    XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        ps->addr = addr;
+        return XPI_SUCCESS;
+    }
+    
+    XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel, XPI_Action action){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        ps->target_action = registry.get_key(action);
+        return XPI_SUCCESS;
+    }
+
+    // Fake version of send, just execute action locally with no data
+    XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        XPI_Action action = registry.get_action(ps->target_action);
+        action(0);
+        return XPI_SUCCESS;
+    }
 
 }
 

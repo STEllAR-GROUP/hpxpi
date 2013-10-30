@@ -41,6 +41,8 @@ typedef int XPI_Err;
 // Implementation defined
 typedef struct { intptr_t adddr; } XPI_Addr;
 
+extern XPI_Addr XPI_NULL;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization and Shutdown [3.2]
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,12 +104,9 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_create(XPI_Parcel* parcel);
 // Free an existing parcel
 HPXPI_EXPORT XPI_Err XPI_Parcel_free(XPI_Parcel parcel);
 
-///////////////////////////////////////////////////////////////////////////////
-// Parcel Generation [4.1]
-///////////////////////////////////////////////////////////////////////////////
-
 // Set where the parcel action is invoked
 // Can be ignored except for LCO targets
+// XPI_NULL specifies no prefered address
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr);
 
 // Set the parcel action
