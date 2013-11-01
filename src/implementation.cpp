@@ -13,6 +13,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 using namespace std;
 
 namespace hpxpi
@@ -23,6 +24,8 @@ namespace hpxpi
 struct parcel_struct{
     XPI_Addr addr;
     string target_action;
+    vector<unsigned char> argument_data;
+    vector<unsigned char> environment_data;
 };
 
 struct action_registry{
@@ -145,11 +148,27 @@ extern "C" {
         return XPI_SUCCESS;
     }
 
+    XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* data){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        unsigned char* cast_data = static_cast<unsigned char*>(data);
+        (ps->environment_data).assign(cast_data, cast_data+bytes);
+        return XPI_SUCCESS;
+    }
+
+    // Should we be copying the data?
+    XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes, void* data){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        unsigned char* cast_data = static_cast<unsigned char*>(data);
+        (ps->argument_data).assign(cast_data, cast_data+bytes);
+        return XPI_SUCCESS;
+    }
+
     // Fake version of send, just execute action locally with no data
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        void* data = static_cast<void*>(ps->argument_data.data());
         XPI_Action action = registry.get_action(ps->target_action);
-        action(0);
+        action(data);
         return XPI_SUCCESS;
     }
 

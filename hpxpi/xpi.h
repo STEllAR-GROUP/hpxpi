@@ -112,6 +112,12 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr);
 // Set the parcel action
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel, XPI_Action action);
 
+// Set the parcel environment data
+HPXPI_EXPORT XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* data);
+
+// Set the parcel argument data
+HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes, void* data);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Sending a Parcel [4.4]
 ///////////////////////////////////////////////////////////////////////////////
