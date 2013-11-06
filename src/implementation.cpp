@@ -181,6 +181,20 @@ extern "C" {
         return XPI_SUCCESS;
     }
 
+    XPI_Err XPI_Parcel_push(XPI_Parcel parcel){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        ps->records.push(ps->records.top());
+        return XPI_SUCCESS;
+    }
+
+    // What is this actually supposed to do?
+    // Currently sync, future not used
+    XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        ps->records.pop();
+        return XPI_SUCCESS;
+    }
+
     // Fake version of send, just execute action locally with no data
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
