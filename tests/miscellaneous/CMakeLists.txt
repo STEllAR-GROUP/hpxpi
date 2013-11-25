@@ -4,6 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(miscellaneous_tests
+    parcel_stack
     version)
 
 set(version_FLAGS DEPENDENCIES iostreams_component)

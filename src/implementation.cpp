@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <stack>
 using namespace std;
 
 namespace hpxpi
@@ -21,11 +22,28 @@ namespace hpxpi
     int xpi_main_wrapper(int argc, char** argv, XPI_Err (*XPI_main_)(size_t, void**));
 }
 
-struct parcel_struct{
+struct parcel_frame{
     XPI_Addr addr;
     string target_action;
-    vector<unsigned char> argument_data;
     vector<unsigned char> environment_data;
+};
+
+struct parcel_struct{
+    parcel_struct(): records( { parcel_frame() } ) {}
+    vector<unsigned char> argument_data;
+    stack<parcel_frame> records;
+
+    XPI_Addr& addr(){
+        return records.top().addr;
+    }
+
+    string& target_action(){
+        return records.top().target_action;
+    }
+
+    vector<unsigned char>& environment_data(){
+        return records.top().environment_data;
+    }
 };
 
 struct action_registry{
@@ -138,20 +156,20 @@ extern "C" {
 
     XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr){
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
-        ps->addr = addr;
+        ps->addr() = addr;
         return XPI_SUCCESS;
     }
     
     XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel, XPI_Action action){
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
-        ps->target_action = registry.get_key(action);
+        ps->target_action() = registry.get_key(action);
         return XPI_SUCCESS;
     }
 
     XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* data){
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
         unsigned char* cast_data = static_cast<unsigned char*>(data);
-        (ps->environment_data).assign(cast_data, cast_data+bytes);
+        (ps->environment_data()).assign(cast_data, cast_data+bytes);
         return XPI_SUCCESS;
     }
 
@@ -163,11 +181,25 @@ extern "C" {
         return XPI_SUCCESS;
     }
 
+    XPI_Err XPI_Parcel_push(XPI_Parcel parcel){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        ps->records.push(ps->records.top());
+        return XPI_SUCCESS;
+    }
+
+    // What is this actually supposed to do?
+    // Currently sync, future not used
+    XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete){
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        ps->records.pop();
+        return XPI_SUCCESS;
+    }
+
     // Fake version of send, just execute action locally with no data
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
         void* data = static_cast<void*>(ps->argument_data.data());
-        XPI_Action action = registry.get_action(ps->target_action);
+        XPI_Action action = registry.get_action(ps->target_action());
         action(data);
         return XPI_SUCCESS;
     }

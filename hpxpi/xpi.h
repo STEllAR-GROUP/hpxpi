@@ -119,6 +119,18 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* d
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes, void* data);
 
 ///////////////////////////////////////////////////////////////////////////////
+// Continuation Stack Management [4.3]
+///////////////////////////////////////////////////////////////////////////////
+
+// Push a new record (target action, address, and environment) onto the stack
+// New top is copy of previous top
+HPXPI_EXPORT XPI_Err XPI_Parcel_push(XPI_Parcel parcel);
+
+// Pop a closure off of continuation stack
+// Done async, with complete indicating success
+HPXPI_EXPORT XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete);
+
+///////////////////////////////////////////////////////////////////////////////
 // Sending a Parcel [4.4]
 ///////////////////////////////////////////////////////////////////////////////
 
