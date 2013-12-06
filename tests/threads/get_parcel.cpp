@@ -6,19 +6,19 @@
 #include <hpxpi/xpi.h>
 #include <hpx/util/lightweight_test.hpp>
 
-const n=10;
+const int n=10;
 
 XPI_Parcel p;
 
 struct data{
     int  number;
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err some_action(void* nothing)
 {
     HPX_TEST_EQ(XPI_Thread_get_cont(), p);
-    data* env = dynamic_cast<env*>(XPI_Thread_get_env());
+    data* env = reinterpret_cast<data*>(XPI_Thread_get_env());
     HPX_TEST_EQ(env->number, n);
     return XPI_SUCCESS;
 }
@@ -34,7 +34,7 @@ XPI_Err XPI_main(size_t nargs, void* args[])
     HPX_TEST_EQ(XPI_Parcel_set_action(p, some_action), XPI_SUCCESS);
     data d;
     d.number=n;
-    HPX_TEST_EQ(XPI_Parcel_set_env(p, sizeof(p),&d), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_env(p, sizeof(data),reinterpret_cast<void*>(&d)), XPI_SUCCESS);
     HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL), XPI_SUCCESS); //is null a valid future?
 
     return XPI_SUCCESS;
@@ -51,8 +51,6 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ(result, XPI_SUCCESS);
 
     HPX_TEST_EQ(XPI_finalize(), XPI_SUCCESS);
-
-    HPX_TEST(executed_action);
 
     return hpx::util::report_errors();
 }

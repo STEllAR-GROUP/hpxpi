@@ -5,6 +5,7 @@
 
 set(subdirs
     actions
+    threads
     miscellaneous)
 
 foreach(subdir ${subdirs})
