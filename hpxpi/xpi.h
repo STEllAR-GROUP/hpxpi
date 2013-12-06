@@ -137,6 +137,31 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete);
 // Sends a parcel, with future signalling completion
 HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future);
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Threads Actions [6.1]
+///////////////////////////////////////////////////////////////////////////////
+
+// Indicates processing of parcell including continuations should stop
+extern XPI_Action XPI_ACTION_NULL;
+
+///////////////////////////////////////////////////////////////////////////////
+// Thread Instantiation [6.2]
+///////////////////////////////////////////////////////////////////////////////
+
+// Get own global address
+HPXPI_EXPORT XPI_Addr XPI_Thread_get_self();
+
+// Gets target address of instanting parcel
+HPXPI_EXPORT XPI_Addr XPI_Thread_get_addr();
+
+
+// Gets the environment data of instantiating parcel
+HPXPI_EXPORT void* XPI_Thread_get_env();
+
+// Gets the handle for continuation parcel
+HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
+
 ///////////////////////////////////////////////////////////////////////////////
 // XPI Error Codes [Appendix B]
 ///////////////////////////////////////////////////////////////////////////////
