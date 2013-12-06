@@ -7,6 +7,8 @@
 #include <hpxpi/xpi.h>
 
 #include <hpx/include/runtime.hpp>
+#include <hpx/include/actions.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_finalize.hpp>
@@ -63,8 +65,18 @@ struct action_registry{
     map<string, XPI_Action> key_to_action;
     map<XPI_Action, string> action_to_key;
 };
-
 action_registry registry;
+
+XPI_Err recieve_parcel(XPI_Parcel p, XPI_Addr future){
+    parcel_struct* ps = reinterpret_cast<parcel_struct*>(p);
+    void* data = static_cast<void*>(ps->argument_data.data());
+    XPI_Action action = registry.get_action(ps->target_action());
+    XPI_Err status = action(data);
+    // TODO: activate future
+    return status;
+}
+HPX_PLAIN_ACTION(recieve_parcel, recieve_parcel_action);
+recieve_parcel_action parcel_reciever;
 
 extern "C" {
 
@@ -197,10 +209,7 @@ extern "C" {
 
     // Fake version of send, just execute action locally with no data
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
-        void* data = static_cast<void*>(ps->argument_data.data());
-        XPI_Action action = registry.get_action(ps->target_action());
-        action(data);
+        hpx::async(recieve_parcel, parcel, future);
         return XPI_SUCCESS;
     }
 
