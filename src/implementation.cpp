@@ -13,6 +13,9 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_finalize.hpp>
 
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
+
 #include <string>
 #include <map>
 #include <vector>
@@ -28,12 +31,21 @@ struct parcel_frame{
     XPI_Addr addr;
     string target_action;
     vector<unsigned char> environment_data;
+
+private:
+    friend class boost::serialization::access;
+
+    template<typename Archive>
+    void serialize(Archive& ar, const unsigned int version){
+        //todo
+    }
 };
 
 struct parcel_struct{
     parcel_struct(): records( { parcel_frame() } ) {}
     vector<unsigned char> argument_data;
     stack<parcel_frame> records;
+    vector<int> test;
 
     XPI_Addr& addr(){
         return records.top().addr;
@@ -45,6 +57,15 @@ struct parcel_struct{
 
     vector<unsigned char>& environment_data(){
         return records.top().environment_data;
+    }
+
+private:
+    friend class boost::serialization::access;
+
+    template<typename Archive>
+    void serialize(Archive& ar, const unsigned int version){
+        //todo
+        //ar & argument_data & records;
     }
 };
 
@@ -67,10 +88,9 @@ struct action_registry{
 };
 action_registry registry;
 
-XPI_Err recieve_parcel(XPI_Parcel p, XPI_Addr future){
-    parcel_struct* ps = reinterpret_cast<parcel_struct*>(p);
-    void* data = static_cast<void*>(ps->argument_data.data());
-    XPI_Action action = registry.get_action(ps->target_action());
+XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
+    void* data = static_cast<void*>(ps.argument_data.data());
+    XPI_Action action = registry.get_action(ps.target_action());
     XPI_Err status = action(data);
     // TODO: activate future
     return status;
@@ -207,9 +227,10 @@ extern "C" {
         return XPI_SUCCESS;
     }
 
-    // Fake version of send, just execute action locally with no data
+    // Local only for now since serialization isn't finished
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
-        hpx::async(recieve_parcel, parcel, future);
+        parcel_struct ps = *reinterpret_cast<parcel_struct*>(parcel);
+        hpx::async(recieve_parcel, ps, future.addr);
         return XPI_SUCCESS;
     }
 

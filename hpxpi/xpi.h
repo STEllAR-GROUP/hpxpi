@@ -39,7 +39,7 @@ typedef int XPI_Err;
 ///////////////////////////////////////////////////////////////////////////////
 
 // Implementation defined
-typedef struct { intptr_t adddr; } XPI_Addr;
+typedef struct { intptr_t addr; } XPI_Addr;
 
 extern XPI_Addr XPI_NULL;
 
