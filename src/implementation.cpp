@@ -13,61 +13,18 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_finalize.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
-
 #include <string>
 #include <map>
 #include <vector>
 #include <stack>
 using namespace std;
 
+#include "headers/parcel.hpp"
+
 namespace hpxpi
 {
     int xpi_main_wrapper(int argc, char** argv, XPI_Err (*XPI_main_)(size_t, void**));
 }
-
-struct parcel_frame{
-    XPI_Addr addr;
-    string target_action;
-    vector<unsigned char> environment_data;
-
-private:
-    friend class boost::serialization::access;
-
-    template<typename Archive>
-    void serialize(Archive& ar, const unsigned int version){
-        //todo
-    }
-};
-
-struct parcel_struct{
-    parcel_struct(): records( { parcel_frame() } ) {}
-    vector<unsigned char> argument_data;
-    stack<parcel_frame> records;
-    vector<int> test;
-
-    XPI_Addr& addr(){
-        return records.top().addr;
-    }
-
-    string& target_action(){
-        return records.top().target_action;
-    }
-
-    vector<unsigned char>& environment_data(){
-        return records.top().environment_data;
-    }
-
-private:
-    friend class boost::serialization::access;
-
-    template<typename Archive>
-    void serialize(Archive& ar, const unsigned int version){
-        //todo
-        //ar & argument_data & records;
-    }
-};
 
 struct action_registry{
     void register_action(XPI_Action action, string key){
