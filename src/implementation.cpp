@@ -57,6 +57,12 @@ XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
 HPX_PLAIN_ACTION(recieve_parcel, recieve_parcel_action);
 recieve_parcel_action parcel_reciever;
 
+parcel_struct* get_self_parcel(){
+    hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
+    parcel_struct* p=reinterpret_cast<parcel_struct*>(self->get_thread_data());
+    return p;
+}
+
 extern "C" {
 
     XPI_Addr XPI_NULL = {0};
