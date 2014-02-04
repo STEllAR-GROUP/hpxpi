@@ -48,6 +48,8 @@ action_registry registry;
 XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
     void* data = static_cast<void*>(ps.argument_data.data());
     XPI_Action action = registry.get_action(ps.target_action());
+    hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
+    self->set_thread_data(reinterpret_cast<size_t>(&ps));
     XPI_Err status = action(data);
     // TODO: activate future
     return status;
