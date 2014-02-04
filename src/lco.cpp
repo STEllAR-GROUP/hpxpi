@@ -3,6 +3,10 @@
 using namespace std;
 using namespace hpx;
 
+xpi_future::xpi_future(size_t buffer_size): buffer(buffer_size){
+    hpx_future=hpx_promise.get_future();
+}
+
 //Should this return a copy? How do we know how big?
 void* xpi_future::value(){
     gotten=true;
@@ -18,6 +22,6 @@ size_t xpi_future::size(){
     return buffer.size();
 }
 
-bool had_get(){
+bool xpi_future::had_get(){
     return gotten;
 }
