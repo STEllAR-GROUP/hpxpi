@@ -45,7 +45,9 @@ struct action_registry{
 };
 action_registry registry;
 
-XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
+//XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
+//Forget future for now
+XPI_Err recieve_parcel(parcel_struct ps){
     void* data = static_cast<void*>(ps.argument_data.data());
     XPI_Action action = registry.get_action(ps.target_action());
     XPI_Err status = action(data);
@@ -57,7 +59,7 @@ recieve_parcel_action parcel_reciever;
 
 extern "C" {
 
-    XPI_Addr XPI_NULL = {0};
+    XPI_Addr XPI_NULL = {0,0};
 
     // XPI_version queries the specification version number that the XPI 
     // implementation conforms to.
@@ -187,7 +189,8 @@ extern "C" {
     // Local only for now since serialization isn't finished
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
         parcel_struct ps = *reinterpret_cast<parcel_struct*>(parcel);
-        hpx::async(recieve_parcel, ps, future.addr);
+        //hpx::async(recieve_parcel, ps, future.addr);
+        hpx::async(recieve_parcel, ps);
         return XPI_SUCCESS;
     }
 
