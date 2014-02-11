@@ -91,7 +91,7 @@ extern "C" {
             *release = XPI_VERSION_RELEASE;
     }
 
-    XPI_Err XPI_register_action_with_key(XPI_Action action, char* key){
+    XPI_Err XPI_register_action_with_key(XPI_Action action, const char* key){
         registry.register_action(action, string(key));
         return XPI_SUCCESS;
     }
@@ -146,7 +146,7 @@ extern "C" {
     // returning control to the XPI_run site with the result set to the passed
     // code, and optionally printing the message. This should clean up resources
     // associated with the running application.
-    HPXPI_ATTRIBUTE_NORETURN void XPI_abort(int code, char* message)
+    void XPI_abort(int code, char* message)
     {
         hpx::terminate();
     }

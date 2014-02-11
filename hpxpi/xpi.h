@@ -94,7 +94,7 @@ HPXPI_EXPORT void XPI_version(size_t* major, size_t* minor, size_t* release);
 typedef XPI_Err (*XPI_Action)(void* args) /** CONT(...) **/;
 
 //Register an action with the runtime, must be done at all localities
-HPXPI_EXPORT XPI_Err XPI_register_action_with_key(XPI_Action action, char* key);
+HPXPI_EXPORT XPI_Err XPI_register_action_with_key(XPI_Action action,const char* key);
 #define XPI_register_action(act) XPI_register_action_with_key(act, #act)
 
 ///////////////////////////////////////////////////////////////////////////////
