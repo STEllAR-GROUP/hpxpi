@@ -5,6 +5,7 @@
 
 set(miscellaneous_tests
     parcel_stack
+    future_fib
     version)
 
 set(version_FLAGS DEPENDENCIES iostreams_component)
