@@ -2,7 +2,8 @@
 
 using namespace std;
 
-thread_struct::thread_struct(parcel_struct creator):
+thread_struct::thread_struct(parcel_struct& creator):
+    continuation(creator),
     addr(creator.addr()),
     target_action(creator.target_action()),
     environment_data(creator.environment_data())

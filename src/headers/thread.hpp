@@ -13,10 +13,10 @@
 #include "parcel.hpp"
 
 struct thread_struct{
-    parcel_struct continuation;
+    parcel_struct& continuation;
     XPI_Addr addr;
     std::string target_action;
     std::vector<unsigned char> environment_data;
 
-    thread_struct(parcel_struct creator);
+    thread_struct(parcel_struct& creator);
 };
