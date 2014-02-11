@@ -207,5 +207,10 @@ extern "C" {
         return XPI_SUCCESS;
     }
 
+    void* XPI_Thread_get_env(){
+        thread_struct* self=get_self_thread();
+        return &(self->environment_data);
+    }
+
 }
 
