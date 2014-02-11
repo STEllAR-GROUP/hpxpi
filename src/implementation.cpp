@@ -77,6 +77,7 @@ thread_struct* get_self_thread(){
 extern "C" {
 
     XPI_Addr XPI_NULL = {0,0};
+    XPI_Action XPI_ACTION_NULL=NULL;
 
     // XPI_version queries the specification version number that the XPI 
     // implementation conforms to.
@@ -206,6 +207,9 @@ extern "C" {
     // Local only for now since serialization isn't finished
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
         parcel_struct ps = *reinterpret_cast<parcel_struct*>(parcel);
+        if(ps.target_action()==registry.get_key(XPI_ACTION_NULL)){
+            return XPI_SUCCESS;
+        }
         //hpx::async(recieve_parcel, ps, future.addr);
         hpx::async(recieve_parcel, ps);
         return XPI_SUCCESS;
