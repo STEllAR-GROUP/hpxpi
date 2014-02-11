@@ -20,6 +20,7 @@
 using namespace std;
 
 #include "headers/parcel.hpp"
+#include "headers/thread.hpp"
 
 namespace hpxpi
 {
@@ -45,19 +46,38 @@ struct action_registry{
 };
 action_registry registry;
 
-XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
+//XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
+//Forget future for now
+XPI_Err recieve_parcel(parcel_struct ps){
     void* data = static_cast<void*>(ps.argument_data.data());
     XPI_Action action = registry.get_action(ps.target_action());
+    //Create thread struct
+    thread_struct new_thread(ps);
+    ps.records.pop();
+    //Pass new thread
+    hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
+    self->set_thread_data(reinterpret_cast<size_t>(&new_thread));
     XPI_Err status = action(data);
     // TODO: activate future
+    //Send continuation
+    if(ps.records.size()>0){
+        XPI_Parcel_send(reinterpret_cast<XPI_Parcel>(&ps),XPI_NULL);
+    }
     return status;
 }
 HPX_PLAIN_ACTION(recieve_parcel, recieve_parcel_action);
 recieve_parcel_action parcel_reciever;
 
+thread_struct* get_self_thread(){
+    hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
+    thread_struct* ts=reinterpret_cast<thread_struct*>(self->get_thread_data());
+    return ts;
+}
+
 extern "C" {
 
-    XPI_Addr XPI_NULL = {0};
+    XPI_Addr XPI_NULL = {0,0};
+    XPI_Action XPI_ACTION_NULL=NULL;
 
     // XPI_version queries the specification version number that the XPI 
     // implementation conforms to.
@@ -187,8 +207,17 @@ extern "C" {
     // Local only for now since serialization isn't finished
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
         parcel_struct ps = *reinterpret_cast<parcel_struct*>(parcel);
-        hpx::async(recieve_parcel, ps, future.addr);
+        if(ps.target_action()==registry.get_key(XPI_ACTION_NULL)){
+            return XPI_SUCCESS;
+        }
+        //hpx::async(recieve_parcel, ps, future.addr);
+        hpx::async(recieve_parcel, ps);
         return XPI_SUCCESS;
+    }
+
+    void* XPI_Thread_get_env(){
+        thread_struct* self=get_self_thread();
+        return &(self->environment_data[0]);
     }
 
 }

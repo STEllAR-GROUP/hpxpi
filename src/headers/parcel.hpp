@@ -33,9 +33,7 @@ struct parcel_struct{
     std::stack<parcel_frame> records;
 
     XPI_Addr& addr();
-
     std::string& target_action();
-
     std::vector<unsigned char>& environment_data();
 
 private:
