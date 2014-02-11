@@ -39,7 +39,11 @@ typedef int XPI_Err;
 ///////////////////////////////////////////////////////////////////////////////
 
 // Implementation defined
-typedef struct { intptr_t addr; } XPI_Addr;
+// Corresponds to hpx gid_type
+typedef struct {
+    uint64_t lsb;
+    uint64_t msb;
+} XPI_Addr;
 
 extern XPI_Addr XPI_NULL;
 
