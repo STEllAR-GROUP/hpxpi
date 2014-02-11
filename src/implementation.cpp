@@ -64,10 +64,10 @@ XPI_Err recieve_parcel(parcel_struct ps){
 HPX_PLAIN_ACTION(recieve_parcel, recieve_parcel_action);
 recieve_parcel_action parcel_reciever;
 
-parcel_struct* get_self_parcel(){
+thread_struct* get_self_thread(){
     hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
-    parcel_struct* p=reinterpret_cast<parcel_struct*>(self->get_thread_data());
-    return p;
+    thread_struct* ts=reinterpret_cast<thread_struct*>(self->get_thread_data());
+    return ts;
 }
 
 extern "C" {
