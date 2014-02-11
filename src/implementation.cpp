@@ -50,8 +50,12 @@ action_registry registry;
 XPI_Err recieve_parcel(parcel_struct ps){
     void* data = static_cast<void*>(ps.argument_data.data());
     XPI_Action action = registry.get_action(ps.target_action());
+    //Create thread struct
+    thread_struct new_thread(ps);
+    ps.records.pop();
+    //Pass new thread
     hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
-    self->set_thread_data(reinterpret_cast<size_t>(&ps));
+    self->set_thread_data(reinterpret_cast<size_t>(&new_thread));
     XPI_Err status = action(data);
     // TODO: activate future
     return status;
