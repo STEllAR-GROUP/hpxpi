@@ -59,6 +59,10 @@ XPI_Err recieve_parcel(parcel_struct ps){
     self->set_thread_data(reinterpret_cast<size_t>(&new_thread));
     XPI_Err status = action(data);
     // TODO: activate future
+    //Send continuation
+    if(ps.records.size()>0){
+        XPI_Parcel_send(reinterpret_cast<XPI_Parcel>(&ps),XPI_NULL);
+    }
     return status;
 }
 HPX_PLAIN_ACTION(recieve_parcel, recieve_parcel_action);
