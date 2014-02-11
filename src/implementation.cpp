@@ -209,7 +209,7 @@ extern "C" {
 
     void* XPI_Thread_get_env(){
         thread_struct* self=get_self_thread();
-        return &(self->environment_data);
+        return &(self->environment_data[0]);
     }
 
 }

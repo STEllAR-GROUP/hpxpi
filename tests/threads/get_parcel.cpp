@@ -6,6 +6,8 @@
 #include <hpxpi/xpi.h>
 #include <hpx/util/lightweight_test.hpp>
 
+const int n=99;
+
 XPI_Parcel p;
 
 struct data{
