@@ -10,7 +10,7 @@
 #include <boost/serialization/serialization.hpp>
 
 #include "hpxpi/xpi.h"
-#include "headers/parcel.hpp"
+#include "parcel.hpp"
 
 struct thread_struct{
     parcel_struct continuation;

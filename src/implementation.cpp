@@ -20,6 +20,7 @@
 using namespace std;
 
 #include "headers/parcel.hpp"
+#include "headers/thread.hpp"
 
 namespace hpxpi
 {

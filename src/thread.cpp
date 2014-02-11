@@ -3,8 +3,8 @@
 using namespace std;
 
 thread_struct::thread_struct(parcel_struct creator):
-    addr(creator.adddr()),
+    addr(creator.addr()),
     target_action(creator.target_action()),
-    environment_data(creator.environment_data)
+    environment_data(creator.environment_data())
 {
-
+}
