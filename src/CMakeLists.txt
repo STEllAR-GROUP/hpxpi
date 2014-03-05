@@ -1,30 +1,42 @@
-# Copyright (c) 2013 Hartmut Kaiser
+# Copyright (c) 2014 Hartmut Kaiser
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 include_directories(${HPX_INCLUDE_DIR})
 link_directories(${HPX_LIBRARY_DIR})
 
+# Source files
 add_hpx_library_sources(hpxpi
   GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/src/*.cpp")
 
 add_hpx_source_group(
-  NAME hpxpi 
+  NAME hpxpi
   CLASS "Source Files"
   ROOT ${hpxpi_SOURCE_DIR}/src
   TARGETS ${hpxpi_SOURCES})
 
+# Header files
 add_hpx_library_headers(hpxpi
   GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/hpxpi/*.hpp")
 add_hpx_library_headers(hpxpi
   GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/hpxpi/*.h")
 
 add_hpx_source_group(
-  NAME hpxpi 
+  NAME hpxpi
   CLASS "Header Files"
   ROOT ${hpxpi_SOURCE_DIR}/hpxpi
   TARGETS ${hpxpi_HEADERS})
+
+# Internal header files
+add_hpx_library_headers(hpxpi_internal
+  GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/src/headers/*.hpp")
+
+add_hpx_source_group(
+  NAME hpxpi_internal
+  CLASS "Internal Header Files"
+  ROOT ${hpxpi_SOURCE_DIR}/src
+  TARGETS ${hpxpi_internal_HEADERS})
 
 add_definitions("-DHPXPI_EXPORTS")
 
@@ -33,8 +45,9 @@ add_definitions("-DHPXPI_EXPORTS")
 if("${HPX_BUILD_TYPE}" STREQUAL "Debug")
   hpx_debug("hpxpi" "hpxpi_SOURCES: ${hpxpi_SOURCES}")
   hpx_debug("hpxpi" "hpxpi_HEADERS: ${hpxpi_HEADERS}")
+  hpx_debug("hpxpi" "hpxpi_internal_HEADERS: ${hpxpi_internal_HEADERS}")
   add_hpx_library(hpxpi SHARED
-    ${hpxpi_SOURCES} ${hpxpi_HEADERS} 
+    ${hpxpi_SOURCES} ${hpxpi_HEADERS} ${hpxpi_internal_HEADERS}
     DEPENDENCIES hpx_init${HPX_DEBUG_POSTFIX}
     OUTPUT_SUFFIX lib/hpx
     ESSENTIAL)
@@ -46,7 +59,7 @@ if("${HPX_BUILD_TYPE}" STREQUAL "Debug")
     FOLDER "Core")
 else()
   add_hpx_library(hpxpi SHARED
-    ${hpxpi_SOURCES} ${hpxpi_HEADERS} 
+    ${hpxpi_SOURCES} ${hpxpi_HEADERS} ${hpxpi_internal_HEADERS}
     DEPENDENCIES hpx_init
     OUTPUT_SUFFIX lib/hpx
     ESSENTIAL)
@@ -59,4 +72,4 @@ else()
 endif()
 
 # Don't cause our applications to link against hpx_init.
-set_target_properties(hpxpi_lib PROPERTIES LINK_INTERFACE_LIBRARIES "") 
+set_target_properties(hpxpi_lib PROPERTIES LINK_INTERFACE_LIBRARIES "")
