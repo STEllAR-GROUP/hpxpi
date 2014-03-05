@@ -100,7 +100,7 @@ HPXPI_EXPORT XPI_Err XPI_register_action_with_key(XPI_Action action, char* key);
 ///////////////////////////////////////////////////////////////////////////////
 // Parcel Generation [4.1]
 ///////////////////////////////////////////////////////////////////////////////
-typedef intptr_t XPI_Parcel;
+typedef struct XPI_Parcel { intptr_t p; } XPI_Parcel;
 
 // Create an empty parcel
 HPXPI_EXPORT XPI_Err XPI_Parcel_create(XPI_Parcel* parcel);
@@ -138,7 +138,7 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete);
 // Sending a Parcel [4.4]
 ///////////////////////////////////////////////////////////////////////////////
 
-// Sends a parcel, with future signalling completion
+// Sends a parcel, with future signaling completion
 HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future);
 
 
@@ -146,7 +146,7 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future);
 // Threads Actions [6.1]
 ///////////////////////////////////////////////////////////////////////////////
 
-// Indicates processing of parcell including continuations should stop
+// Indicates processing of parcel including continuations should stop
 extern XPI_Action XPI_ACTION_NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,6 +175,7 @@ XPI_Err const XPI_ERR_INV_TYPE = -2;        // the type is invalid
 XPI_Err const XPI_ERR_INV_PARCEL = -3;      // the parcel descriptor handle is invalid
 XPI_Err const XPI_ERR_NO_MEM = -4;          // not enough space to allocate memory
 XPI_Err const XPI_ERR_INV_ADDR = -5;        // the target global address is invalid
+XPI_Err const XPI_ERR_BAD_ARG = -6;         // the given argument is invalid
 
 #if defined(__cplusplus)
 }

@@ -9,6 +9,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/include/local_lcos.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_finalize.hpp>
@@ -28,19 +29,33 @@ namespace hpxpi
 }
 
 struct action_registry{
+    typedef hpx::lcos::local::spinlock mutex_type;
+
     void register_action(XPI_Action action, string key){
+        mutex_type::scoped_lock l(mtx_);
         key_to_action[key] = action;
         action_to_key[action] = key;
     }
 
-    XPI_Action get_action(string key){
-        return key_to_action[key];
-    }
-    
-    string get_key(XPI_Action action){
-        return action_to_key[action];
+    XPI_Action get_action(string key) const{
+        mutex_type::scoped_lock l(mtx_);
+        map<string, XPI_Action>::const_iterator it = key_to_action.find(key);
+        if (it == key_to_action.end()) {
+            // FIXME: what do?
+        }
+        return it->second;
     }
 
+    string get_key(XPI_Action action) const{
+        mutex_type::scoped_lock l(mtx_);
+        map<XPI_Action, string>::const_iterator it = action_to_key.find(action);
+        if (it == action_to_key.end()) {
+            // FIXME: what do?
+        }
+        return it->second;
+    }
+
+    mutable mutex_type mtx_;
     map<string, XPI_Action> key_to_action;
     map<XPI_Action, string> action_to_key;
 };
@@ -60,8 +75,10 @@ XPI_Err receive_parcel(parcel_struct ps){
     XPI_Err status = action(data);
     // TODO: activate future
     //Send continuation
-    if(ps.records.size()>0){
-        XPI_Parcel_send(reinterpret_cast<XPI_Parcel>(&ps),XPI_NULL);
+    if(!ps.records.empty()){
+        XPI_Parcel parcel;
+        parcel.p = reinterpret_cast<intptr_t>(&ps);
+        XPI_Parcel_send(parcel,XPI_NULL);
     }
     return status;
 }
@@ -80,7 +97,7 @@ extern "C" {
     XPI_Addr XPI_NULL = {0,0};
     XPI_Action XPI_ACTION_NULL=NULL;
 
-    // XPI_version queries the specification version number that the XPI 
+    // XPI_version queries the specification version number that the XPI
     // implementation conforms to.
     void XPI_version(size_t* major, size_t* minor, size_t* release)
     {
@@ -153,31 +170,47 @@ extern "C" {
     }
 
     XPI_Err XPI_Parcel_create(XPI_Parcel* parcel){
-        parcel_struct* new_parcel = new parcel_struct;
-        *parcel = reinterpret_cast<XPI_Parcel>(new_parcel);
+        if (0 == parcel)
+            return XPI_ERR_BAD_ARG;
+
+        XPI_Parcel new_parcel;
+        new_parcel.p = reinterpret_cast<intptr_t>(new parcel_struct);
+        *parcel = new_parcel;
         return XPI_SUCCESS;
     }
 
     XPI_Err XPI_Parcel_free(XPI_Parcel parcel){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         delete ps;
         return XPI_SUCCESS;
     }
 
     XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         ps->addr() = addr;
         return XPI_SUCCESS;
     }
-    
+
     XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel, XPI_Action action){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         ps->target_action() = registry.get_key(action);
         return XPI_SUCCESS;
     }
 
     XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* data){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         unsigned char* cast_data = static_cast<unsigned char*>(data);
         (ps->environment_data()).assign(cast_data, cast_data+bytes);
         return XPI_SUCCESS;
@@ -185,14 +218,20 @@ extern "C" {
 
     // Should we be copying the data?
     XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes, void* data){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         unsigned char* cast_data = static_cast<unsigned char*>(data);
         (ps->argument_data).assign(cast_data, cast_data+bytes);
         return XPI_SUCCESS;
     }
 
     XPI_Err XPI_Parcel_push(XPI_Parcel parcel){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         ps->records.push(ps->records.top());
         return XPI_SUCCESS;
     }
@@ -200,19 +239,25 @@ extern "C" {
     // What is this actually supposed to do?
     // Currently sync, future not used
     XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete){
-        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel);
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         ps->records.pop();
         return XPI_SUCCESS;
     }
 
     // Local only for now since serialization isn't finished
     XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
-        parcel_struct ps = *reinterpret_cast<parcel_struct*>(parcel);
-        if(ps.target_action()==registry.get_key(XPI_ACTION_NULL)){
+        if (0 == parcel.p)
+            return XPI_ERR_INV_PARCEL;
+
+        parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
+        if(ps->target_action() == registry.get_key(XPI_ACTION_NULL)){
             return XPI_SUCCESS;
         }
         //hpx::async(recieve_parcel, ps, future.addr);
-        hpx::async(receive_parcel, ps);
+        hpx::async(receive_parcel, *ps);
         return XPI_SUCCESS;
     }
 
