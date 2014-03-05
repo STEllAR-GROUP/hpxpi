@@ -46,17 +46,17 @@ struct action_registry{
 };
 action_registry registry;
 
-//XPI_Err recieve_parcel(parcel_struct ps, intptr_t future){
+//XPI_Err receive_parcel(parcel_struct ps, intptr_t future){
 //Forget future for now
-XPI_Err recieve_parcel(parcel_struct ps){
+XPI_Err receive_parcel(parcel_struct ps){
     void* data = static_cast<void*>(ps.argument_data.data());
     XPI_Action action = registry.get_action(ps.target_action());
     //Create thread struct
     thread_struct new_thread(ps);
     ps.records.pop();
     //Pass new thread
-    hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
-    self->set_thread_data(reinterpret_cast<size_t>(&new_thread));
+    hpx::threads::set_thread_data(
+        hpx::threads::get_self_id(), reinterpret_cast<size_t>(&new_thread));
     XPI_Err status = action(data);
     // TODO: activate future
     //Send continuation
@@ -65,12 +65,13 @@ XPI_Err recieve_parcel(parcel_struct ps){
     }
     return status;
 }
-HPX_PLAIN_ACTION(recieve_parcel, recieve_parcel_action);
+HPX_PLAIN_ACTION(receive_parcel, recieve_parcel_action);
 recieve_parcel_action parcel_reciever;
 
 thread_struct* get_self_thread(){
     hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
-    thread_struct* ts=reinterpret_cast<thread_struct*>(self->get_thread_data());
+    thread_struct* ts=reinterpret_cast<thread_struct*>(
+        hpx::threads::get_thread_data(hpx::threads::get_self_id()));
     return ts;
 }
 
@@ -211,7 +212,7 @@ extern "C" {
             return XPI_SUCCESS;
         }
         //hpx::async(recieve_parcel, ps, future.addr);
-        hpx::async(recieve_parcel, ps);
+        hpx::async(receive_parcel, ps);
         return XPI_SUCCESS;
     }
 
