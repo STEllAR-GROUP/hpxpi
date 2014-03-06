@@ -1,4 +1,5 @@
-//  Copyright (c) 2013 Hartmut Kaiser, Alexander Duchene
+//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2013 Alexander Duchene
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -110,7 +111,7 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_free(XPI_Parcel parcel);
 
 // Set where the parcel action is invoked
 // Can be ignored except for LCO targets
-// XPI_NULL specifies no prefered address
+// XPI_NULL specifies no preferred address
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr);
 
 // Set the parcel action
@@ -139,7 +140,7 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete);
 ///////////////////////////////////////////////////////////////////////////////
 
 // Sends a parcel, with future signaling completion
-HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete, XPI_Addr future);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,15 +157,42 @@ extern XPI_Action XPI_ACTION_NULL;
 // Get own global address
 HPXPI_EXPORT XPI_Addr XPI_Thread_get_self();
 
-// Gets target address of instanting parcel
+// Gets target address of instantiating parcel
 HPXPI_EXPORT XPI_Addr XPI_Thread_get_addr();
-
 
 // Gets the environment data of instantiating parcel
 HPXPI_EXPORT void* XPI_Thread_get_env();
 
 // Gets the handle for continuation parcel
 HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
+
+///////////////////////////////////////////////////////////////////////////////
+// LCOs: Common Interface [7.2]
+///////////////////////////////////////////////////////////////////////////////
+// HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, const void *data,
+//     XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_LCO_trigger_sync(XPI_Addr lco, const void *data);
+// 
+// HPXPI_EXPORT XPI_Err XPI_LCO_get_size(XPI_Addr lco, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_LCO_get_size_sync(XPI_Addr lco, size_t *size);
+// 
+// HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value(XPI_Addr lco, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value_sync(XPI_Addr lco, bool *value);
+// 
+// HPXPI_EXPORT XPI_Err XPI_LCO_free(XPI_Addr lco, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
+
+///////////////////////////////////////////////////////////////////////////////
+// Futures [7.3.1]
+///////////////////////////////////////////////////////////////////////////////
+typedef struct XPI_Distribution { intptr_t p; } XPI_Distribution;
+
+// HPXPI_EXPORT XPI_Err XPI_Process_Future_New(XPI_Addr process,
+//     size_t count, size_t bytes, XPI_Distribution distribution,
+//     XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
+    size_t count, size_t bytes, XPI_Distribution distribution,
+    XPI_Addr *address);
 
 ///////////////////////////////////////////////////////////////////////////////
 // XPI Error Codes [Appendix B]

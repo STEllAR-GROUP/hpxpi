@@ -7,24 +7,32 @@
 #include <vector>
 
 #include <hpx/include/actions.hpp>
+#include <hpx/util/serialize_buffer.hpp>
 
 #include <boost/serialization/serialization.hpp>
 
-#include "hpxpi/xpi.h"
+#include <hpxpi/xpi.h>
 
-struct xpi_future{
-    hpx::shared_future<void*> hpx_future;
-    hpx::promise<void*> hpx_promise;
-    std::vector<unsigned char> buffer;
-    bool gotten;
+namespace hpxpi
+{
+    struct xpi_future {
+    private:
+        typedef std::vector<unsigned char> data_type;
 
-    xpi_future(size_t buffer_size);
+        size_t buffsize;
+        hpx::lcos::promise<data_type> hpx_promise;
+        hpx::unique_future<data_type> hpx_future;
 
-    void* value();
-    void trigger(void* data);
-    size_t size();
-    bool had_get();
-};
+    public:
+        xpi_future(size_t buffer_size);
+
+        void* value();
+        void trigger(void* data);
+        size_t size() const { return buffsize; }
+        bool had_get() const { return hpx_future.valid(); }
+    };
+}
+
 /*
 extern "C"{
 

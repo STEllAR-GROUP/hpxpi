@@ -8,25 +8,25 @@
 using namespace std;
 using namespace hpx;
 
-xpi_future::xpi_future(size_t buffer_size): buffer(buffer_size){
-    hpx_future=hpx_promise.get_future();
+namespace hpxpi
+{
+    xpi_future::xpi_future(size_t buffer_size)
+      : buffsize(buffer_size),
+        hpx_promise(),
+        hpx_future(hpx_promise.get_future())
+    {
+    }
+
+    // Should this return a copy? How do we know how big?
+    void* xpi_future::value()
+    {
+        return hpx_future.get().data();
+    }
+
+    void xpi_future::trigger(void* data)
+    {
+        unsigned char* buffer = reinterpret_cast<unsigned char*>(data);
+        hpx_promise.set_value(data_type(buffer, buffer+buffsize));
+    }
 }
 
-//Should this return a copy? How do we know how big?
-void* xpi_future::value(){
-    gotten=true;
-    return hpx_future.get();
-}
-
-void xpi_future::trigger(void* data){
-    //should we set the bufer? How big?
-    hpx_promise.set_value(data);
-}
-
-size_t xpi_future::size(){
-    return buffer.size();
-}
-
-bool xpi_future::had_get(){
-    return gotten;
-}

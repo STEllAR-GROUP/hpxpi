@@ -26,8 +26,8 @@ XPI_Err fib_naive(void* data){
     fib_data d1={cast_data->n-1, futures[0]};
     fib_data d2={cast_data->n-2, futures[1]};
     //Send parcels
-    XPI_Parcel_appy(XPI_NULL, fib_naive, sizeof(fib_data), &d1, XPI_NULL);
-    XPI_Parcel_appy(XPI_NULL, fib_naive, sizeof(fib_data), &d2, XPI_NULL);
+    XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d1, XPI_NULL);
+    XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d2, XPI_NULL);
     //Wait on futures
     void* results[2];
     HPX_TEST_EQ(XPI_Thread_wait_all(2,futures,results), XPI_SUCESS);
@@ -45,7 +45,7 @@ XPI_Err XPI_main(size_t nargs, void* args[])
     int r;
     HPX_TEST_EQ(XPI_Process_future_new_sync(1,sizeof(int),XPI_NULL,&result), XPI_SUCESS);
     fib_data init={fib_n, result};
-    XPI_Parcel_appy(XPI_NULL, fib_naive, sizeof(fib_data), &init, XPI_NULL);
+    XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &init, XPI_NULL);
     HPX_TEST_EQ(XPI_Thread_wait(result,&r),XPI_SUCESS);
     cout<<r<<endl;
     return XPI_SUCCESS;

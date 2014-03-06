@@ -20,8 +20,10 @@
 #include <stack>
 using namespace std;
 
+#include "headers/addr.hpp"
 #include "headers/parcel.hpp"
 #include "headers/thread.hpp"
+#include "headers/lco.hpp"
 
 namespace hpxpi
 {
@@ -61,41 +63,66 @@ struct action_registry{
 };
 action_registry registry;
 
-//XPI_Err receive_parcel(parcel_struct ps, intptr_t future){
-//Forget future for now
-XPI_Err receive_parcel(parcel_struct ps){
+namespace detail
+{
+    struct thread_data
+    {
+        thread_data(thread_struct* new_thread)
+        {
+            hpx::threads::set_thread_data(
+                hpx::threads::get_self_id(),
+                reinterpret_cast<size_t>(new_thread));
+        }
+        ~thread_data()
+        {
+            hpx::threads::set_thread_data(
+                hpx::threads::get_self_id(), 0);
+        }
+    };
+}
+
+XPI_Err receive_parcel(parcel_struct ps, XPI_Addr future){
     void* data = static_cast<void*>(ps.argument_data.data());
     XPI_Action action = registry.get_action(ps.target_action());
-    //Create thread struct
+
+    // Create thread struct
     thread_struct new_thread(ps);
-    ps.records.pop();
-    //Pass new thread
-    hpx::threads::set_thread_data(
-        hpx::threads::get_self_id(), reinterpret_cast<size_t>(&new_thread));
-    XPI_Err status = action(data);
-    // TODO: activate future
-    //Send continuation
+    ps.records.pop_front();
+
+    // activate future
+    if (XPI_NULL != future) {
+        hpx::trigger_lco_event(hpxpi::get_id(future));
+    }
+
+    // Pass new thread
+    XPI_Err status = XPI_SUCCESS;
+    {
+        detail::thread_data reset(&new_thread);
+        status = action(data);
+    }
+
+    // Send continuation
     if(!ps.records.empty()){
         XPI_Parcel parcel;
         parcel.p = reinterpret_cast<intptr_t>(&ps);
-        XPI_Parcel_send(parcel,XPI_NULL);
+        XPI_Parcel_send(parcel, XPI_NULL, XPI_NULL);
     }
     return status;
 }
 HPX_PLAIN_ACTION(receive_parcel, recieve_parcel_action);
-recieve_parcel_action parcel_reciever;
+recieve_parcel_action parcel_receiver;
 
 thread_struct* get_self_thread(){
-    hpx::threads::thread_self* self=hpx::threads::get_self_ptr();
     thread_struct* ts=reinterpret_cast<thread_struct*>(
         hpx::threads::get_thread_data(hpx::threads::get_self_id()));
     return ts;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 extern "C" {
 
     XPI_Addr XPI_NULL = {0,0};
-    XPI_Action XPI_ACTION_NULL=NULL;
+    XPI_Action XPI_ACTION_NULL = NULL;
 
     // XPI_version queries the specification version number that the XPI
     // implementation conforms to.
@@ -200,6 +227,8 @@ extern "C" {
     XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel, XPI_Action action){
         if (0 == parcel.p)
             return XPI_ERR_INV_PARCEL;
+        if (0 == action)
+            return XPI_ERR_BAD_ARG;
 
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         ps->target_action() = registry.get_key(action);
@@ -209,6 +238,8 @@ extern "C" {
     XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* data){
         if (0 == parcel.p)
             return XPI_ERR_INV_PARCEL;
+        if (0 == bytes || 0 == data)
+            return XPI_ERR_BAD_ARG;
 
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         unsigned char* cast_data = static_cast<unsigned char*>(data);
@@ -220,6 +251,8 @@ extern "C" {
     XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes, void* data){
         if (0 == parcel.p)
             return XPI_ERR_INV_PARCEL;
+        if (0 == bytes || 0 == data)
+            return XPI_ERR_BAD_ARG;
 
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
         unsigned char* cast_data = static_cast<unsigned char*>(data);
@@ -232,7 +265,7 @@ extern "C" {
             return XPI_ERR_INV_PARCEL;
 
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
-        ps->records.push(ps->records.top());
+        ps->records.push_back(ps->records.front());
         return XPI_SUCCESS;
     }
 
@@ -243,12 +276,13 @@ extern "C" {
             return XPI_ERR_INV_PARCEL;
 
         parcel_struct* ps = reinterpret_cast<parcel_struct*>(parcel.p);
-        ps->records.pop();
+        ps->records.pop_front();
         return XPI_SUCCESS;
     }
 
     // Local only for now since serialization isn't finished
-    XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr future){
+    XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete, XPI_Addr thread_id)
+    {
         if (0 == parcel.p)
             return XPI_ERR_INV_PARCEL;
 
@@ -256,15 +290,32 @@ extern "C" {
         if(ps->target_action() == registry.get_key(XPI_ACTION_NULL)){
             return XPI_SUCCESS;
         }
-        //hpx::async(recieve_parcel, ps, future.addr);
-        hpx::async(receive_parcel, *ps);
+
+        hpx::apply(&receive_parcel, *ps, thread_id);
+        if (XPI_NULL != complete) {
+            hpx::trigger_lco_event(hpxpi::get_id(complete));
+        }
         return XPI_SUCCESS;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void* XPI_Thread_get_env(){
         thread_struct* self=get_self_thread();
         return &(self->environment_data[0]);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
+        size_t count, size_t bytes, XPI_Distribution distribution,
+        XPI_Addr *address)
+    {
+        // we support creating one future at a time only
+        if (1 != count)
+            return XPI_ERR_BAD_ARG;
+
+        hpxpi::xpi_future* f = new hpxpi::xpi_future(bytes);
+
+        return XPI_SUCCESS;
+    }
 }
 

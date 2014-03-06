@@ -9,7 +9,8 @@
 #include <stack>
 
 #include <boost/serialization/serialization.hpp>
-
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/deque.hpp>
 
 #include "hpxpi/xpi.h"
 
@@ -23,14 +24,14 @@ private:
 
     template<typename Archive>
     void serialize(Archive& ar, const unsigned int version){
-        //todo
+        ar & addr & target_action & environment_data;
     }
 };
 
 struct parcel_struct{
     parcel_struct(): records( { parcel_frame() } ) {}
     std::vector<unsigned char> argument_data;
-    std::stack<parcel_frame> records;
+    std::deque<parcel_frame> records;
 
     XPI_Addr& addr();
     std::string& target_action();
@@ -41,7 +42,6 @@ private:
 
     template<typename Archive>
     void serialize(Archive& ar, const unsigned int version){
-        //todo
-        //ar & argument_data & records;
+        ar & argument_data & records;
     }
 };
