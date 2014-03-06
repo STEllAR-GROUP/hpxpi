@@ -4,18 +4,18 @@
 
 #pragma once
 
-#include <vector>
-
-#include <hpx/include/actions.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/include/lcos.hpp>
 
 #include <boost/serialization/serialization.hpp>
 
 #include <hpxpi/xpi.h>
 
+#include <vector>
+
 namespace hpxpi
 {
-    struct xpi_future {
+    struct future
+    {
     private:
         typedef std::vector<unsigned char> data_type;
 
@@ -24,7 +24,7 @@ namespace hpxpi
         hpx::unique_future<data_type> hpx_future;
 
     public:
-        xpi_future(size_t buffer_size);
+        future(size_t buffer_size);
 
         void* value();
         void trigger(void* data);

@@ -195,6 +195,16 @@ HPXPI_EXPORT XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
     XPI_Addr *address);
 
 ///////////////////////////////////////////////////////////////////////////////
+// Memory Management [8.6.1]
+///////////////////////////////////////////////////////////////////////////////
+// HPXPI_EXPORT XPI_Err XPI_Process_global_malloc(XPI_Addr process,
+//     size_t count, size_t size, XPI_Distribution distribution,
+//     XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_global_malloc_sync(XPI_Addr process,
+    size_t count, size_t size, XPI_Distribution distribution,
+    XPI_Addr* address);
+
+///////////////////////////////////////////////////////////////////////////////
 // XPI Error Codes [Appendix B]
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err const XPI_SUCCESS = 0;              // success

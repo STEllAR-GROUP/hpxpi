@@ -20,23 +20,13 @@ add_hpx_source_group(
 add_hpx_library_headers(hpxpi
   GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/hpxpi/*.hpp")
 add_hpx_library_headers(hpxpi
-  GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/hpxpi/*.h")
+  GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/hpxpi/*.h" APPEND)
 
 add_hpx_source_group(
   NAME hpxpi
   CLASS "Header Files"
   ROOT ${hpxpi_SOURCE_DIR}/hpxpi
   TARGETS ${hpxpi_HEADERS})
-
-# Internal header files
-add_hpx_library_headers(hpxpi_internal
-  GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/src/headers/*.hpp")
-
-add_hpx_source_group(
-  NAME hpxpi_internal
-  CLASS "Internal Header Files"
-  ROOT ${hpxpi_SOURCE_DIR}/src
-  TARGETS ${hpxpi_internal_HEADERS})
 
 add_definitions("-DHPXPI_EXPORTS")
 
@@ -45,9 +35,8 @@ add_definitions("-DHPXPI_EXPORTS")
 if("${HPX_BUILD_TYPE}" STREQUAL "Debug")
   hpx_debug("hpxpi" "hpxpi_SOURCES: ${hpxpi_SOURCES}")
   hpx_debug("hpxpi" "hpxpi_HEADERS: ${hpxpi_HEADERS}")
-  hpx_debug("hpxpi" "hpxpi_internal_HEADERS: ${hpxpi_internal_HEADERS}")
   add_hpx_library(hpxpi SHARED
-    ${hpxpi_SOURCES} ${hpxpi_HEADERS} ${hpxpi_internal_HEADERS}
+    ${hpxpi_SOURCES} ${hpxpi_HEADERS}
     DEPENDENCIES hpx_init${HPX_DEBUG_POSTFIX}
     OUTPUT_SUFFIX lib/hpx
     ESSENTIAL)

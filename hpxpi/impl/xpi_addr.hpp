@@ -1,0 +1,66 @@
+//  Copyright (c) 2014 Hartmut Kaiser
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.
+
+#if !defined(HPXPI_INTERNAL_ADDR_HPP_MARCH_05_2014_0779PM)
+#define HPXPI_INTERNAL_ADDR_HPP_MARCH_05_2014_0779PM
+
+#include <hpxpi/xpi.h>
+
+#include <boost/serialization/serialization.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+inline bool operator== (XPI_Addr lhs, XPI_Addr rhs)
+{
+    return lhs.msb == rhs.msb && lhs.lsb == rhs.lsb;
+}
+
+inline bool operator!= (XPI_Addr lhs, XPI_Addr rhs)
+{
+    return !(lhs == rhs);
+}
+
+inline bool operator< (XPI_Addr lhs, XPI_Addr rhs)
+{
+    if (lhs.msb < rhs.msb)
+        return true;
+    if (lhs.msb == rhs.msb)
+        return lhs.lsb < rhs.lsb;
+    return false;
+}
+
+inline bool operator>= (XPI_Addr lhs, XPI_Addr rhs)
+{
+    return !(lhs < rhs);
+}
+
+inline bool operator> (XPI_Addr lhs, XPI_Addr rhs)
+{
+    return !(lhs < rhs) && !(lhs == rhs);
+}
+
+inline bool operator<= (XPI_Addr lhs, XPI_Addr rhs)
+{
+    return !(lhs > rhs);
+}
+
+namespace hpxpi
+{
+    ///////////////////////////////////////////////////////////////////////////
+    inline hpx::id_type get_id(XPI_Addr addr)
+    {
+        return hpx::id_type(addr.msb, addr.lsb, hpx::id_type::unmanaged);
+    }
+}
+
+namespace boost { namespace serialization
+{
+    template <typename Archive>
+    void serialize(Archive& ar, XPI_Addr addr, unsigned int version)
+    {
+        ar & addr.msb & addr.lsb;
+    }
+}}
+
+#endif
