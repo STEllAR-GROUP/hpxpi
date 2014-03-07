@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/lcos.hpp>
 
 #include <boost/serialization/serialization.hpp>

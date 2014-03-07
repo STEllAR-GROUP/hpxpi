@@ -204,6 +204,11 @@ HPXPI_EXPORT XPI_Err XPI_Process_global_malloc_sync(XPI_Addr process,
     size_t count, size_t size, XPI_Distribution distribution,
     XPI_Addr* address);
 
+// HPXPI_EXPORT XPI_Err XPI_Process_global_free(XPI_Addr process,
+//     XPI_Addr address, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_global_free_sync(XPI_Addr process,
+    XPI_Addr address);
+
 ///////////////////////////////////////////////////////////////////////////////
 // XPI Error Codes [Appendix B]
 ///////////////////////////////////////////////////////////////////////////////

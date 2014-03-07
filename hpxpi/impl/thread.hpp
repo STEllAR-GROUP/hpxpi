@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpxpi/xpi.h>
+#include <hpxpi/impl/parcel.hpp>
+
 #include <string>
 #include <vector>
 
 #include <boost/serialization/serialization.hpp>
-
-#include <hpxpi/xpi.h>
-#include <hpxpi/impl/parcel.hpp>
 
 namespace hpxpi
 {

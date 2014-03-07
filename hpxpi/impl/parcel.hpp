@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpxpi/xpi.h>
+
 #include <string>
 #include <vector>
 #include <stack>
@@ -11,8 +14,6 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/deque.hpp>
-
-#include <hpxpi/xpi.h>
 
 namespace hpxpi
 {
