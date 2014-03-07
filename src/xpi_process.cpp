@@ -18,6 +18,8 @@ extern "C"
     {
         if (0 == address)
             return XPI_ERR_BAD_ARG;
+        if (XPI_NULL == process)
+            process = hpxpi::from_id(hpx::find_here());
 
         using hpx::components::stubs::runtime_support;
 
@@ -35,7 +37,7 @@ extern "C"
         XPI_Addr address)
     {
         if (XPI_NULL == address)
-            return XPI_ERR_BAD_ARG;
+            return XPI_ERR_INV_ADDR;
 
         // create an id, taking ownership, destructor releases credits
         hpx::id_type id = hpxpi::from_address(address);

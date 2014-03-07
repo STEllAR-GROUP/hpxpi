@@ -66,7 +66,7 @@ namespace hpxpi
 
     // Return XPI_Addr representing given id, this releases the ownership to
     // the returned address.
-    inline XPI_Addr from_id(hpx::id_type& id)
+    inline XPI_Addr from_id(hpx::id_type id)
     {
         XPI_Addr addr;
         addr.msb = id.get_msb();

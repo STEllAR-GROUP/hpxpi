@@ -40,13 +40,19 @@ typedef int XPI_Err;
 ///////////////////////////////////////////////////////////////////////////////
 
 // Implementation defined
+// 
 // Corresponds to hpx gid_type
-typedef struct {
-    uint64_t lsb;
+typedef struct XPI_Addr {
     uint64_t msb;
+    uint64_t lsb;
 } XPI_Addr;
 
-extern XPI_Addr XPI_NULL;
+HPXPI_EXPORT extern XPI_Addr XPI_NULL;
+
+typedef struct XPI_AddrDiff {
+    int64_t msb;
+    uint64_t lsb;
+} XPI_AddrDiff;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization and Shutdown [3.2]
@@ -102,6 +108,7 @@ HPXPI_EXPORT XPI_Err XPI_register_action_with_key(XPI_Action action, char* key);
 // Parcel Generation [4.1]
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct XPI_Parcel { intptr_t p; } XPI_Parcel;
+HPXPI_EXPORT extern XPI_Parcel XPI_PARCEL_NULL;
 
 // Create an empty parcel
 HPXPI_EXPORT XPI_Err XPI_Parcel_create(XPI_Parcel* parcel);
@@ -142,13 +149,53 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete);
 // Sends a parcel, with future signaling completion
 HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete, XPI_Addr future);
 
+///////////////////////////////////////////////////////////////////////////////
+// Asynchronous memory access [5.3.1]
+///////////////////////////////////////////////////////////////////////////////
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_u8(XPI_Addr addr, uint8_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_u16(XPI_Addr addr, uint16_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_u32(XPI_Addr addr, uint32_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_u64(XPI_Addr addr, uint64_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_u128(XPI_Addr addr, __uint128_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_s8(XPI_Addr addr, int8_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_s16(XPI_Addr addr, int16_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_s32(XPI_Addr addr, int32_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_s64(XPI_Addr addr, int64_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_s128(XPI_Addr addr, __int128_t val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_f(XPI_Addr addr, float val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_d(XPI_Addr addr, double val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_fc(XPI_Addr addr, float _Complex val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_dc(XPI_Addr addr, double _Complex val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_addr(XPI_Addr addr, XPI_Addr val, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_addrdiff(XPI_Addr addr, XPI_AddrDiff val, XPI_Addr future);
+
+///////////////////////////////////////////////////////////////////////////////
+// Synchronous memory access [5.3.2]
+///////////////////////////////////////////////////////////////////////////////
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u8_sync(XPI_Addr addr, uint8_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u16_sync(XPI_Addr addr, uint16_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u32_sync(XPI_Addr addr, uint32_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u64_sync(XPI_Addr addr, uint64_t val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_u128_sync(XPI_Addr addr, __uint128_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s8_sync(XPI_Addr addr, int8_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s16_sync(XPI_Addr addr, int16_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s32_sync(XPI_Addr addr, int32_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s64_sync(XPI_Addr addr, int64_t val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_s128_sync(XPI_Addr addr, __int128_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_f_sync(XPI_Addr addr, float val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_d_sync(XPI_Addr addr, double val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_fc_sync(XPI_Addr addr, float _Complex val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_store_dc_sync(XPI_Addr addr, double _Complex val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_addr_sync(XPI_Addr addr, XPI_Addr val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_addrdiff_sync(XPI_Addr addr, XPI_AddrDiff val);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Threads Actions [6.1]
 ///////////////////////////////////////////////////////////////////////////////
 
 // Indicates processing of parcel including continuations should stop
-extern XPI_Action XPI_ACTION_NULL;
+HPXPI_EXPORT extern XPI_Action XPI_ACTION_NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Thread Instantiation [6.2]
@@ -186,6 +233,7 @@ HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
 // Futures [7.3.1]
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct XPI_Distribution { intptr_t p; } XPI_Distribution;
+HPXPI_EXPORT extern XPI_Distribution XPI_DISTRIBUTION_NULL;
 
 // HPXPI_EXPORT XPI_Err XPI_Process_Future_New(XPI_Addr process,
 //     size_t count, size_t bytes, XPI_Distribution distribution,
