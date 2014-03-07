@@ -152,22 +152,39 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete, XPI_A
 ///////////////////////////////////////////////////////////////////////////////
 // Asynchronous memory access [5.3.1]
 ///////////////////////////////////////////////////////////////////////////////
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_u8(XPI_Addr addr, uint8_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_u16(XPI_Addr addr, uint16_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_u32(XPI_Addr addr, uint32_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_u64(XPI_Addr addr, uint64_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u8(XPI_Addr addr, uint8_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u16(XPI_Addr addr, uint16_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u32(XPI_Addr addr, uint32_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u64(XPI_Addr addr, uint64_t val, XPI_Addr future);
 // HPXPI_EXPORT XPI_Err XPI_Agas_store_u128(XPI_Addr addr, __uint128_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_s8(XPI_Addr addr, int8_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_s16(XPI_Addr addr, int16_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_s32(XPI_Addr addr, int32_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_s64(XPI_Addr addr, int64_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s8(XPI_Addr addr, int8_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s16(XPI_Addr addr, int16_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s32(XPI_Addr addr, int32_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s64(XPI_Addr addr, int64_t val, XPI_Addr future);
 // HPXPI_EXPORT XPI_Err XPI_Agas_store_s128(XPI_Addr addr, __int128_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_f(XPI_Addr addr, float val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_d(XPI_Addr addr, double val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_f(XPI_Addr addr, float val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_d(XPI_Addr addr, double val, XPI_Addr future);
 // HPXPI_EXPORT XPI_Err XPI_Agas_store_fc(XPI_Addr addr, float _Complex val, XPI_Addr future);
 // HPXPI_EXPORT XPI_Err XPI_Agas_store_dc(XPI_Addr addr, double _Complex val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_addr(XPI_Addr addr, XPI_Addr val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_addrdiff(XPI_Addr addr, XPI_AddrDiff val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_addr(XPI_Addr addr, XPI_Addr val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_addrdiff(XPI_Addr addr, XPI_AddrDiff val, XPI_Addr future);
+
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u8(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u16(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u32(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u64(XPI_Addr addr, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_u128(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s8(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s16(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s32(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s64(XPI_Addr addr, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_s128(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_f(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_d(XPI_Addr addr, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_fc(XPI_Addr addr, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_dc(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_addr(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_addrdiff(XPI_Addr addr, XPI_Addr future);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Synchronous memory access [5.3.2]
@@ -232,18 +249,18 @@ HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
 ///////////////////////////////////////////////////////////////////////////////
 // LCOs: Common Interface [7.2]
 ///////////////////////////////////////////////////////////////////////////////
-// HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, const void *data,
+// HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, void const* data,
 //     XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_LCO_trigger_sync(XPI_Addr lco, const void *data);
-// 
+HPXPI_EXPORT XPI_Err XPI_LCO_trigger_sync(XPI_Addr lco, void const* data);
+
 // HPXPI_EXPORT XPI_Err XPI_LCO_get_size(XPI_Addr lco, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_LCO_get_size_sync(XPI_Addr lco, size_t *size);
-// 
+HPXPI_EXPORT XPI_Err XPI_LCO_get_size_sync(XPI_Addr lco, size_t *size);
+
 // HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value(XPI_Addr lco, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value_sync(XPI_Addr lco, bool *value);
-// 
+HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value_sync(XPI_Addr lco, bool *value);
+
 // HPXPI_EXPORT XPI_Err XPI_LCO_free(XPI_Addr lco, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
+HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Futures [7.3.1]
@@ -257,6 +274,37 @@ HPXPI_EXPORT extern XPI_Distribution XPI_DISTRIBUTION_NULL;
 HPXPI_EXPORT XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
     size_t count, size_t bytes, XPI_Distribution distribution,
     XPI_Addr *address);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User LCOs [7.4]
+///////////////////////////////////////////////////////////////////////////////
+typedef struct XPI_LCO_Descriptor {
+    // Handles initialization of the LCO.
+    void (*init) (void * const lco, const void * const data);
+    // Handles the XPI_LCO_TRIGGER action, and should update the LCO’s state.
+    void (*trigger) (void * const lco, const void * const data);
+    // Called to evaluate the LCO’s predicate. It should not change the
+    // state of the LCO. The implementation may cache the result once it
+    // returns true.
+    bool (*eval) (const void * const lco);
+    // This should return the address of the computed value of the LCO. This
+    // will only be called when eval has returned true, and should point to
+    // memory of at least get_size bytes. The return address or value may be
+    // cached by the implementation.
+    const void *(*get_value) (const void * const lco);
+    // This should return the size of the value of the LCO.
+    size_t (*get_size) (const void * const lco);
+} XPI_LCO_Descriptor;
+
+// HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc(XPI_Addr process,
+//     size_t count, size_t size, XPI_LCO_Descriptor handlers,
+//     XPI_Distribution distribution, size_t init_data_size,
+//     const void * const init_data, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc_sync(XPI_Addr process,
+    size_t count, size_t size, XPI_LCO_Descriptor handlers,
+    XPI_Distribution distribution, size_t init_data_size,
+    const void * const init_data, XPI_Addr *address);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Memory Management [8.6.1]

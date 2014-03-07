@@ -3,11 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/runtime/components/stubs/memory.hpp>
 
 #include <hpxpi/xpi.h>
 #include <hpxpi/impl/xpi_addr.hpp>
+#include <hpxpi/impl/lco.hpp>
 
 extern "C"
 {
@@ -17,6 +18,208 @@ extern "C"
 
     XPI_Distribution XPI_DISTRIBUTION_NULL = { 0 };
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Asynchronous memory access [5.3.1]
+    ///////////////////////////////////////////////////////////////////////////
+    XPI_Err XPI_Agas_store_u8(XPI_Addr addr, uint8_t val, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::store8(hpxpi::get_id(addr), val), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_store_u16(XPI_Addr addr, uint16_t val, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::store16(hpxpi::get_id(addr), val), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_store_u32(XPI_Addr addr, uint32_t val, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::store32(hpxpi::get_id(addr), val), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_store_u64(XPI_Addr addr, uint64_t val, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::store64(hpxpi::get_id(addr), val), future);
+
+        return XPI_SUCCESS;
+    }
+
+    // XPI_Err XPI_Agas_store_u128(XPI_Addr addr, __uint128_t val, XPI_Addr future);
+
+    XPI_Err XPI_Agas_store_s8(XPI_Addr addr, int8_t val, XPI_Addr future)
+    {
+        return XPI_Agas_store_u8(addr, val, future);
+    }
+
+    XPI_Err XPI_Agas_store_s16(XPI_Addr addr, int16_t val, XPI_Addr future)
+    {
+        return XPI_Agas_store_u16(addr, val, future);
+    }
+
+    XPI_Err XPI_Agas_store_s32(XPI_Addr addr, int32_t val, XPI_Addr future)
+    {
+        return XPI_Agas_store_u32(addr, val, future);
+    }
+
+    XPI_Err XPI_Agas_store_s64(XPI_Addr addr, int64_t val, XPI_Addr future)
+    {
+        return XPI_Agas_store_u64(addr, val, future);
+    }
+
+    // XPI_Err XPI_Agas_store_s128(XPI_Addr addr, __int128_t val, XPI_Addr future);
+
+    XPI_Err XPI_Agas_store_f(XPI_Addr addr, float val, XPI_Addr future)
+    {
+        return XPI_Agas_store_u32(addr, *reinterpret_cast<uint32_t*>(&val), future);
+    }
+
+    XPI_Err XPI_Agas_store_d(XPI_Addr addr, double val, XPI_Addr future)
+    {
+        return XPI_Agas_store_u64(addr, *reinterpret_cast<uint64_t*>(&val), future);
+    }
+
+    // XPI_Err XPI_Agas_store_fc(XPI_Addr addr, float _Complex val, XPI_Addr future);
+    // XPI_Err XPI_Agas_store_dc(XPI_Addr addr, double _Complex val, XPI_Addr future);
+
+    XPI_Err XPI_Agas_store_addr(XPI_Addr addr, XPI_Addr val, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpx::components::server::memory::uint128_t u128(val.msb, val.lsb);
+        hpxpi::propagate(memory::store128(hpxpi::get_id(addr), u128), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_store_addrdiff(XPI_Addr addr, XPI_AddrDiff val,
+        XPI_Addr future)
+    {
+        return XPI_Agas_store_addr(addr, *reinterpret_cast<XPI_Addr*>(&val), future);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    XPI_Err XPI_Agas_load_u8(XPI_Addr addr, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::load8(hpxpi::get_id(addr)), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_load_u16(XPI_Addr addr, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::load16(hpxpi::get_id(addr)), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_load_u32(XPI_Addr addr, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::load32(hpxpi::get_id(addr)), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_load_u64(XPI_Addr addr, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::load64(hpxpi::get_id(addr)), future);
+
+        return XPI_SUCCESS;
+    }
+
+    // XPI_Err XPI_Agas_load_u128(XPI_Addr addr, XPI_Addr future);
+
+    XPI_Err XPI_Agas_load_s8(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_u8(addr, future);
+    }
+
+    XPI_Err XPI_Agas_load_s16(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_u16(addr, future);
+    }
+
+    XPI_Err XPI_Agas_load_s32(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_u32(addr, future);
+    }
+
+    XPI_Err XPI_Agas_load_s64(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_u64(addr, future);
+    }
+
+    // XPI_Err XPI_Agas_load_s128(XPI_Addr addr, XPI_Addr future);
+
+    XPI_Err XPI_Agas_load_f(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_u32(addr, future);
+    }
+
+    XPI_Err XPI_Agas_load_d(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_u64(addr, future);
+    }
+
+    // XPI_Err XPI_Agas_load_fc(XPI_Addr addr, XPI_Addr future);
+    // XPI_Err XPI_Agas_load_dc(XPI_Addr addr, XPI_Addr future);
+
+    XPI_Err XPI_Agas_load_addr(XPI_Addr addr, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::load128(hpxpi::get_id(addr)), future);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Agas_load_addrdiff(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_addr(addr, future);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Synchronous memory access [5.3.2]
     ///////////////////////////////////////////////////////////////////////////
     XPI_Err XPI_Agas_store_u8_sync(XPI_Addr addr, uint8_t val)
     {

@@ -46,15 +46,28 @@ extern "C"
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    XPI_Err XPI_Process_lco_malloc_sync(XPI_Addr process,
+        size_t count, size_t size, XPI_LCO_Descriptor handlers,
+        XPI_Distribution distribution, size_t init_data_size,
+        const void * const init_data, XPI_Addr *address)
+    {
+        if (0 == address)
+            return XPI_ERR_BAD_ARG;
+        if (XPI_NULL == process)
+            process = hpxpi::from_id(hpx::find_here());
+
+        return XPI_SUCCESS;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
         size_t count, size_t bytes, XPI_Distribution distribution,
         XPI_Addr *address)
     {
-        // we support creating one future at a time only
-        if (1 != count)
+        if (0 == address)
             return XPI_ERR_BAD_ARG;
-
-        hpxpi::future* f = new hpxpi::future(bytes);
+        if (XPI_NULL == process)
+            process = hpxpi::from_id(hpx::find_here());
 
         return XPI_SUCCESS;
     }
