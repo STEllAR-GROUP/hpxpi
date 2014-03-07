@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/components/stubs/memory.hpp>
 
 #include <hpxpi/xpi.h>
 #include <hpxpi/impl/lco.hpp>
@@ -21,11 +22,9 @@ extern "C"
         if (XPI_NULL == process)
             process = hpxpi::from_id(hpx::find_here());
 
-        using hpx::components::stubs::runtime_support;
-
-        hpx::actions::manage_object_action<boost::uint8_t, void> const act;
-        hpx::id_type mem_id = runtime_support::create_memory_block(
-            hpxpi::get_id(process), count*size, act);
+        using hpx::components::stubs::memory;
+        hpx::id_type mem_id = memory::allocate_sync(
+            hpxpi::get_id(process), count*size);
 
         *address = hpxpi::from_id(mem_id);
 

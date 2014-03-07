@@ -10,6 +10,11 @@
 
 #include <hpxpi/xpi.h>
 
+#include <ios>
+#include <iomanip>
+#include <iostream>
+
+#include <boost/io/ios_state.hpp>
 #include <boost/serialization/serialization.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,6 +50,24 @@ inline bool operator> (XPI_Addr lhs, XPI_Addr rhs)
 inline bool operator<= (XPI_Addr lhs, XPI_Addr rhs)
 {
     return !(lhs > rhs);
+}
+
+inline std::ostream& operator<< (std::ostream& os, XPI_Addr addr)
+{
+    boost::io::ios_flags_saver ifs(os);
+    if (addr != XPI_NULL)
+    {
+        os << std::hex
+            << "{" << std::right << std::setfill('0') << std::setw(16)
+                    << addr.msb << ", "
+                    << std::right << std::setfill('0') << std::setw(16)
+                    << addr.lsb << "}";
+    }
+    else
+    {
+        os << "{invalid}";
+    }
+    return os;
 }
 
 namespace hpxpi
