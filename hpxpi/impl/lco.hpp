@@ -6,7 +6,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/util/serialize_buffer.hpp>
 
 #include <boost/serialization/serialization.hpp>
 
@@ -16,24 +18,6 @@
 
 namespace hpxpi
 {
-    struct future
-    {
-    private:
-        typedef std::vector<unsigned char> data_type;
-
-        size_t buffsize;
-        hpx::lcos::promise<data_type> hpx_promise;
-        hpx::unique_future<data_type> hpx_future;
-
-    public:
-        future(size_t buffer_size);
-
-        void* value();
-        void trigger(void* data);
-        size_t size() const { return buffsize; }
-        bool had_get() const { return hpx_future.valid(); }
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -67,21 +51,57 @@ namespace hpxpi
         using hpx::util::placeholders::_1;
         f.then(hpx::util::bind(&detail::on_ready, _1, cont));
     }
+
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////////
+        class custom_lco
+          : public hpx::components::managed_component_base<custom_lco>
+        {
+        public:
+            typedef hpx::util::serialize_buffer<boost::uint8_t> buffer_type;
+
+            custom_lco()
+              : desc_({ 0, 0, 0, 0, 0 }),
+                had_get_value_(false)
+            {}
+
+            void init(XPI_LCO_Descriptor desc, std::size_t size,
+                void const* const init_data)
+            {
+                desc_ = desc;
+                if (0 != desc.init)
+                    desc.init(this, size, init_data);
+            }
+
+            size_t get_size() const;
+            buffer_type get_value() const;
+            void set_value(buffer_type data);
+            bool had_get_value() const;
+
+            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, get_size,
+                get_size_action);
+            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, get_value,
+                get_value_action);
+            HPX_DEFINE_COMPONENT_ACTION(custom_lco, set_value,
+                set_value_action);
+            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, had_get_value,
+                had_get_value_action);
+
+        private:
+            XPI_LCO_Descriptor desc_;
+            mutable bool had_get_value_;
+        };
+    }
+
+    typedef hpx::components::managed_component<detail::custom_lco> custom_lco;
 }
 
-/*
-extern "C"{
-
-//Spec doesn't have void* argument required for action type?
-XPI_Err XPI_LCO_GET_VALUE(void* nothing);
-
-//How do we know how big the data is?
-XPI_Err XPI_LCO_TRIGGER_ACTION(void* data);
-
-//Spec doesn't have void* argument required for action type?
-XPI_Err XPI_LCO_GET_SIZE_ACTION(void* nothing);
-
-//Spec doesn't have void* argument required for action type?
-XPI_Err XPI_LCO_HAD_GET_VALUE_ACTION(void* nothing);
-}
-*/
+HPX_REGISTER_ACTION_DECLARATION(
+    hpxpi::detail::custom_lco::get_size_action, custom_lco_get_size_action);
+HPX_REGISTER_ACTION_DECLARATION(
+    hpxpi::detail::custom_lco::get_value_action, custom_lco_get_value_action);
+HPX_REGISTER_ACTION_DECLARATION(
+    hpxpi::detail::custom_lco::set_value_action, custom_lco_set_value_action);
+HPX_REGISTER_ACTION_DECLARATION(
+    hpxpi::detail::custom_lco::had_get_value_action, custom_lco_had_get_value_action);

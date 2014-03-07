@@ -97,6 +97,14 @@ namespace hpxpi
         id.make_unmanaged();        // release ownership
         return addr;
     }
+
+    inline XPI_Addr from_id(hpx::naming::gid_type gid)
+    {
+        XPI_Addr addr;
+        addr.msb = gid.get_msb();
+        addr.lsb = gid.get_lsb();
+        return addr;
+    }
 }
 
 namespace boost { namespace serialization

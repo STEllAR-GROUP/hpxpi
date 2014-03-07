@@ -52,9 +52,25 @@ extern "C"
     {
         if (0 == address)
             return XPI_ERR_BAD_ARG;
-        if (XPI_NULL == process)
-            process = hpxpi::from_id(hpx::find_here());
 
+        // FIXME: How to send the XPI_LCO_Descriptor over the wire?
+        if (XPI_NULL != process)
+            return XPI_ERR_INV_ADDR;
+
+        hpxpi::custom_lco* lco = static_cast<hpxpi::custom_lco*>(
+            hpxpi::custom_lco::create());
+
+        lco->get()->init(handlers, init_data_size, init_data);
+
+        hpx::naming::gid_type gid = lco->get_base_gid();
+        if (!gid)
+        {
+            hpxpi::custom_lco::destroy(lco);
+            return XPI_ERR_NO_MEM;
+        }
+
+        // everything is ok, return the new id
+        *address = hpxpi::from_id(gid);
         return XPI_SUCCESS;
     }
 

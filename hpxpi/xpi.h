@@ -281,20 +281,21 @@ HPXPI_EXPORT XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct XPI_LCO_Descriptor {
     // Handles initialization of the LCO.
-    void (*init) (void * const lco, const void * const data);
+    // FIXME: added size argument
+    void (*init) (void* const lco, size_t size, void const* const data);
     // Handles the XPI_LCO_TRIGGER action, and should update the LCO’s state.
-    void (*trigger) (void * const lco, const void * const data);
+    void (*trigger) (void* const lco, void const* const data);
     // Called to evaluate the LCO’s predicate. It should not change the
     // state of the LCO. The implementation may cache the result once it
     // returns true.
-    bool (*eval) (const void * const lco);
+    bool (*eval) (void const* const lco);
     // This should return the address of the computed value of the LCO. This
     // will only be called when eval has returned true, and should point to
     // memory of at least get_size bytes. The return address or value may be
     // cached by the implementation.
-    const void *(*get_value) (const void * const lco);
+    void const* (*get_value) (void const* const lco);
     // This should return the size of the value of the LCO.
-    size_t (*get_size) (const void * const lco);
+    size_t (*get_size) (void const* const lco);
 } XPI_LCO_Descriptor;
 
 // HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc(XPI_Addr process,

@@ -10,27 +10,27 @@
 
 using namespace std;
 
+///////////////////////////////////////////////////////////////////////////////
+// Add factory registration functionality.
+HPX_REGISTER_COMPONENT_MODULE();
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(hpxpi::custom_lco, hpxpi_custom_lco);
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialization support for managed_accumulator actions.
+HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::get_size_action,
+    custom_lco_get_size_action);
+HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::get_value_action,
+    custom_lco_get_value_action);
+HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::set_value_action,
+    custom_lco_set_value_action);
+HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::had_get_value_action,
+    custom_lco_had_get_value_action);
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpxpi
 {
-    future::future(size_t buffer_size)
-      : buffsize(buffer_size),
-        hpx_promise(),
-        hpx_future(hpx_promise.get_future())
-    {
-    }
-
-    // Should this return a copy? How do we know how big?
-    void* future::value()
-    {
-        return hpx_future.get().data();
-    }
-
-    void future::trigger(void* data)
-    {
-        unsigned char* buffer = reinterpret_cast<unsigned char*>(data);
-        hpx_promise.set_value(data_type(buffer, buffer+buffsize));
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -47,6 +47,40 @@ namespace hpxpi
                 // FIXME: What should we do in this case? XPI does not have a
                 //        way to propagate an error to the waiting LCO.
             }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        size_t custom_lco::get_size() const
+        {
+            if (0 == desc_.get_size)
+                return 0;
+            return desc_.get_size(this);
+        }
+
+        custom_lco::buffer_type custom_lco::get_value() const
+        {
+            if (0 == desc_.get_value)
+                return buffer_type();
+
+            had_get_value_ = true;
+            boost::uint8_t const* data =
+                reinterpret_cast<boost::uint8_t const*>(
+                    desc_.get_value(this));
+            return buffer_type(data, get_size(), buffer_type::copy);
+        }
+
+        void custom_lco::set_value(custom_lco::buffer_type data)
+        {
+            if (0 == desc_.trigger || 0 == desc_.eval)
+                return;
+
+            desc_.trigger(this, data.data());
+            desc_.eval(this);
+        }
+
+        bool custom_lco::had_get_value() const
+        {
+            return had_get_value_;
         }
     }
 }
