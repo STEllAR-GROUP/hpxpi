@@ -189,6 +189,22 @@ HPXPI_EXPORT XPI_Err XPI_Agas_store_d_sync(XPI_Addr addr, double val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_addr_sync(XPI_Addr addr, XPI_Addr val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_addrdiff_sync(XPI_Addr addr, XPI_AddrDiff val);
 
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u8_sync(XPI_Addr addr, uint8_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u16_sync(XPI_Addr addr, uint16_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u32_sync(XPI_Addr addr, uint32_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u64_sync(XPI_Addr addr, uint64_t *val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_u128_sync(XPI_Addr addr, __uint128_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s8_sync(XPI_Addr addr, int8_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s16_sync(XPI_Addr addr, int16_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s32_sync(XPI_Addr addr, int32_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s64_sync(XPI_Addr addr, int64_t *val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_s128_sync(XPI_Addr addr, __int128_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_f_sync(XPI_Addr addr, float *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_d_sync(XPI_Addr addr, double *val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_fc_sync(XPI_Addr addr, float _Complex *val);
+// HPXPI_EXPORT XPI_Err XPI_Agas_load_dc_sync(XPI_Addr addr, double _Complex *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_addr_sync(XPI_Addr addr, XPI_Addr *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_addrdiff_sync(XPI_Addr addr, XPI_AddrDiff *val);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Threads Actions [6.1]
