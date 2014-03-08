@@ -13,10 +13,32 @@
 extern "C"
 {
     ///////////////////////////////////////////////////////////////////////////
+    // Get own global address
+    XPI_Addr XPI_Thread_get_self()
+    {
+        hpxpi::thread* self = hpxpi::get_self_thread();
+        return self->get_thread_id();
+    }
+
+    // Gets the environment data of instantiating parcel
     void* XPI_Thread_get_env()
     {
         hpxpi::thread* self = hpxpi::get_self_thread();
         return self->get_environment_data();
+    }
+
+    // Gets target address of instantiating parcel
+    XPI_Addr XPI_Thread_get_addr()
+    {
+        hpxpi::thread* self = hpxpi::get_self_thread();
+        return self->get_address();
+    }
+
+    // Gets the handle for continuation parcel
+    XPI_Parcel XPI_Thread_get_cont()
+    {
+        hpxpi::thread* self = hpxpi::get_self_thread();
+        return self->get_continuation();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -58,5 +80,17 @@ extern "C"
                 break;
         }
         return error;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    XPI_Err XPI_Thread_get_process_sync(XPI_Addr address, XPI_Addr *process)
+    {
+        if (XPI_NULL == address)
+            return XPI_ERR_INV_ADDR;
+        if (0 == process)
+            return XPI_ERR_BAD_ARG;
+
+        *process = XPI_NULL;        // always local (for now)
+        return XPI_SUCCESS;
     }
 }

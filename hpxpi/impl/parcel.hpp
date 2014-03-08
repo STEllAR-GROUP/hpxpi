@@ -113,7 +113,7 @@ namespace hpxpi
         }
         void push_frame()
         {
-            records_.push_back(parcel_frame());
+            records_.push_back(records_.front());
         }
 
         bool is_empty() const

@@ -17,12 +17,14 @@ namespace hpxpi
 {
     struct thread
     {
-        parcel const& continuation_;
+    private:
+        parcel& continuation_;
         XPI_Addr addr_;
         std::string target_action_;
         std::vector<uint8_t> environment_data_;
 
-        thread(parcel const& creator);
+    public:
+        thread(parcel& creator);
 
         void* get_environment_data()
         {
@@ -31,6 +33,23 @@ namespace hpxpi
         void const* get_environment_data() const
         {
             return environment_data_.data();
+        }
+
+        XPI_Addr get_address() const
+        {
+            return addr_;
+        }
+
+        // FIXME: this needs to refer to the thread's address, not its target
+        XPI_Addr get_thread_id() const
+        {
+            return addr_;
+        }
+
+        XPI_Parcel get_continuation() const
+        {
+            XPI_Parcel parcel = { reinterpret_cast<intptr_t>(&continuation_) };
+            return parcel;
         }
     };
 

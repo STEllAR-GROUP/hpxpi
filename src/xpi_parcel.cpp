@@ -88,28 +88,28 @@ namespace hpxpi
         void const* data = ps.get_argument_data();
         XPI_Action action = registry.get_action(ps.get_target_action());
 
-        // Create thread struct
-        hpxpi::thread new_thread(ps);
-        ps.pop_frame();
+        // Create thread struct, it modifies ps to refer to this thread's
+        // continuation parcel only.
+        hpxpi::thread t(ps);
 
         // activate future
         if (XPI_NULL != future)
-            hpx::trigger_lco_event(hpxpi::get_id(future));
+            hpx::set_lco_value(hpxpi::get_id(future), t.get_thread_id());
 
         // Pass new thread
         XPI_Err status = XPI_SUCCESS;
         {
-            detail::thread_data reset(&new_thread);
+            detail::thread_data reset(&t);
             status = action(const_cast<void*>(data));
         }
 
         // Send continuation
-        if (!ps.is_empty())
+        if (XPI_SUCCESS == status && !ps.is_empty())
         {
-            XPI_Parcel parcel;
-            parcel.p = reinterpret_cast<intptr_t>(&ps);
+            XPI_Parcel parcel = { reinterpret_cast<intptr_t>(&ps) };
             XPI_Parcel_send(parcel, XPI_NULL, XPI_NULL);
         }
+
         return status;
     }
 
@@ -212,8 +212,8 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    // What is this actually supposed to do?
-    // Currently sync, future not used
+    // FIXME: What is this actually supposed to do?
+    //        Currently sync, future not used
     XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete)
     {
         if (!hpxpi::is_parcel_valid(parcel))
@@ -250,8 +250,67 @@ extern "C"
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
-        size_t bytes, void const*data, XPI_Addr complete)
+    // FIXME: how can we delete the created parcel?
+    // FIXME: It would be useful to have the full (non-optimized) implementation
+    //        of this function in the spec for illustration purposes.
+//     XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
+//         size_t bytes, void const*data, XPI_Addr complete)
+//     {
+//         XPI_Err error = XPI_SUCCESS;
+//
+//         if (XPI_NULL == target)
+//             target = hpxpi::from_id(hpx::find_here());
+//
+//         // create a parcel
+//         XPI_Parcel parcel;
+//         error = XPI_Parcel_create(&parcel);
+//         if (error != XPI_SUCCESS) return error;
+//
+//         // set target address
+//         error = XPI_Parcel_set_addr(parcel, target);
+//         if (error != XPI_SUCCESS)
+//         {
+//             XPI_Parcel_free(parcel);
+//             return error;
+//         }
+//
+//         // set action
+//         error = XPI_Parcel_set_action(parcel, action);
+//         if (error != XPI_SUCCESS)
+//         {
+//             XPI_Parcel_free(parcel);
+//             return error;
+//         }
+//
+//         // set argument data
+//         error = XPI_Parcel_set_data(parcel, bytes, data);
+//         if (error != XPI_SUCCESS)
+//         {
+//             XPI_Parcel_free(parcel);
+//             return error;
+//         }
+//
+//         // send parcel
+//         error = XPI_Parcel_send(parcel, complete, XPI_NULL);
+//         if (error != XPI_SUCCESS)
+//         {
+//             XPI_Parcel_free(parcel);
+//             return error;
+//         }
+//
+//         // FIXME: it is not safe to destroy the parcel here, it must be leaked
+//         // XPI_Parcel_free(parcel);
+//
+//         return XPI_SUCCESS;
+//     }
+
+    // FIXME: It is not clear from the spec what this function should
+    //        synchronize with - the whole operation or the parcel send. We
+    //        decided to synchronize on the parcel send only.
+    // FIXME: It would be useful to have the full (non-optimized) implementation
+    //        of this function in the spec for illustration purposes.
+    XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
+        size_t bytes, const void *data)
     {
         XPI_Err error = XPI_SUCCESS;
 
@@ -287,35 +346,22 @@ extern "C"
             return error;
         }
 
-        // send parcel
-        error = XPI_Parcel_send(parcel, complete, XPI_NULL);
-        if (error != XPI_SUCCESS)
-        {
-            XPI_Parcel_free(parcel);
-            return error;
-        }
-
-        return XPI_Parcel_free(parcel);
-    }
-
-    XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
-        size_t bytes, const void *data)
-    {
-        XPI_Err error = XPI_SUCCESS;
-
         // create completion future
         XPI_Addr complete = XPI_NULL;
         error = XPI_Process_future_new_sync(XPI_NULL, 1, 0,
             XPI_DISTRIBUTION_NULL, &complete);
         if (error != XPI_SUCCESS)
         {
+            XPI_Parcel_free(parcel);
             return error;
         }
 
-        error = XPI_Parcel_apply(target, action, bytes, data, complete);
+        // send parcel
+        error = XPI_Parcel_send(parcel, complete, XPI_NULL);
         if (error != XPI_SUCCESS)
         {
             XPI_LCO_free_sync(complete);
+            XPI_Parcel_free(parcel);
             return error;
         }
 
@@ -324,6 +370,7 @@ extern "C"
 
         // free all resources
         XPI_LCO_free_sync(complete);
+        XPI_Parcel_free(parcel);
 
         return error;
     }

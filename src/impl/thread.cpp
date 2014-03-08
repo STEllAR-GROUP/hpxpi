@@ -11,12 +11,14 @@
 
 namespace hpxpi
 {
-    thread::thread(parcel const& creator)
+    thread::thread(parcel& creator)
       : continuation_(creator),
         addr_(creator.get_target_address()),
         target_action_(creator.get_target_action()),
         environment_data_(creator.get_environment_data())
     {
+        // we need to refer to our continuation data only
+        continuation_.pop_frame();
     }
 
     thread* get_self_thread()
