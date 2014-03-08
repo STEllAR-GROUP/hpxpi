@@ -17,6 +17,7 @@ extern "C"
     XPI_Action XPI_ACTION_NULL = NULL;
 
     XPI_Distribution XPI_DISTRIBUTION_NULL = { 0 };
+    XPI_Distribution XPI_LOCAL = { 0 };
 
     ///////////////////////////////////////////////////////////////////////////
     // Asynchronous memory access [5.3.1]

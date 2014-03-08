@@ -132,10 +132,17 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* d
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes,
     void const* data);
 
-// High-level function call interface
+///////////////////////////////////////////////////////////////////////////////
+// High-level function call interface (Apply) [4.5]
+///////////////////////////////////////////////////////////////////////////////
+
 // FIXME: parameter action: void* --> XPI_Action
-HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
-    size_t bytes, const void *data, XPI_Addr future);
+// HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
+//     size_t bytes, const void *data, XPI_Addr future);
+
+// FIXME: There is an interface mismatch between this and XPI_Parcel_apply.
+//        How should the continuation data be returned for this function?
+// FIXME: parameter action: void* --> XPI_Action
 HPXPI_EXPORT XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
     size_t bytes, const void *data);
 
@@ -156,7 +163,8 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete);
 ///////////////////////////////////////////////////////////////////////////////
 
 // Sends a parcel, with future signaling completion
-HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete,
+    XPI_Addr future);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Asynchronous memory access [5.3.1]
@@ -266,6 +274,14 @@ HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr lco, void *value);
 HPXPI_EXPORT XPI_Err XPI_Thread_wait_all(size_t n, XPI_Addr lco[], void* values[]);
 
 ///////////////////////////////////////////////////////////////////////////////
+// Thread Resources [6.6]
+///////////////////////////////////////////////////////////////////////////////
+
+// HPXPI_EXPORT XPI_Err XPI_Thread_get_process(XPI_Addr address, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Thread_get_process_sync(XPI_Addr address,
+    XPI_Addr *process);
+
+///////////////////////////////////////////////////////////////////////////////
 // LCOs: Common Interface [7.2]
 ///////////////////////////////////////////////////////////////////////////////
 // HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, void const* data,
@@ -286,6 +302,7 @@ HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct XPI_Distribution { intptr_t p; } XPI_Distribution;
 HPXPI_EXPORT extern XPI_Distribution XPI_DISTRIBUTION_NULL;
+HPXPI_EXPORT extern XPI_Distribution XPI_LOCAL;
 
 // HPXPI_EXPORT XPI_Err XPI_Process_Future_New(XPI_Addr process,
 //     size_t count, size_t bytes, XPI_Distribution distribution,
