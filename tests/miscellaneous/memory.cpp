@@ -14,10 +14,10 @@ void test_load_store_u32()
     XPI_Addr mem = XPI_NULL, process = XPI_NULL;
 
     HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint32_t),
-        XPI_DISTRIBUTION_NULL, 0), XPI_ERR_BAD_ARG);
+        XPI_LOCAL, 0), XPI_ERR_BAD_ARG);
 
     HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint32_t),
-        XPI_DISTRIBUTION_NULL, &mem), XPI_SUCCESS);
+        XPI_LOCAL, &mem), XPI_SUCCESS);
 
     uint32_t src = 0x01234567ul;
     uint32_t dest = 0ul;
@@ -41,10 +41,10 @@ void test_load_store_u64()
     XPI_Addr mem = XPI_NULL, process = XPI_NULL;
 
     HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint64_t),
-        XPI_DISTRIBUTION_NULL, 0), XPI_ERR_BAD_ARG);
+        XPI_LOCAL, 0), XPI_ERR_BAD_ARG);
 
     HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint64_t),
-        XPI_DISTRIBUTION_NULL, &mem), XPI_SUCCESS);
+        XPI_LOCAL, &mem), XPI_SUCCESS);
 
     uint64_t src = 0x0123456789abcdefull;
     uint64_t dest = 0ull;
@@ -68,10 +68,10 @@ void test_load_store_u128()
     XPI_Addr mem = XPI_NULL, process = XPI_NULL;
 
     HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(XPI_Addr),
-        XPI_DISTRIBUTION_NULL, 0), XPI_ERR_BAD_ARG);
+        XPI_LOCAL, 0), XPI_ERR_BAD_ARG);
 
     HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(XPI_Addr),
-        XPI_DISTRIBUTION_NULL, &mem), XPI_SUCCESS);
+        XPI_LOCAL, &mem), XPI_SUCCESS);
 
     XPI_Addr src = { 0xfedcba9876543210ull, 0x0123456789abcdefull };
     XPI_Addr dest = XPI_NULL;

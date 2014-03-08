@@ -54,7 +54,7 @@ XPI_Err fib_naive(void* data)
 
         result = result1 + result2;
 
-        // Free the futures (why do I have to do that separately?).
+        // Free the futures (FIXME: why do I have to do that separately?).
         HPX_TEST_EQ(XPI_LCO_free_sync(futures[0]), XPI_SUCCESS);
         HPX_TEST_EQ(XPI_LCO_free_sync(futures[1]), XPI_SUCCESS);
     }

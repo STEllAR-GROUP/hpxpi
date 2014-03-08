@@ -348,8 +348,7 @@ extern "C"
 
         // create completion future
         XPI_Addr complete = XPI_NULL;
-        error = XPI_Process_future_new_sync(XPI_NULL, 1, 0,
-            XPI_DISTRIBUTION_NULL, &complete);
+        error = XPI_Process_future_new_sync(XPI_NULL, 1, 0, XPI_LOCAL, &complete);
         if (error != XPI_SUCCESS)
         {
             XPI_Parcel_free(parcel);

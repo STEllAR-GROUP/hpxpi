@@ -40,7 +40,7 @@ typedef int XPI_Err;
 ///////////////////////////////////////////////////////////////////////////////
 
 // Implementation defined
-// 
+//
 // Corresponds to hpx gid_type
 typedef struct XPI_Addr {
     uint64_t msb;
@@ -300,9 +300,10 @@ HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
 ///////////////////////////////////////////////////////////////////////////////
 // Futures [7.3.1]
 ///////////////////////////////////////////////////////////////////////////////
-typedef struct XPI_Distribution { intptr_t p; } XPI_Distribution;
-HPXPI_EXPORT extern XPI_Distribution XPI_DISTRIBUTION_NULL;
-HPXPI_EXPORT extern XPI_Distribution XPI_LOCAL;
+typedef enum XPI_Distribution {
+    XPI_LOCAL = 0,      // refer to current locality
+    XPI_CYCLIC = 1      // try to cyclically use localities
+} XPI_Distribution;
 
 // HPXPI_EXPORT XPI_Err XPI_Process_Future_New(XPI_Addr process,
 //     size_t count, size_t bytes, XPI_Distribution distribution,

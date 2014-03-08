@@ -19,7 +19,7 @@ extern "C"
     {
         if (0 == address)
             return XPI_ERR_BAD_ARG;
-        if (XPI_NULL == process)
+        if (XPI_NULL == process || XPI_LOCAL == distribution)
             process = hpxpi::from_id(hpx::find_here());
 
         using hpx::components::stubs::memory;
