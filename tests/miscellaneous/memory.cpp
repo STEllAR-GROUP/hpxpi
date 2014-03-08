@@ -9,6 +9,60 @@
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_load_store_u8()
+{
+    XPI_Addr mem = XPI_NULL, process = XPI_NULL;
+
+    HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint8_t),
+        XPI_LOCAL, 0), XPI_ERR_BAD_ARG);
+
+    HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint8_t),
+        XPI_LOCAL, &mem), XPI_SUCCESS);
+
+    uint8_t src = 0x55ul;
+    uint8_t dest = 0ul;
+
+    HPX_TEST_EQ(XPI_Agas_store_u8_sync(XPI_NULL, src), XPI_ERR_INV_ADDR);
+    HPX_TEST_EQ(XPI_Agas_load_u8_sync(XPI_NULL, &dest), XPI_ERR_INV_ADDR);
+    HPX_TEST_EQ(dest, 0ul);
+
+    HPX_TEST_EQ(XPI_Agas_load_u8_sync(mem, 0), XPI_ERR_BAD_ARG);
+
+    HPX_TEST_EQ(XPI_Agas_store_u8_sync(mem, src), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Agas_load_u8_sync(mem, &dest), XPI_SUCCESS);
+    HPX_TEST_EQ(dest, src);
+
+    HPX_TEST_EQ(XPI_Process_global_free_sync(process, XPI_NULL), XPI_ERR_INV_ADDR);
+    HPX_TEST_EQ(XPI_Process_global_free_sync(process, mem), XPI_SUCCESS);
+}
+
+void test_load_store_u16()
+{
+    XPI_Addr mem = XPI_NULL, process = XPI_NULL;
+
+    HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint16_t),
+        XPI_LOCAL, 0), XPI_ERR_BAD_ARG);
+
+    HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint16_t),
+        XPI_LOCAL, &mem), XPI_SUCCESS);
+
+    uint16_t src = 0x0123ul;
+    uint16_t dest = 0ul;
+
+    HPX_TEST_EQ(XPI_Agas_store_u16_sync(XPI_NULL, src), XPI_ERR_INV_ADDR);
+    HPX_TEST_EQ(XPI_Agas_load_u16_sync(XPI_NULL, &dest), XPI_ERR_INV_ADDR);
+    HPX_TEST_EQ(dest, 0ul);
+
+    HPX_TEST_EQ(XPI_Agas_load_u16_sync(mem, 0), XPI_ERR_BAD_ARG);
+
+    HPX_TEST_EQ(XPI_Agas_store_u16_sync(mem, src), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Agas_load_u16_sync(mem, &dest), XPI_SUCCESS);
+    HPX_TEST_EQ(dest, src);
+
+    HPX_TEST_EQ(XPI_Process_global_free_sync(process, XPI_NULL), XPI_ERR_INV_ADDR);
+    HPX_TEST_EQ(XPI_Process_global_free_sync(process, mem), XPI_SUCCESS);
+}
+
 void test_load_store_u32()
 {
     XPI_Addr mem = XPI_NULL, process = XPI_NULL;
@@ -93,6 +147,8 @@ void test_load_store_u128()
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
+    test_load_store_u8();
+    test_load_store_u16();
     test_load_store_u32();
     test_load_store_u64();
     test_load_store_u128();

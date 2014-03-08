@@ -7,6 +7,7 @@
 #define HPXPI_INTERNAL_ADDR_HPP_MARCH_05_2014_0779PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 #include <hpxpi/xpi.h>
 
@@ -80,29 +81,29 @@ namespace hpxpi
         return hpx::id_type(addr.msb, addr.lsb, hpx::id_type::unmanaged);
     }
 
-    // Return id_type representing given address, this takes the ownership of
-    // the credits stored in the address
+    ///////////////////////////////////////////////////////////////////////////
+    // Release the credits stored in the given XPI_Addr.
     inline void release_id(XPI_Addr addr)
     {
+        // The destructor of the temporary id_type created will trigger the
+        // release of the referenced credits, which may result in the
+        // destruction of the referenced object.
         hpx::id_type(addr.msb, addr.lsb, hpx::id_type::managed);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // Return XPI_Addr representing given id, this releases the ownership to
     // the returned address.
     inline XPI_Addr from_id(hpx::id_type id)
     {
-        XPI_Addr addr;
-        addr.msb = id.get_msb();
-        addr.lsb = id.get_lsb();
+        XPI_Addr addr = { id.get_msb(), id.get_lsb() };
         id.make_unmanaged();        // release ownership
         return addr;
     }
 
-    inline XPI_Addr from_id(hpx::naming::gid_type gid)
+    inline XPI_Addr from_id(hpx::naming::gid_type const& gid)
     {
-        XPI_Addr addr;
-        addr.msb = gid.get_msb();
-        addr.lsb = gid.get_lsb();
+        XPI_Addr addr = { gid.get_msb(), gid.get_lsb() };
         return addr;
     }
 }
