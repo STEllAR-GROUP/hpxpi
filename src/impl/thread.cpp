@@ -12,10 +12,10 @@
 namespace hpxpi
 {
     thread::thread(parcel const& creator)
-      : continuation(creator),
-        addr(creator.addr()),
-        target_action(creator.target_action()),
-        environment_data(creator.environment_data())
+      : continuation_(creator),
+        addr_(creator.get_target_address()),
+        target_action_(creator.get_target_action()),
+        environment_data_(creator.get_environment_data())
     {
     }
 

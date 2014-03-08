@@ -51,4 +51,12 @@ extern "C"
 
         return XPI_SUCCESS;
     }
+
+    XPI_Err XPI_LCO_get_value(XPI_Addr lco, void const* data)
+    {
+        if (XPI_NULL == lco)
+            return XPI_ERR_INV_ADDR;
+
+        return XPI_SUCCESS;
+    }
 }

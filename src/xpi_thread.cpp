@@ -12,6 +12,6 @@ extern "C"
     void* XPI_Thread_get_env()
     {
         hpxpi::thread* self = hpxpi::get_self_thread();
-        return self->environment_data.data();
+        return self->get_environment_data();
     }
 }

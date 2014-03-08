@@ -9,31 +9,32 @@
 #include <iostream>
 using namespace std;
 
-const int fib_n=10;
+int const fib_n = 10;
 
-typedef struct{
+typedef struct fib_data {
     int n;
     XPI_Addr future;
 } fib_data;
 
-XPI_Err fib_naive(void* data){
-    fib_data cast_args=(fib_data*)data;
-    //Alocate futures
-    XPI_Addr futures[2];
-    //Ignore distribution
-    HPX_TEST_EQ(XPI_Process_future_new_sync(2,sizeof(int),XPI_NULL,&futures), XPI_SUCESS);
-    //Create structs
-    fib_data d1={cast_data->n-1, futures[0]};
-    fib_data d2={cast_data->n-2, futures[1]};
-    //Send parcels
-    XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d1, XPI_NULL);
-    XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d2, XPI_NULL);
-    //Wait on futures
-    void* results[2];
-    HPX_TEST_EQ(XPI_Thread_wait_all(2,futures,results), XPI_SUCESS);
-    int result=*(int*)results[0]+*(int*)results[1];
-    //Send results
-    HPX_TEST_EQ(XPI_LCO_trigger(cast_args->future, &result, XPI_NULL), XPI_SUCESS);
+XPI_Err fib_naive(void* data)
+{
+//     fib_data cast_args=(fib_data*)data;
+//     //Alocate futures
+//     XPI_Addr futures[2];
+//     //Ignore distribution
+//     HPX_TEST_EQ(XPI_Process_future_new_sync(2,sizeof(int),XPI_NULL,&futures), XPI_SUCESS);
+//     //Create structs
+//     fib_data d1={cast_data->n-1, futures[0]};
+//     fib_data d2={cast_data->n-2, futures[1]};
+//     //Send parcels
+//     XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d1, XPI_NULL);
+//     XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d2, XPI_NULL);
+//     //Wait on futures
+//     void* results[2];
+//     HPX_TEST_EQ(XPI_Thread_wait_all(2,futures,results), XPI_SUCESS);
+//     int result=*(int*)results[0]+*(int*)results[1];
+//     //Send results
+//     HPX_TEST_EQ(XPI_LCO_trigger(cast_args->future, &result, XPI_NULL), XPI_SUCESS);
     return XPI_SUCCESS;
 }
 
@@ -42,18 +43,24 @@ XPI_Err fib_naive(void* data){
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
     XPI_Addr result;
-    int r;
-    HPX_TEST_EQ(XPI_Process_future_new_sync(1,sizeof(int),XPI_NULL,&result), XPI_SUCESS);
-    fib_data init={fib_n, result};
-    XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &init, XPI_NULL);
-    HPX_TEST_EQ(XPI_Thread_wait(result,&r),XPI_SUCESS);
-    cout<<r<<endl;
+    HPX_TEST_EQ(XPI_Process_future_new_sync(XPI_NULL, 1, sizeof(int),
+        XPI_DISTRIBUTION_NULL, &result), XPI_SUCCESS);
+
+    fib_data init = { fib_n, result };
+    XPI_Parcel_apply_sync(XPI_NULL, &fib_naive, sizeof(fib_data), &init, XPI_NULL);
+
+    int r = 0;
+//     HPX_TEST_EQ(XPI_Thread_wait(result,&r),XPI_SUCESS);
+
+    std::cout << "fib(" << fib_n << ") = " << r << std::endl;
     return XPI_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+    int result = 0;
+
     HPX_TEST_EQ(XPI_init(&argc, &argv, 0), XPI_SUCCESS);
 
     HPX_TEST_EQ(XPI_run(argc, argv, &result), XPI_SUCCESS);

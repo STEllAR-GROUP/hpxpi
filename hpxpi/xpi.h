@@ -128,7 +128,15 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel, XPI_Action action)
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* data);
 
 // Set the parcel argument data
-HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes, void* data);
+// FIXME: added const to last argument
+HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes,
+    void const* data);
+
+// High-level function call interface
+// HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, void *action,
+//     size_t bytes, const void *data, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
+    size_t bytes, const void *data);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Continuation Stack Management [4.3]
@@ -262,6 +270,9 @@ HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value_sync(XPI_Addr lco, bool *value);
 // HPXPI_EXPORT XPI_Err XPI_LCO_free(XPI_Addr lco, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
 
+// FIXME: Spec doesn't define this
+HPXPI_EXPORT XPI_Err XPI_LCO_get_value(XPI_Addr lco, void const* data);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Futures [7.3.1]
 ///////////////////////////////////////////////////////////////////////////////
@@ -275,14 +286,18 @@ HPXPI_EXPORT XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
     size_t count, size_t bytes, XPI_Distribution distribution,
     XPI_Addr *address);
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // User LCOs [7.4]
 ///////////////////////////////////////////////////////////////////////////////
+
+// FIXME: const parameters do not make too much sense
 typedef struct XPI_LCO_Descriptor {
     // Handles initialization of the LCO.
-    // FIXME: added size argument
-    void (*init) (void* const lco, size_t size, void const* const data);
+    // FIXME: changed return type
+    // FIXME: added size, init_size arguments
+    void* (*init) (size_t size, size_t init_size, void const* const data);
+    // FIXME: added destroy method
+    void (*destroy) (void* const lco);
     // Handles the XPI_LCO_TRIGGER action, and should update the LCO’s state.
     void (*trigger) (void* const lco, void const* const data);
     // Called to evaluate the LCO’s predicate. It should not change the
@@ -302,6 +317,7 @@ typedef struct XPI_LCO_Descriptor {
 //     size_t count, size_t size, XPI_LCO_Descriptor handlers,
 //     XPI_Distribution distribution, size_t init_data_size,
 //     const void * const init_data, XPI_Addr future);
+
 HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc_sync(XPI_Addr process,
     size_t count, size_t size, XPI_LCO_Descriptor handlers,
     XPI_Distribution distribution, size_t init_data_size,

@@ -48,29 +48,33 @@ extern "C"
     XPI_Err XPI_Process_lco_malloc_sync(XPI_Addr process,
         size_t count, size_t size, XPI_LCO_Descriptor handlers,
         XPI_Distribution distribution, size_t init_data_size,
-        const void * const init_data, XPI_Addr *address)
+        void const* const init_data, XPI_Addr *address)
     {
-        if (0 == address)
+        if (0 == address || 0 == count)
             return XPI_ERR_BAD_ARG;
 
         // FIXME: How to send the XPI_LCO_Descriptor over the wire?
         if (XPI_NULL != process)
             return XPI_ERR_INV_ADDR;
 
-        hpxpi::custom_lco* lco = static_cast<hpxpi::custom_lco*>(
-            hpxpi::custom_lco::create());
-
-        lco->get()->init(handlers, init_data_size, init_data);
-
-        hpx::naming::gid_type gid = lco->get_base_gid();
-        if (!gid)
+        for (size_t i = 0; i != count; ++i)
         {
-            hpxpi::custom_lco::destroy(lco);
-            return XPI_ERR_NO_MEM;
+            hpxpi::custom_lco* lco = static_cast<hpxpi::custom_lco*>(
+                hpxpi::custom_lco::create());
+
+            lco->get()->init(handlers, size, init_data_size, init_data);
+
+            hpx::naming::gid_type gid = lco->get_base_gid();
+            if (!gid)
+            {
+                hpxpi::custom_lco::destroy(lco);
+                return XPI_ERR_NO_MEM;
+            }
+
+            // everything is ok, return the new id
+            address[i] = hpxpi::from_id(gid);
         }
 
-        // everything is ok, return the new id
-        *address = hpxpi::from_id(gid);
         return XPI_SUCCESS;
     }
 
@@ -79,11 +83,17 @@ extern "C"
         size_t count, size_t bytes, XPI_Distribution distribution,
         XPI_Addr *address)
     {
-        if (0 == address)
-            return XPI_ERR_BAD_ARG;
-        if (XPI_NULL == process)
-            process = hpxpi::from_id(hpx::find_here());
+        XPI_LCO_Descriptor handlers =
+        {
+            &hpxpi::future_init,
+            &hpxpi::future_destroy,
+            &hpxpi::future_trigger,
+            &hpxpi::future_eval,
+            &hpxpi::future_get_value,
+            &hpxpi::future_get_size
+        };
 
-        return XPI_SUCCESS;
+        return XPI_Process_lco_malloc_sync(process, count, bytes, handlers,
+            distribution, 0, 0, address);
     }
 }
