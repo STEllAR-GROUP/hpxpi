@@ -21,7 +21,7 @@ XPI_Err fib_naive(void* data)
     fib_data* cast_args = (fib_data*)data;
 
     int result = 0;
-    if (cast_args->n > 2)
+    if (cast_args->n >= 2)
     {
         XPI_Addr process = XPI_NULL;
         HPX_TEST_EQ(
