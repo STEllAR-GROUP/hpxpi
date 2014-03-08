@@ -215,10 +215,22 @@ namespace hpxpi
 
         ///////////////////////////////////////////////////////////////////////
         class custom_lco
-          : public hpx::components::managed_component_base<custom_lco>
+          : public hpx::lcos::base_lco_with_value<hpx::util::serialize_buffer<uint8_t> >,
+            public hpx::components::locking_hook<
+                hpx::components::managed_component_base<custom_lco> >
         {
+        private:
+            typedef hpx::components::managed_component_base<custom_lco> base_type;
+
         public:
+            typedef
+                hpx::lcos::base_lco_with_value<hpx::util::serialize_buffer<uint8_t> >
+            base_lco_type;
+
             typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
+
+            typedef base_lco_type::base_type_holder base_type_holder;
+            typedef base_type::wrapping_type wrapping_type;
 
             custom_lco()
               : desc_({ 0, 0, 0, 0, 0, 0 }),
@@ -241,37 +253,50 @@ namespace hpxpi
                 if (0 != desc_.destroy)
                     desc_.destroy(lco_);
                 lco_ = 0;
+                base_type::finalize();
             }
 
+            static hpx::components::component_type get_component_type()
+            {
+                return hpx::components::get_component_type<custom_lco>();
+            }
+            static void set_component_type(hpx::components::component_type type)
+            {
+                hpx::components::set_component_type<custom_lco>(type);
+            }
+            using base_type::wrap_action;
+
             size_t get_size() const;
-            buffer_type get_value() const;
-            void set_value(buffer_type data);
+            buffer_type get_value_() const;
+            void set_value(buffer_type&& data);
             bool had_get_value() const;
+
+            buffer_type const& get_value(hpx::error_code &ec);
 
             HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, get_size,
                 get_size_action);
-            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, get_value,
+            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, get_value_,
                 get_value_action);
-            HPX_DEFINE_COMPONENT_ACTION(custom_lco, set_value,
-                set_value_action);
             HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, had_get_value,
                 had_get_value_action);
 
         private:
             XPI_LCO_Descriptor desc_;
             void* lco_;
-            mutable bool had_get_value_;
+            bool had_get_value_;
+            buffer_type data_;
         };
     }
 
     typedef hpx::components::managed_component<detail::custom_lco> custom_lco;
 }
 
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::util::serialize_buffer<uint8_t>, serialize_buffer_uin8_t_type)
+
 HPX_REGISTER_ACTION_DECLARATION(
     hpxpi::detail::custom_lco::get_size_action, custom_lco_get_size_action);
 HPX_REGISTER_ACTION_DECLARATION(
     hpxpi::detail::custom_lco::get_value_action, custom_lco_get_value_action);
-HPX_REGISTER_ACTION_DECLARATION(
-    hpxpi::detail::custom_lco::set_value_action, custom_lco_set_value_action);
 HPX_REGISTER_ACTION_DECLARATION(
     hpxpi::detail::custom_lco::had_get_value_action, custom_lco_had_get_value_action);

@@ -11,20 +11,23 @@
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Add factory registration functionality.
+// Add factory registration functionality for this module.
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(hpxpi::custom_lco, hpxpi_custom_lco);
+HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::util::serialize_buffer<uint8_t>,
+    serialize_buffer_uin8_t_type)
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(hpxpi::custom_lco, hpxpi_custom_lco,
+    "serialize_buffer_uin8_t_type", hpx::components::factory_enabled)
+
+HPX_DEFINE_GET_COMPONENT_TYPE(hpxpi::detail::custom_lco)
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for managed_accumulator actions.
+// Serialization support for hpxpi::custom_lco actions.
 HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::get_size_action,
     custom_lco_get_size_action);
 HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::get_value_action,
     custom_lco_get_value_action);
-HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::set_value_action,
-    custom_lco_set_value_action);
 HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::had_get_value_action,
     custom_lco_had_get_value_action);
 
@@ -57,20 +60,29 @@ namespace hpxpi
             return desc_.get_size(lco_);
         }
 
-        custom_lco::buffer_type custom_lco::get_value() const
+        custom_lco::buffer_type custom_lco::get_value_() const
         {
-            if (0 == desc_.get_value)
-                return buffer_type();
-
-            had_get_value_ = true;
-            boost::uint8_t const* data =
-                reinterpret_cast<boost::uint8_t const*>(
-                    desc_.get_value(lco_));
-
-            return buffer_type(data, get_size(), buffer_type::copy);
+            return const_cast<custom_lco*>(this)->get_value(hpx::throws);
         }
 
-        void custom_lco::set_value(custom_lco::buffer_type data)
+        custom_lco::buffer_type const& custom_lco::get_value(hpx::error_code &ec)
+        {
+            if (0 == desc_.get_value)
+                return data_;
+
+            if (!had_get_value_)
+            {
+                had_get_value_ = true;
+                boost::uint8_t const* data =
+                    reinterpret_cast<boost::uint8_t const*>(
+                        desc_.get_value(lco_));
+                data_ = buffer_type(data, get_size(), buffer_type::reference);
+            }
+
+            return data_;
+        }
+
+        void custom_lco::set_value(custom_lco::buffer_type&& data)
         {
             if (0 == desc_.trigger || 0 == desc_.eval)
                 return;
