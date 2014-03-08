@@ -215,17 +215,20 @@ namespace hpxpi
 
         ///////////////////////////////////////////////////////////////////////
         class custom_lco
-          : public hpx::lcos::base_lco_with_value<hpx::util::serialize_buffer<uint8_t> >,
+          : public hpx::lcos::base_lco_with_value<
+                hpx::util::serialize_buffer<uint8_t> >,
             public hpx::components::locking_hook<
                 hpx::components::managed_component_base<custom_lco> >
         {
         private:
-            typedef hpx::components::managed_component_base<custom_lco> base_type;
+            typedef hpx::components::locking_hook<
+                hpx::components::managed_component_base<custom_lco>
+            > base_type;
 
         public:
-            typedef
-                hpx::lcos::base_lco_with_value<hpx::util::serialize_buffer<uint8_t> >
-            base_lco_type;
+            typedef hpx::lcos::base_lco_with_value<
+                hpx::util::serialize_buffer<uint8_t>
+            > base_lco_type;
 
             typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
 
