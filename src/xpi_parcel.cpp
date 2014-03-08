@@ -129,9 +129,9 @@ extern "C"
     XPI_Parcel XPI_PARCEL_NULL = { 0 };
 
     ///////////////////////////////////////////////////////////////////////////
-    XPI_Err XPI_register_action_with_key(XPI_Action action, char* key)
+    XPI_Err XPI_register_action_with_key(XPI_Action action, char const* key)
     {
-        hpxpi::registry.register_action(action, const_cast<char const*>(key));
+        hpxpi::registry.register_action(action, key);
         return XPI_SUCCESS;
     }
 

@@ -33,11 +33,6 @@ extern "C" {
             *release = XPI_VERSION_RELEASE;
     }
 
-    XPI_Err XPI_register_action_with_key(XPI_Action action, const char* key){
-        registry.register_action(action, string(key));
-        return XPI_SUCCESS;
-    }
-
     ///////////////////////////////////////////////////////////////////////////////
     // XPI_init initializes the XPI runtime, using the passed arguments and the
     // environment. C applications usually simply forward pointers to argc, argv,
