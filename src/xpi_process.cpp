@@ -39,7 +39,7 @@ extern "C"
             return XPI_ERR_INV_ADDR;
 
         // create an id, taking ownership, destructor releases credits
-        hpx::id_type id = hpxpi::from_address(address);
+        hpxpi::release_id(address);
 
         return XPI_SUCCESS;
     }

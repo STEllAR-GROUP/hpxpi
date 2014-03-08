@@ -13,12 +13,12 @@
 #include <cstdint>
 #include <cstddef>
 using std::size_t;
-#include <cstdint>
+#include <cstdlib>
 using std::intptr_t;
 #else
 #include <stdint.h>
 #include <stddef.h>
-#include <stdint.h>
+#include <stdlib.h>
 #endif
 
 #include <hpxpi/config/version.h>
@@ -133,8 +133,9 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes,
     void const* data);
 
 // High-level function call interface
-// HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, void *action,
-//     size_t bytes, const void *data, XPI_Addr future);
+// FIXME: parameter action: void* --> XPI_Action
+HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
+    size_t bytes, const void *data, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
     size_t bytes, const void *data);
 
@@ -255,6 +256,16 @@ HPXPI_EXPORT void* XPI_Thread_get_env();
 HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
 
 ///////////////////////////////////////////////////////////////////////////////
+// Thread Suspension [6.5]
+///////////////////////////////////////////////////////////////////////////////
+
+// This blocks execution until the LCO fires.
+HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr lco, void *value);
+
+// This blocks until all of the LCOs in lcos have fired.
+HPXPI_EXPORT XPI_Err XPI_Thread_wait_all(size_t n, XPI_Addr lco[], void* values[]);
+
+///////////////////////////////////////////////////////////////////////////////
 // LCOs: Common Interface [7.2]
 ///////////////////////////////////////////////////////////////////////////////
 // HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, void const* data,
@@ -269,9 +280,6 @@ HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value_sync(XPI_Addr lco, bool *value);
 
 // HPXPI_EXPORT XPI_Err XPI_LCO_free(XPI_Addr lco, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
-
-// FIXME: Spec doesn't define this
-HPXPI_EXPORT XPI_Err XPI_LCO_get_value(XPI_Addr lco, void const* data);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Futures [7.3.1]

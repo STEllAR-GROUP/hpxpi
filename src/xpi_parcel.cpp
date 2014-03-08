@@ -40,13 +40,20 @@ namespace hpxpi
     {
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        void register_action(XPI_Action action, std::string key){
+        action_registry()
+        {
+            register_action(XPI_ACTION_NULL, "__XPI_ACTION_NULL__");
+        }
+
+        void register_action(XPI_Action action, std::string key)
+        {
             mutex_type::scoped_lock l(mtx_);
             key_to_action[key] = action;
             action_to_key[action] = key;
         }
 
-        XPI_Action get_action(std::string key) const{
+        XPI_Action get_action(std::string key) const
+        {
             mutex_type::scoped_lock l(mtx_);
             std::map<std::string, XPI_Action>::const_iterator it =
                 key_to_action.find(key);
@@ -56,7 +63,8 @@ namespace hpxpi
             return it->second;
         }
 
-        std::string get_key(XPI_Action action) const{
+        std::string get_key(XPI_Action action) const
+        {
             mutex_type::scoped_lock l(mtx_);
             std::map<XPI_Action, std::string>::const_iterator it =
                 action_to_key.find(action);
@@ -228,22 +236,22 @@ extern "C"
         if (XPI_NULL != complete)
         {
             hpx::apply_cb<receive_parcel_action>(
-                hpxpi::from_address(ps->get_target_address()),
+                hpxpi::get_id(ps->get_target_address()),
                 hpx::util::bind(&hpxpi::parcel_sent, complete),
                 *ps, thread_id);
         }
         else
         {
             hpx::apply<receive_parcel_action>(
-                hpxpi::from_address(ps->get_target_address()), *ps, thread_id);
+                hpxpi::get_id(ps->get_target_address()), *ps, thread_id);
         }
 
         return XPI_SUCCESS;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
-        size_t bytes, const void *data)
+    XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
+        size_t bytes, void const*data, XPI_Addr complete)
     {
         XPI_Err error = XPI_SUCCESS;
 
@@ -279,31 +287,43 @@ extern "C"
             return error;
         }
 
+        // send parcel
+        error = XPI_Parcel_send(parcel, complete, XPI_NULL);
+        if (error != XPI_SUCCESS)
+        {
+            XPI_Parcel_free(parcel);
+            return error;
+        }
+
+        return XPI_Parcel_free(parcel);
+    }
+
+    XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
+        size_t bytes, const void *data)
+    {
+        XPI_Err error = XPI_SUCCESS;
+
         // create completion future
         XPI_Addr complete = XPI_NULL;
         error = XPI_Process_future_new_sync(XPI_NULL, 1, 0,
             XPI_DISTRIBUTION_NULL, &complete);
         if (error != XPI_SUCCESS)
         {
-            XPI_Parcel_free(parcel);
             return error;
         }
 
-        // send parcel
-        error = XPI_Parcel_send(parcel, complete, XPI_NULL);
+        error = XPI_Parcel_apply(target, action, bytes, data, complete);
         if (error != XPI_SUCCESS)
         {
             XPI_LCO_free_sync(complete);
-            XPI_Parcel_free(parcel);
             return error;
         }
 
         // wait for the parcel to be sent
-        error = XPI_LCO_get_value(complete, 0);
+        error = XPI_Thread_wait(complete, 0);
 
         // free all resources
         XPI_LCO_free_sync(complete);
-        XPI_Parcel_free(parcel);
 
         return error;
     }

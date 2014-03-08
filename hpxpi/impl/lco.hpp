@@ -103,6 +103,8 @@ namespace hpxpi
 
         void const* get_value() const
         {
+            if (!future_.is_ready())
+                future_.wait();
             return data_.data();
         }
 
@@ -145,6 +147,8 @@ namespace hpxpi
 
         void const* get_value() const
         {
+            if (!future_.is_ready())
+                future_.wait();
             return 0;
         }
 

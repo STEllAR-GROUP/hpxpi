@@ -29,6 +29,8 @@ add_hpx_source_group(
   TARGETS ${hpxpi_HEADERS})
 
 add_definitions("-DHPXPI_EXPORTS")
+add_definitions("-DHPX_COMPONENT_NAME=hpxpi")
+add_definitions("-DHPX_COMPONENT_STRIN=\"hpxpi\"")
 
 # We intentionally check HPX_BUILD_TYPE, not the application build type, as
 # the HPX libraries will be suffixed depending on their build type, not ours.

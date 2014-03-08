@@ -18,23 +18,41 @@ typedef struct fib_data {
 
 XPI_Err fib_naive(void* data)
 {
-//     fib_data cast_args=(fib_data*)data;
-//     //Alocate futures
-//     XPI_Addr futures[2];
-//     //Ignore distribution
-//     HPX_TEST_EQ(XPI_Process_future_new_sync(2,sizeof(int),XPI_NULL,&futures), XPI_SUCESS);
-//     //Create structs
-//     fib_data d1={cast_data->n-1, futures[0]};
-//     fib_data d2={cast_data->n-2, futures[1]};
-//     //Send parcels
-//     XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d1, XPI_NULL);
-//     XPI_Parcel_apply(XPI_NULL, fib_naive, sizeof(fib_data), &d2, XPI_NULL);
-//     //Wait on futures
-//     void* results[2];
-//     HPX_TEST_EQ(XPI_Thread_wait_all(2,futures,results), XPI_SUCESS);
-//     int result=*(int*)results[0]+*(int*)results[1];
-//     //Send results
-//     HPX_TEST_EQ(XPI_LCO_trigger(cast_args->future, &result, XPI_NULL), XPI_SUCESS);
+    fib_data* cast_args = (fib_data*)data;
+
+    int result = 0;
+    if (cast_args->n > 2)
+    {
+        // Allocate futures
+        XPI_Addr futures[2];
+        HPX_TEST_EQ(XPI_Process_future_new_sync(XPI_NULL, 2, sizeof(int),
+            XPI_DISTRIBUTION_NULL, futures), XPI_SUCCESS);
+
+        // Create arguments
+        fib_data d1 = { cast_args->n - 1, futures[0] };
+        fib_data d2 = { cast_args->n - 2, futures[1] };
+
+        // Send parcels
+        HPX_TEST_EQ(XPI_Parcel_apply(XPI_NULL, &fib_naive, sizeof(fib_data),
+            &d1, XPI_NULL), XPI_SUCCESS);
+        HPX_TEST_EQ(XPI_Parcel_apply(XPI_NULL, &fib_naive, sizeof(fib_data),
+            &d2, XPI_NULL), XPI_SUCCESS);
+
+        // Wait on futures
+        int result1 = 0, result2 = 0;
+        void* results[2] = { &result1, &result2 };
+        HPX_TEST_EQ(XPI_Thread_wait_all(2, futures, results), XPI_SUCCESS);
+
+        result = result1 + result2;
+    }
+    else
+    {
+        result = cast_args->n;
+    }
+
+    // Send results
+    HPX_TEST_EQ(XPI_LCO_trigger_sync(cast_args->future, &result), XPI_SUCCESS);
+
     return XPI_SUCCESS;
 }
 
@@ -42,17 +60,24 @@ XPI_Err fib_naive(void* data)
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
-    XPI_Addr result;
+    HPX_TEST_EQ(XPI_register_action_with_key(&fib_naive, "fib_naive"),
+        XPI_SUCCESS);
+
+    XPI_Addr result = XPI_NULL;
     HPX_TEST_EQ(XPI_Process_future_new_sync(XPI_NULL, 1, sizeof(int),
         XPI_DISTRIBUTION_NULL, &result), XPI_SUCCESS);
 
     fib_data init = { fib_n, result };
-    XPI_Parcel_apply_sync(XPI_NULL, &fib_naive, sizeof(fib_data), &init, XPI_NULL);
+    HPX_TEST_EQ(XPI_Parcel_apply(XPI_NULL, &fib_naive, sizeof(fib_data),
+        &init, XPI_NULL), XPI_SUCCESS);
 
     int r = 0;
-//     HPX_TEST_EQ(XPI_Thread_wait(result,&r),XPI_SUCESS);
+    HPX_TEST_EQ(XPI_Thread_wait(result, &r), XPI_SUCCESS);
 
     std::cout << "fib(" << fib_n << ") = " << r << std::endl;
+
+    HPX_TEST_EQ(XPI_LCO_free_sync(result), XPI_SUCCESS);
+
     return XPI_SUCCESS;
 }
 

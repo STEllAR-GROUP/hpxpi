@@ -82,9 +82,9 @@ namespace hpxpi
 
     // Return id_type representing given address, this takes the ownership of
     // the credits stored in the address
-    inline hpx::id_type from_address(XPI_Addr addr)
+    inline void release_id(XPI_Addr addr)
     {
-        return hpx::id_type(addr.msb, addr.lsb, hpx::id_type::managed);
+        hpx::id_type(addr.msb, addr.lsb, hpx::id_type::managed);
     }
 
     // Return XPI_Addr representing given id, this releases the ownership to
