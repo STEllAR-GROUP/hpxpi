@@ -53,17 +53,7 @@ namespace hpxpi
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct future_base
-    {
-        virtual ~future_base() {}
-
-        virtual size_t get_size() const = 0;
-        virtual void set_value(void const* data) = 0;
-        virtual bool eval() const = 0;
-        virtual void const* get_value() const = 0;
-    };
-
-    struct future : future_base
+    struct future
     {
         typedef std::vector<uint8_t> value_type;
 
@@ -116,11 +106,11 @@ namespace hpxpi
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct trigger : future_base
+    struct trigger
     {
-        trigger(bool ready)
+        trigger(size_t size, size_t init_data_size, void const* data)
         {
-            if (ready)
+            if (0 != size)
             {
                 future_ = hpx::make_ready_future();
             }
@@ -156,33 +146,74 @@ namespace hpxpi
         hpx::unique_future<void> future_;
     };
 
-    ///////////////////////////////////////////////////////////////////////
-    // Callback functions needed for a XPI future
-    void* future_init (size_t size, size_t init_size, void const* const data);
-
-    // FIXME: added destroy method
-    void future_destroy (void* const lco);
-
-    // Handles the XPI_LCO_TRIGGER action, and should update the LCO’s state.
-    void future_trigger (void* const lco, void const* const data);
-
-    // Called to evaluate the LCO’s predicate. It should not change the
-    // state of the LCO. The implementation may cache the result once it
-    // returns true.
-    bool future_eval (void const* const lco);
-
-    // This should return the address of the computed value of the LCO. This
-    // will only be called when eval has returned true, and should point to
-    // memory of at least get_size bytes. The return address or value may be
-    // cached by the implementation.
-    void const* future_get_value (void const* const lco);
-
-    // This should return the size of the value of the LCO.
-    size_t future_get_size (void const* const lco);
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        // Callback functions needed for an XPI LCO
+        template <typename Implementation>
+        struct lco_descriptor
+        {
+            static void* init (size_t size, size_t init_data_size,
+                void const* const data)
+            {
+                return new Implementation(size, init_data_size, data);
+            }
+
+            // FIXME: added destroy method
+            static void destroy (void* const lco)
+            {
+                delete reinterpret_cast<Implementation*>(lco);
+            }
+
+            // Handles the XPI_LCO_TRIGGER action, and should update the LCO’s state.
+            static void trigger (void* const lco, void const* const data)
+            {
+                reinterpret_cast<Implementation*>(lco)->set_value(data);
+            }
+
+            // Called to evaluate the LCO’s predicate. It should not change the
+            // state of the LCO. The implementation may cache the result once it
+            // returns true.
+            static bool eval (void const* const lco)
+            {
+                return reinterpret_cast<Implementation const*>(lco)->eval();
+            }
+
+            // This should return the address of the computed value of the LCO. This
+            // will only be called when eval has returned true, and should point to
+            // memory of at least get_size bytes. The return address or value may be
+            // cached by the implementation.
+            static void const* get_value (void const* const lco)
+            {
+                return reinterpret_cast<Implementation const*>(lco)->get_value();
+            }
+
+            // This should return the size of the value of the LCO.
+            static size_t get_size (void const* const lco)
+            {
+                return reinterpret_cast<Implementation const*>(lco)->get_size();
+            }
+
+            static XPI_LCO_Descriptor handlers;
+
+            static XPI_LCO_Descriptor get_handlers()
+            {
+                return handlers;
+            }
+        };
+
+        template <typename Implementation>
+        XPI_LCO_Descriptor lco_descriptor<Implementation>::handlers =
+        {
+            &lco_descriptor::init,
+            &lco_descriptor::destroy,
+            &lco_descriptor::trigger,
+            &lco_descriptor::eval,
+            &lco_descriptor::get_value,
+            &lco_descriptor::get_size
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         class custom_lco
           : public hpx::components::managed_component_base<custom_lco>
         {

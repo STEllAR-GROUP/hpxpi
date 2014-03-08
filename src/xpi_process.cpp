@@ -83,15 +83,9 @@ extern "C"
         size_t count, size_t bytes, XPI_Distribution distribution,
         XPI_Addr *address)
     {
-        XPI_LCO_Descriptor handlers =
-        {
-            &hpxpi::future_init,
-            &hpxpi::future_destroy,
-            &hpxpi::future_trigger,
-            &hpxpi::future_eval,
-            &hpxpi::future_get_value,
-            &hpxpi::future_get_size
-        };
+        XPI_LCO_Descriptor handlers = (0 != bytes) ?
+            hpxpi::detail::lco_descriptor<hpxpi::future>::get_handlers() :
+            hpxpi::detail::lco_descriptor<hpxpi::trigger>::get_handlers();
 
         return XPI_Process_lco_malloc_sync(process, count, bytes, handlers,
             distribution, 0, 0, address);

@@ -84,49 +84,5 @@ namespace hpxpi
             return had_get_value_;
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////
-    // Callback functions needed for a XPI future
-    void* future_init (size_t size, size_t init_data_size, void const* const data)
-    {
-        if (0 != size)
-            return new future(size, init_data_size, data);
-        return new trigger(init_data_size != 0);
-    }
-
-    // FIXME: added destroy method
-    void future_destroy (void* const lco)
-    {
-        delete reinterpret_cast<future_base*>(lco);
-    }
-
-    // Handles the XPI_LCO_TRIGGER action, and should update the LCO’s state.
-    void future_trigger (void* const lco, void const* const data)
-    {
-        reinterpret_cast<future_base*>(lco)->set_value(data);
-    }
-
-    // Called to evaluate the LCO’s predicate. It should not change the
-    // state of the LCO. The implementation may cache the result once it
-    // returns true.
-    bool future_eval (void const* const lco)
-    {
-        return reinterpret_cast<future_base const*>(lco)->eval();
-    }
-
-    // This should return the address of the computed value of the LCO. This
-    // will only be called when eval has returned true, and should point to
-    // memory of at least get_size bytes. The return address or value may be
-    // cached by the implementation.
-    void const* future_get_value (void const* const lco)
-    {
-        return reinterpret_cast<future_base const*>(lco)->get_value();
-    }
-
-    // This should return the size of the value of the LCO.
-    size_t future_get_size (void const* const lco)
-    {
-        return reinterpret_cast<future_base const*>(lco)->get_size();
-    }
 }
 
