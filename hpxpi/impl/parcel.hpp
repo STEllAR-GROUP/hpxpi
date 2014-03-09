@@ -183,4 +183,18 @@ namespace hpxpi
     {
         return reinterpret_cast<hpxpi::parcel*>(parcel.p);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Main action entry point
+    XPI_Err receive_parcel(parcel ps, XPI_Addr future);
+
+    ///////////////////////////////////////////////////////////////////////////
+    void apply_parcel(hpx::id_type const& targetid, parcel& ps,
+        std::string const& action, XPI_Addr complete, XPI_Addr thread_id);
+
+    void apply_parcel_colocated(hpx::id_type const& targetid, parcel& ps,
+        std::string const& action, XPI_Addr complete, XPI_Addr thread_id);
 }
+
+HPX_DEFINE_PLAIN_ACTION(hpxpi::receive_parcel, receive_parcel_action);
+HPX_DEFINE_PLAIN_DIRECT_ACTION(hpxpi::receive_parcel, receive_parcel_direct_action);
