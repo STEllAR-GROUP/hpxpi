@@ -45,6 +45,20 @@ extern "C"
         return XPI_SUCCESS;
     }
 
+    XPI_Err XPI_Parcel_clone(XPI_Parcel parcel, XPI_Parcel *clone)
+    {
+        if (!hpxpi::is_parcel_valid(parcel))
+            return XPI_ERR_INV_PARCEL;
+        if (0 == clone)
+            return XPI_ERR_BAD_ARG;
+
+        hpxpi::parcel* ps = reinterpret_cast<hpxpi::parcel*>(parcel.p);
+        XPI_Parcel new_parcel { reinterpret_cast<intptr_t>(new hpxpi::parcel(*ps)) };
+        *clone = new_parcel;
+
+        return XPI_SUCCESS;
+    }
+
     XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr)
     {
         if (!hpxpi::is_parcel_valid(parcel))

@@ -26,8 +26,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpxpi::detail::custom_lco)
 // Serialization support for hpxpi::custom_lco actions.
 HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::get_size_action,
     custom_lco_get_size_action);
-HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::get_value_action,
-    custom_lco_get_value_action);
+HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::get_value_continue_action,
+    custom_lco_get_value_continue_action);
 HPX_REGISTER_ACTION(hpxpi::detail::custom_lco::had_get_value_action,
     custom_lco_had_get_value_action);
 
@@ -55,40 +55,73 @@ namespace hpxpi
         ///////////////////////////////////////////////////////////////////////
         size_t custom_lco::get_size() const
         {
-            if (0 == desc_.get_size)
-                return 0;
+            assert(0 != desc_.get_size);
             return desc_.get_size(lco_);
         }
 
-        custom_lco::buffer_type custom_lco::get_value_() const
+        // Send stored continuation parcel on its way
+        void custom_lco::trigger_continuation(XPI_Parcel cont, bool owns_parcel)
         {
-            return const_cast<custom_lco*>(this)->get_value(hpx::throws);
+            assert(0 != desc_.eval && desc_.eval(lco_));
+            assert(0 != desc_.get_value);
+
+            XPI_Parcel_set_data(cont, get_size(), desc_.get_value(lco_));
+
+            XPI_Addr process = XPI_NULL;
+            XPI_Addr complete = XPI_NULL;
+
+            XPI_Thread_get_process_sync(XPI_Thread_get_self(), &process) != XPI_SUCCESS &&
+            XPI_Process_future_new_sync(process, 1, 0, XPI_LOCAL, &complete) != XPI_SUCCESS &&
+            XPI_Parcel_send(cont, complete, XPI_NULL) != XPI_SUCCESS &&
+            XPI_Thread_wait(complete, 0, 0);
+
+            XPI_LCO_free_sync(complete);
+            if (owns_parcel)
+                XPI_Parcel_free(cont);
+
+            had_get_value_ = true;
         }
 
+        // This implements the XPI get_value functionality which attaches a
+        // continuation to the LCO and returns without suspension.
+        void custom_lco::get_value_continue()
+        {
+            assert(0 != desc_.eval);
+
+            if (!desc_.eval(lco_))
+            {
+                XPI_Parcel cont;
+                if (XPI_Parcel_clone(XPI_Thread_get_cont(), &cont) != XPI_SUCCESS)
+                {
+                    future_.then(hpx::util::bind(
+                        &custom_lco::trigger_continuation, this,
+                        cont, true));
+                }
+            }
+            else
+            {
+                trigger_continuation(XPI_Thread_get_cont(), false);
+            }
+        }
+
+        // This is the 'conventional' HPX get_value function, will be never called
         custom_lco::buffer_type const& custom_lco::get_value(hpx::error_code &ec)
         {
-            if (0 == desc_.get_value)
-                return data_;
-
-            if (!had_get_value_)
-            {
-                had_get_value_ = true;
-                boost::uint8_t const* data =
-                    reinterpret_cast<boost::uint8_t const*>(
-                        desc_.get_value(lco_));
-                data_ = buffer_type(data, get_size(), buffer_type::reference);
-            }
-
-            return data_;
+            static buffer_type data;
+            assert(false);
+            return data;
         }
 
         void custom_lco::set_value(custom_lco::buffer_type&& data)
         {
-            if (0 == desc_.trigger || 0 == desc_.eval)
-                return;
+            assert(0 == desc_.trigger && 0 == desc_.eval);
 
             desc_.trigger(lco_, data.data());
-            desc_.eval(lco_);
+            if (desc_.eval(lco_))
+            {
+                // trigger continuations
+                promise_.set_value();
+            }
         }
 
         bool custom_lco::had_get_value() const

@@ -49,6 +49,7 @@ extern "C"
 
         typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
 
+        // FIXME: change to accommodate wait-free LCOs
         hpxpi::detail::custom_lco::get_value_action act;
         buffer_type b = act(hpxpi::get_id(lco));
 
@@ -57,7 +58,7 @@ extern "C"
         XPI_Err error = XPI_LCO_get_size_sync(lco, &size);
         if (error != XPI_SUCCESS)
             return error;
-        assert(size >= b.size());
+        assert(size == b.size());
         assert(bytes == b.size());
 #endif
 

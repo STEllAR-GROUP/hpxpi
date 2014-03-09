@@ -110,7 +110,7 @@ namespace hpxpi
         typedef std::vector<uint8_t> value_type;
 
         future(size_t size, size_t init_data_size, void const* data)
-          : size_(size)
+          : size_(size), has_value_(false)
         {
             if (0 != init_data_size && 0 != data)
             {
@@ -118,11 +118,7 @@ namespace hpxpi
                 data_ = value_type(d, d + init_data_size);
                 if (size > init_data_size)
                     data_.resize(size_);
-                future_ = hpx::make_ready_future(boost::ref(data_));
-            }
-            else
-            {
-                future_ = promise_.get_future();
+                has_value_ = true;
             }
         }
 
@@ -135,41 +131,32 @@ namespace hpxpi
         {
             uint8_t const* d = reinterpret_cast<uint8_t const*>(data);
             data_ = value_type(d, d + size_);
-            promise_.set_value(data_);
+            has_value_ = true;
         }
 
         bool eval() const
         {
-            return future_.is_ready();
+            return has_value_;
         }
 
         void const* get_value() const
         {
-            if (!future_.is_ready())
-                future_.wait();
+            assert(has_value_);
             return data_.data();
         }
 
     private:
         size_t size_;
         value_type data_;
-        hpx::lcos::local::promise<value_type&> promise_;
-        hpx::unique_future<value_type&> future_;
+        bool has_value_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct trigger
     {
         trigger(size_t size, size_t init_data_size, void const* data)
+          : has_value_(0 != init_data_size)
         {
-            if (0 != init_data_size)
-            {
-                future_ = hpx::make_ready_future();
-            }
-            else
-            {
-                future_ = promise_.get_future();
-            }
         }
 
         size_t get_size() const
@@ -179,23 +166,20 @@ namespace hpxpi
 
         void set_value(void const*)
         {
-            promise_.set_value();
+            has_value_ = true;
         }
 
         bool eval() const
         {
-            return future_.is_ready();
+            return has_value_;
         }
 
         void const* get_value() const
         {
-            if (!future_.is_ready())
-                future_.wait();
             return 0;
         }
 
-        hpx::lcos::local::promise<void> promise_;
-        hpx::unique_future<void> future_;
+        bool has_value_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -297,16 +281,17 @@ namespace hpxpi
                 std::size_t init_data_size, void const* const init_data)
             {
                 desc_ = desc;
-                if (0 != desc.init)
-                {
-                    lco_ = desc.init(size, init_data_size, init_data);
-                }
+                assert(0 != desc.init);
+
+                lco_ = desc.init(size, init_data_size, init_data);
+                future_ = promise_.get_future().share();
             }
 
             void finalize()
             {
-                if (0 != desc_.destroy)
-                    desc_.destroy(lco_);
+                assert(0 != desc_.destroy);
+                desc_.destroy(lco_);
+
                 lco_ = 0;
                 base_type::finalize();
             }
@@ -322,24 +307,28 @@ namespace hpxpi
             using base_type::wrap_action;
 
             size_t get_size() const;
-            buffer_type get_value_() const;
+            void get_value_continue();
             void set_value(buffer_type&& data);
             bool had_get_value() const;
 
             buffer_type const& get_value(hpx::error_code &ec);
 
-            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco, get_size,
-                get_size_action);
-            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco, get_value_,
-                get_value_action);
-            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco, had_get_value,
-                had_get_value_action);
+            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco,
+                get_size, get_size_action);
+            HPX_DEFINE_COMPONENT_DIRECT_ACTION(custom_lco,
+                get_value_continue, get_value_continue_action);
+            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco,
+                had_get_value, had_get_value_action);
+
+        protected:
+            void trigger_continuation(XPI_Parcel cont, bool owns_parcel);
 
         private:
             XPI_LCO_Descriptor desc_;
             void* lco_;
             bool had_get_value_;
-            buffer_type data_;
+            hpx::lcos::local::promise<void> promise_;
+            hpx::shared_future<void> future_;
         };
     }
 
@@ -350,8 +339,11 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::util::serialize_buffer<uint8_t>, serialize_buffer_uin8_t_type)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpxpi::detail::custom_lco::get_size_action, custom_lco_get_size_action);
+    hpxpi::detail::custom_lco::get_size_action,
+    custom_lco_get_size_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpxpi::detail::custom_lco::get_value_action, custom_lco_get_value_action);
+    hpxpi::detail::custom_lco::get_value_continue_action,
+    custom_lco_get_value_continue_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpxpi::detail::custom_lco::had_get_value_action, custom_lco_had_get_value_action);
+    hpxpi::detail::custom_lco::had_get_value_action,
+    custom_lco_had_get_value_action);
