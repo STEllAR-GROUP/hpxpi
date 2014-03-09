@@ -1,4 +1,5 @@
-//  Copyright (c) 2013 Alexander Duchene
+//  Copyright (c) 2013-2014 Alexander Duchene
+//  Copyright (c) 2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,17 +12,68 @@ using namespace std;
 
 int const fib_n = 10;
 
-typedef struct fib_data {
-    int n;
-    XPI_Addr future;
-} fib_data;
-
-XPI_Err fib_naive(void* data)
+///////////////////////////////////////////////////////////////////////////////
+XPI_Err fib_synchronous(void* data)
 {
-    fib_data* cast_args = (fib_data*)data;
+    int n = *(int*)data;
 
     int result = 0;
-    if (cast_args->n >= 2)
+    if (n >= 2)
+    {
+        XPI_Addr process = XPI_NULL;
+        HPX_TEST_EQ(
+            XPI_Thread_get_process_sync(XPI_Thread_get_self(), &process),
+            XPI_SUCCESS);
+
+        int n1 = n - 1, n2 = n - 2;
+        int result1 = 0, result2 = 0;
+
+        // Send parcels
+        HPX_TEST_EQ(
+            XPI_Parcel_apply_sync(process, &fib_synchronous, sizeof(int), &n1,
+                sizeof(int), &result1),
+            XPI_SUCCESS);
+        HPX_TEST_EQ(
+            XPI_Parcel_apply_sync(process, &fib_synchronous, sizeof(int), &n2,
+                sizeof(int), &result2),
+            XPI_SUCCESS);
+
+        result = result1 + result2;
+    }
+    else
+    {
+        result = n;
+    }
+
+    // Send results
+    XPI_continue1(sizeof(int), &result);
+
+    return XPI_SUCCESS;
+}
+
+void test_fib_synchronous(int n)
+{
+    XPI_Addr process = XPI_NULL;
+    HPX_TEST_EQ(
+        XPI_Thread_get_process_sync(XPI_Thread_get_self(), &process),
+        XPI_SUCCESS);
+
+    int result = 0;
+    HPX_TEST_EQ(
+        XPI_Parcel_apply_sync(process, &fib_synchronous, sizeof(int), &n,
+            sizeof(result), &result),
+        XPI_SUCCESS);
+
+    HPX_TEST_EQ(result, 55);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+XPI_Err fib_asynchronous(void* data)
+{
+    int n = *(int*)data;
+
+    int result = 0;
+    if (n >= 2)
     {
         XPI_Addr process = XPI_NULL;
         HPX_TEST_EQ(
@@ -35,22 +87,24 @@ XPI_Err fib_naive(void* data)
                 XPI_LOCAL, futures),
             XPI_SUCCESS);
 
-        // Create arguments
-        fib_data d1 = { cast_args->n - 1, futures[0] };
-        fib_data d2 = { cast_args->n - 2, futures[1] };
-
         // Send parcels
+        int n1 = n - 1, n2 = n - 2;
         HPX_TEST_EQ(
-            XPI_Parcel_apply_sync(process, &fib_naive, sizeof(fib_data), &d1),
+            XPI_Parcel_apply(process, &fib_asynchronous, sizeof(int), &n1,
+                futures[0]),
             XPI_SUCCESS);
         HPX_TEST_EQ(
-            XPI_Parcel_apply_sync(process, &fib_naive, sizeof(fib_data), &d2),
+            XPI_Parcel_apply(process, &fib_asynchronous, sizeof(int), &n2,
+                futures[1]),
             XPI_SUCCESS);
 
-        // Wait on futures
         int result1 = 0, result2 = 0;
+
+        size_t sizes[2] = { sizeof(int), sizeof(int) };
         void* results[2] = { &result1, &result2 };
-        HPX_TEST_EQ(XPI_Thread_wait_all(2, futures, results), XPI_SUCCESS);
+        HPX_TEST_EQ(
+            XPI_Thread_wait_all(2, futures, sizes, results),
+            XPI_SUCCESS);
 
         result = result1 + result2;
 
@@ -60,47 +114,43 @@ XPI_Err fib_naive(void* data)
     }
     else
     {
-        result = cast_args->n;
+        result = n;
     }
 
     // Send results
-    HPX_TEST_EQ(XPI_LCO_trigger_sync(cast_args->future, &result), XPI_SUCCESS);
+    XPI_continue1(sizeof(int), &result);
 
     return XPI_SUCCESS;
 }
 
+void test_fib_asynchronous(int n)
+{
+    XPI_Addr process = XPI_NULL;
+    HPX_TEST_EQ(
+        XPI_Thread_get_process_sync(XPI_Thread_get_self(), &process),
+        XPI_SUCCESS);
+
+    int result = 0;
+    HPX_TEST_EQ(
+        XPI_Parcel_apply_sync(process, &fib_asynchronous, sizeof(int), &n,
+            sizeof(result), &result),
+        XPI_SUCCESS);
+
+    HPX_TEST_EQ(result, 55);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
-    HPX_TEST_EQ(XPI_register_action_with_key(&fib_naive, "fib_naive"),
-        XPI_SUCCESS);
-
-    XPI_Addr process = XPI_NULL;
-
-//     FIXME: Calling XPI_Thread_get_self in XPI_main is not supported yet
-//     HPX_TEST_EQ(
-//         XPI_Thread_get_process_sync(XPI_Thread_get_self(), &process),
-//         XPI_SUCCESS);
-
-    XPI_Addr result = XPI_NULL;
     HPX_TEST_EQ(
-        XPI_Process_future_new_sync(process, 1, sizeof(int),
-            XPI_LOCAL, &result),
+        XPI_register_action_with_key(&fib_synchronous, "fib_synchronous"),
         XPI_SUCCESS);
-
-    fib_data init = { fib_n, result };
     HPX_TEST_EQ(
-        XPI_Parcel_apply_sync(process, &fib_naive, sizeof(fib_data), &init),
+        XPI_register_action_with_key(&fib_asynchronous, "fib_asynchronous"),
         XPI_SUCCESS);
 
-    int r = 0;
-    HPX_TEST_EQ(XPI_Thread_wait(result, &r), XPI_SUCCESS);
-
-    std::cout << "fib(" << fib_n << ") = " << r << std::endl;
-
-    HPX_TEST_EQ(XPI_LCO_free_sync(result), XPI_SUCCESS);
-
+    test_fib_synchronous(fib_n);
+    test_fib_asynchronous(fib_n);
     return XPI_SUCCESS;
 }
 
