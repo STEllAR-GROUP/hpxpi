@@ -10,7 +10,10 @@
 #include <iostream>
 using namespace std;
 
+///////////////////////////////////////////////////////////////////////////////
+// The code below calculates 'fibonacci(fib_n)' and should yield 'fib_result'.
 int const fib_n = 10;
+int const fib_result = 55;
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err fib_synchronous(void* data)
@@ -51,7 +54,7 @@ XPI_Err fib_synchronous(void* data)
     return XPI_SUCCESS;
 }
 
-void test_fib_synchronous(int n)
+int test_fib_synchronous(int n)
 {
     XPI_Addr process = XPI_NULL;
     HPX_TEST_EQ(
@@ -64,7 +67,7 @@ void test_fib_synchronous(int n)
             sizeof(result), &result),
         XPI_SUCCESS);
 
-    HPX_TEST_EQ(result, 55);
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,7 +126,7 @@ XPI_Err fib_asynchronous(void* data)
     return XPI_SUCCESS;
 }
 
-void test_fib_asynchronous(int n)
+int test_fib_asynchronous(int n)
 {
     XPI_Addr process = XPI_NULL;
     HPX_TEST_EQ(
@@ -136,7 +139,7 @@ void test_fib_asynchronous(int n)
             sizeof(result), &result),
         XPI_SUCCESS);
 
-    HPX_TEST_EQ(result, 55);
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,8 +152,9 @@ XPI_Err XPI_main(size_t nargs, void* args[])
         XPI_register_action_with_key(&fib_asynchronous, "fib_asynchronous"),
         XPI_SUCCESS);
 
-    test_fib_synchronous(fib_n);
-    test_fib_asynchronous(fib_n);
+    HPX_TEST_EQ(test_fib_synchronous(fib_n), fib_result);
+    HPX_TEST_EQ(test_fib_asynchronous(fib_n), fib_result);
+
     return XPI_SUCCESS;
 }
 
