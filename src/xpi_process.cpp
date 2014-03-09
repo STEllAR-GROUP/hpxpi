@@ -54,7 +54,7 @@ extern "C"
             return XPI_ERR_BAD_ARG;
 
         // FIXME: How to send the XPI_LCO_Descriptor over the wire?
-        if (XPI_NULL != process)
+        if (XPI_NULL != process && process != hpxpi::from_id(hpx::find_here()))
             return XPI_ERR_INV_ADDR;
 
         for (size_t i = 0; i != count; ++i)

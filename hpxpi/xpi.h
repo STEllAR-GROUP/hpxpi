@@ -1,5 +1,5 @@
-//  Copyright (c) 2014 Hartmut Kaiser
-//  Copyright (c) 2013 Alexander Duchene
+//  Copyright (c) 2013-2014 Hartmut Kaiser
+//  Copyright (c) 2013-2014 Alexander Duchene
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -122,10 +122,12 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_free(XPI_Parcel parcel);
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_addr(XPI_Parcel parcel, XPI_Addr addr);
 
 // Set the parcel action
-HPXPI_EXPORT XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel, XPI_Action action);
+HPXPI_EXPORT XPI_Err XPI_Parcel_set_action(XPI_Parcel parcel,
+    XPI_Action action);
 
 // Set the parcel environment data
-HPXPI_EXPORT XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes, void* data);
+HPXPI_EXPORT XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes,
+    void* data);
 
 // Set the parcel argument data
 // FIXME: added const to last argument
@@ -136,15 +138,10 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes,
 // High-level function call interface (Apply) [4.5]
 ///////////////////////////////////////////////////////////////////////////////
 
-// FIXME: parameter action: void* --> XPI_Action
-// HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
-//     size_t bytes, const void *data, XPI_Addr future);
-
-// FIXME: There is an interface mismatch between this and XPI_Parcel_apply.
-//        How should the continuation data be returned for this function?
-// FIXME: parameter action: void* --> XPI_Action
+HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
+    size_t bytes, const void *data, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
-    size_t bytes, const void *data);
+    size_t data_bytes, void const* data, size_t result_bytes, void* result);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Continuation Stack Management [4.3]
@@ -264,14 +261,25 @@ HPXPI_EXPORT void* XPI_Thread_get_env();
 HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
 
 ///////////////////////////////////////////////////////////////////////////////
+// Continuing [6.3]
+///////////////////////////////////////////////////////////////////////////////
+
+// the continue primitive
+// HPXPI_EXPORT void XPI_continue(size_t n, size_t sizes[], const void * vals[]);
+HPXPI_EXPORT void XPI_continue1(size_t size, const void *val);
+
+///////////////////////////////////////////////////////////////////////////////
 // Thread Suspension [6.5]
 ///////////////////////////////////////////////////////////////////////////////
 
 // This blocks execution until the LCO fires.
-HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr lco, void *value);
+// FIXME: added parameter: size_t bytes
+HPXPI_EXPORT XPI_Err XPI_Thread_wait(XPI_Addr lco, size_t bytes, void *value);
 
 // This blocks until all of the LCOs in lcos have fired.
-HPXPI_EXPORT XPI_Err XPI_Thread_wait_all(size_t n, XPI_Addr lco[], void* values[]);
+// FIXME: added parameter: size_t bytes[]
+HPXPI_EXPORT XPI_Err XPI_Thread_wait_all(size_t n, XPI_Addr lco[],
+    size_t bytes[], void* values[]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Thread Resources [6.6]
@@ -284,17 +292,34 @@ HPXPI_EXPORT XPI_Err XPI_Thread_get_process_sync(XPI_Addr address,
 ///////////////////////////////////////////////////////////////////////////////
 // LCOs: Common Interface [7.2]
 ///////////////////////////////////////////////////////////////////////////////
-// HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, void const* data,
-//     XPI_Addr future);
+
+// XPI_LCO_TRIGGER_ACTION(value)
+//  IN value (optional) an optional trigger value
+HPXPI_EXPORT XPI_Err XPI_LCO_TRIGGER_ACTION(void* args);
+
+HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, void const* data,
+    XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_trigger_sync(XPI_Addr lco, void const* data);
 
-// HPXPI_EXPORT XPI_Err XPI_LCO_get_size(XPI_Addr lco, XPI_Addr future);
+// XPI_LCO_GET_SIZE_ACTION CONTINUE(size)
+//  CONT size the size of the user-portion of the LCO
+HPXPI_EXPORT XPI_Err XPI_LCO_GET_SIZE_ACTION(void* args);
+
+HPXPI_EXPORT XPI_Err XPI_LCO_get_size(XPI_Addr lco, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_get_size_sync(XPI_Addr lco, size_t *size);
 
-// HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value(XPI_Addr lco, XPI_Addr future);
+// XPI_LCO_HAD_GET_VALUE_ACTION CONTINUE(value)
+//   CONT value true if any threads have performed XPI_LCO_GET_VALUE on the
+//        target LCO
+HPXPI_EXPORT XPI_Err XPI_LCO_HAD_GET_VALUE_ACTION(void* args);
+
+HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value(XPI_Addr lco, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value_sync(XPI_Addr lco, bool *value);
 
-// HPXPI_EXPORT XPI_Err XPI_LCO_free(XPI_Addr lco, XPI_Addr future);
+// XPI_LCO_FREE_ACTION
+HPXPI_EXPORT XPI_Err XPI_LCO_FREE_ACTION(void* args);
+
+HPXPI_EXPORT XPI_Err XPI_LCO_free(XPI_Addr lco, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_LCO_free_sync(XPI_Addr lco);
 
 ///////////////////////////////////////////////////////////////////////////////
