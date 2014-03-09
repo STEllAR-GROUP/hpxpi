@@ -13,11 +13,15 @@
 #include <boost/serialization/serialization.hpp>
 
 #include <hpxpi/xpi.h>
+#include <hpxpi/impl/xpi_addr.hpp>
 
 #include <vector>
 
 namespace hpxpi
 {
+    ///////////////////////////////////////////////////////////////////////////
+    void register_lco_actions();
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -39,6 +43,7 @@ namespace hpxpi
         void on_ready(hpx::unique_future<void> f, XPI_Addr cont);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     void propagate(hpx::unique_future<T> f, XPI_Addr cont)
     {
@@ -50,6 +55,53 @@ namespace hpxpi
     {
         using hpx::util::placeholders::_1;
         f.then(hpx::util::bind(&detail::on_ready, _1, cont));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline void set_lco_value(XPI_Addr lco, T const& data)
+    {
+        typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
+        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(&data),
+            sizeof(T), buffer_type::copy);
+        hpx::set_lco_value(get_id(lco), buffer);
+    }
+
+    inline void set_lco_value(XPI_Addr lco, size_t size, void const* data)
+    {
+        typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
+        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(data),
+            size, buffer_type::copy);
+        hpx::set_lco_value(get_id(lco), buffer);
+    }
+
+    template <typename T>
+    inline void set_lco_value(XPI_Addr lco, T const& data, XPI_Addr cont)
+    {
+        typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
+        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(&data),
+            sizeof(T), buffer_type::copy);
+        hpx::set_lco_value(get_id(lco), buffer, get_id(cont));
+    }
+
+    inline void set_lco_value(XPI_Addr lco, size_t size, void const* data,
+        XPI_Addr cont)
+    {
+        typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
+        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(data),
+            size, buffer_type::copy);
+        hpx::set_lco_value(get_id(lco), buffer, get_id(cont));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline void trigger_lco_event(XPI_Addr lco)
+    {
+        hpx::trigger_lco_event(get_id(lco));
+    }
+
+    inline void trigger_lco_event(XPI_Addr lco, XPI_Addr cont)
+    {
+        hpx::trigger_lco_event(get_id(lco), get_id(cont));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -110,7 +162,7 @@ namespace hpxpi
     {
         trigger(size_t size, size_t init_data_size, void const* data)
         {
-            if (0 != size)
+            if (0 != init_data_size)
             {
                 future_ = hpx::make_ready_future();
             }
@@ -276,11 +328,11 @@ namespace hpxpi
 
             buffer_type const& get_value(hpx::error_code &ec);
 
-            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, get_size,
+            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco, get_size,
                 get_size_action);
-            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, get_value_,
+            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco, get_value_,
                 get_value_action);
-            HPX_DEFINE_COMPONENT_CONST_ACTION(custom_lco, had_get_value,
+            HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(custom_lco, had_get_value,
                 had_get_value_action);
 
         private:
