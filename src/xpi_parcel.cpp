@@ -31,6 +31,7 @@ extern "C"
 
         XPI_Parcel new_parcel { reinterpret_cast<intptr_t>(new hpxpi::parcel) };
         *parcel = new_parcel;
+
         return XPI_SUCCESS;
     }
 
@@ -39,8 +40,21 @@ extern "C"
         if (!hpxpi::is_parcel_valid(parcel))
             return XPI_ERR_INV_PARCEL;
 
+        intrusive_ptr_release(reinterpret_cast<hpxpi::parcel*>(parcel.p));
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_Parcel_clone(XPI_Parcel parcel, XPI_Parcel *clone)
+    {
+        if (!hpxpi::is_parcel_valid(parcel))
+            return XPI_ERR_INV_PARCEL;
+        if (0 == clone)
+            return XPI_ERR_BAD_ARG;
+
         hpxpi::parcel* ps = reinterpret_cast<hpxpi::parcel*>(parcel.p);
-        delete ps;
+        XPI_Parcel new_parcel { reinterpret_cast<intptr_t>(new hpxpi::parcel(*ps)) };
+        *clone = new_parcel;
 
         return XPI_SUCCESS;
     }
@@ -128,11 +142,11 @@ extern "C"
 
         if (hpx::naming::is_locality(targetid))
         {
-            hpxpi::apply_parcel(targetid, *ps, action, complete, thread_id);
+            hpxpi::apply_parcel(targetid, parcel, action, complete, thread_id);
         }
         else
         {
-            hpxpi::apply_parcel_colocated(targetid, *ps, action, complete, thread_id);
+            hpxpi::apply_parcel_colocated(targetid, parcel, action, complete, thread_id);
         }
 
         return XPI_SUCCESS;
@@ -181,29 +195,10 @@ extern "C"
             XPI_Parcel_free(parcel);
         }
 
-        // create completion future
-        XPI_Addr complete = XPI_NULL;
-        error = XPI_Process_future_new_sync(process, 1, 0, XPI_LOCAL, &complete);
-        if (error != XPI_SUCCESS)
-        {
-            XPI_Parcel_free(parcel);
-            return error;
-        }
-
         // send parcel
-        error = XPI_Parcel_send(parcel, complete, XPI_NULL);
-        if (error != XPI_SUCCESS)
-        {
-            XPI_LCO_free_sync(complete);
-            XPI_Parcel_free(parcel);
-            return error;
-        }
-
-        // wait for the parcel to be sent
-        error = XPI_Thread_wait(complete, 0, 0);
+        error = XPI_Parcel_send(parcel, XPI_NULL, XPI_NULL);
 
         // free all resources
-        XPI_LCO_free_sync(complete);
         XPI_Parcel_free(parcel);
 
         return error;

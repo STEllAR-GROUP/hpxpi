@@ -113,6 +113,9 @@ HPXPI_EXPORT extern XPI_Parcel XPI_PARCEL_NULL;
 // Create an empty parcel
 HPXPI_EXPORT XPI_Err XPI_Parcel_create(XPI_Parcel* parcel);
 
+// Clone the given parcel
+HPXPI_EXPORT XPI_Err XPI_Parcel_clone(XPI_Parcel parcel, XPI_Parcel *clone);
+
 // Free an existing parcel
 HPXPI_EXPORT XPI_Err XPI_Parcel_free(XPI_Parcel parcel);
 
@@ -293,6 +296,10 @@ HPXPI_EXPORT XPI_Err XPI_Thread_get_process_sync(XPI_Addr address,
 // LCOs: Common Interface [7.2]
 ///////////////////////////////////////////////////////////////////////////////
 
+// XPI_LCO_GET_VALUE_ACTION CONTINUE(value)
+//   CONT value the LCO value: CONT(void *data)
+HPXPI_EXPORT XPI_Err XPI_LCO_GET_VALUE_ACTION(void* args);
+
 // XPI_LCO_TRIGGER_ACTION(value)
 //  IN value (optional) an optional trigger value
 HPXPI_EXPORT XPI_Err XPI_LCO_TRIGGER_ACTION(void* args);
@@ -302,7 +309,7 @@ HPXPI_EXPORT XPI_Err XPI_LCO_trigger(XPI_Addr lco, void const* data,
 HPXPI_EXPORT XPI_Err XPI_LCO_trigger_sync(XPI_Addr lco, void const* data);
 
 // XPI_LCO_GET_SIZE_ACTION CONTINUE(size)
-//  CONT size the size of the user-portion of the LCO
+//  CONT size the size of the user-portion of the LCO: CONT(size_t size)
 HPXPI_EXPORT XPI_Err XPI_LCO_GET_SIZE_ACTION(void* args);
 
 HPXPI_EXPORT XPI_Err XPI_LCO_get_size(XPI_Addr lco, XPI_Addr future);
@@ -310,7 +317,7 @@ HPXPI_EXPORT XPI_Err XPI_LCO_get_size_sync(XPI_Addr lco, size_t *size);
 
 // XPI_LCO_HAD_GET_VALUE_ACTION CONTINUE(value)
 //   CONT value true if any threads have performed XPI_LCO_GET_VALUE on the
-//        target LCO
+//        target LCO: CONT(bool)
 HPXPI_EXPORT XPI_Err XPI_LCO_HAD_GET_VALUE_ACTION(void* args);
 
 HPXPI_EXPORT XPI_Err XPI_LCO_had_get_value(XPI_Addr lco, XPI_Addr future);

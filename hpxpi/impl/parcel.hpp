@@ -95,7 +95,16 @@ namespace hpxpi
     struct parcel
     {
     public:
-        parcel() : records_(1) {}
+        parcel()
+          : records_(1), count_(1)
+        {}
+
+        // this intentionally creates a deep copy
+        parcel(parcel const& rhs)
+          : argument_data_(rhs.argument_data_),
+            records_(rhs.records_),
+            count_(1)
+        {}
 
         XPI_Addr get_target_address() const
         {
@@ -159,9 +168,15 @@ namespace hpxpi
             return records_.empty() || records_.front().is_empty();
         }
 
+        // reference counting
+        friend void intrusive_ptr_add_ref(parcel* p);
+        friend void intrusive_ptr_release(parcel* p);
+
     private:
         std::vector<uint8_t> argument_data_;
         std::list<parcel_frame> records_;
+
+        boost::atomic_int count_;
 
     private:
         friend class boost::serialization::access;
@@ -189,10 +204,10 @@ namespace hpxpi
     XPI_Err receive_parcel(parcel ps, XPI_Addr future);
 
     ///////////////////////////////////////////////////////////////////////////
-    void apply_parcel(hpx::id_type const& targetid, parcel& ps,
+    void apply_parcel(hpx::id_type const& targetid, XPI_Parcel p,
         std::string const& action, XPI_Addr complete, XPI_Addr thread_id);
 
-    void apply_parcel_colocated(hpx::id_type const& targetid, parcel& ps,
+    void apply_parcel_colocated(hpx::id_type const& targetid, XPI_Parcel p,
         std::string const& action, XPI_Addr complete, XPI_Addr thread_id);
 }
 

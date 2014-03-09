@@ -350,8 +350,11 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::util::serialize_buffer<uint8_t>, serialize_buffer_uin8_t_type)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpxpi::detail::custom_lco::get_size_action, custom_lco_get_size_action);
+    hpxpi::detail::custom_lco::get_size_action,
+    custom_lco_get_size_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpxpi::detail::custom_lco::get_value_action, custom_lco_get_value_action);
+    hpxpi::detail::custom_lco::get_value_action,
+    custom_lco_get_value_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpxpi::detail::custom_lco::had_get_value_action, custom_lco_had_get_value_action);
+    hpxpi::detail::custom_lco::had_get_value_action,
+    custom_lco_had_get_value_action);

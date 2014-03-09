@@ -157,75 +157,67 @@ namespace hpxpi
 
     ///////////////////////////////////////////////////////////////////////////
     // Will be called if parcel-send requires local confirmation
-    void parcel_sent(XPI_Addr complete)
+    void parcel_sent(hpxpi::parcel* ps, XPI_Addr complete)
     {
-        hpx::trigger_lco_event(hpxpi::get_id(complete));
+        if (XPI_NULL != complete)
+            hpxpi::trigger_lco_event(complete);
+        intrusive_ptr_release(ps);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void apply_parcel(hpx::id_type const& targetid, parcel& ps,
+    void apply_parcel(hpx::id_type const& targetid, XPI_Parcel parcel,
         std::string const& action, XPI_Addr complete, XPI_Addr thread_id)
     {
+        hpxpi::parcel* ps = hpxpi::get_parcel(parcel);
+        intrusive_ptr_add_ref(ps);      // keep parcel alive while sending
+
         if (hpxpi::registry_is_direct_action(action))
         {
             receive_parcel_direct_action act;
-            if (XPI_NULL != complete)
-            {
-                hpx::apply_cb(act, targetid,
-                    hpx::util::bind(&hpxpi::parcel_sent, complete),
-                    ps, thread_id);
-            }
-            else
-            {
-                hpx::apply(act, targetid, ps, thread_id);
-            }
+            hpx::apply_cb(act, targetid,
+                hpx::util::bind(&hpxpi::parcel_sent, ps, complete),
+                *ps, thread_id);
         }
         else
         {
             receive_parcel_action act;
-            if (XPI_NULL != complete)
-            {
-                hpx::apply_cb(act, targetid,
-                    hpx::util::bind(&hpxpi::parcel_sent, complete),
-                    ps, thread_id);
-            }
-            else
-            {
-                hpx::apply(act, targetid, ps, thread_id);
-            }
+            hpx::apply_cb(act, targetid,
+                hpx::util::bind(&hpxpi::parcel_sent, ps, complete),
+                *ps, thread_id);
         }
     }
 
-    void apply_parcel_colocated(hpx::id_type const& targetid, parcel& ps,
+    void apply_parcel_colocated(hpx::id_type const& targetid, XPI_Parcel parcel,
         std::string const& action, XPI_Addr complete, XPI_Addr thread_id)
     {
+        hpxpi::parcel* ps = hpxpi::get_parcel(parcel);
+        intrusive_ptr_add_ref(ps);      // keep parcel alive while sending
+
         if (hpxpi::registry_is_direct_action(action))
         {
             receive_parcel_direct_action act;
-            if (XPI_NULL != complete)
-            {
-                hpx::apply_colocated_cb(act, targetid,
-                    hpx::util::bind(&hpxpi::parcel_sent, complete),
-                    ps, thread_id);
-            }
-            else
-            {
-                hpx::apply_colocated(act, targetid, ps, thread_id);
-            }
+            hpx::apply_colocated_cb(act, targetid,
+                hpx::util::bind(&hpxpi::parcel_sent, ps, complete),
+                *ps, thread_id);
         }
         else
         {
             receive_parcel_action act;
-            if (XPI_NULL != complete)
-            {
-                hpx::apply_cb(act, targetid,
-                    hpx::util::bind(&hpxpi::parcel_sent, complete),
-                    ps, thread_id);
-            }
-            else
-            {
-                hpx::apply(act, targetid, ps, thread_id);
-            }
+            hpx::apply_colocated_cb(act, targetid,
+                hpx::util::bind(&hpxpi::parcel_sent, ps, complete),
+                *ps, thread_id);
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void intrusive_ptr_add_ref(parcel* p)
+    {
+        ++p->count_;
+    }
+
+    void intrusive_ptr_release(parcel* p)
+    {
+        if (0 == --p->count_)
+            delete p;
     }
 }

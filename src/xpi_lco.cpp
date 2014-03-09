@@ -21,6 +21,7 @@ namespace hpxpi
         HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_GET_SIZE_ACTION);
         HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_HAD_GET_VALUE_ACTION);
         HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_FREE_ACTION);
+        HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_GET_VALUE_ACTION);
     }
 }
 
@@ -187,5 +188,23 @@ extern "C"
     XPI_Err XPI_LCO_FREE_ACTION(void* args)
     {
         return XPI_LCO_free_sync(XPI_Thread_get_addr());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // XPI_LCO_GET_VALUE_ACTION CONTINUE(value)
+    //   CONT value the LCO value: CONT(void *data)
+    // FIXME: make wait-free
+    XPI_Err XPI_LCO_GET_VALUE_ACTION(void* args)
+    {
+        typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
+
+        XPI_Addr lco = XPI_Thread_get_addr();
+
+        hpxpi::detail::custom_lco::get_value_action act;
+        buffer_type b = act(hpxpi::get_id(lco));
+
+        XPI_continue1(b.size(), b.data());
+
+        return XPI_SUCCESS;
     }
 }
