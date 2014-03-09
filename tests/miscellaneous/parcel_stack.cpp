@@ -12,13 +12,13 @@ XPI_Err XPI_main(size_t nargs, void* args[])
     XPI_Parcel parcel;
     HPX_TEST_EQ(XPI_Parcel_create(&parcel), XPI_SUCCESS);
 
-    char* data = new char[2];
-    data[0]='a';
-    data[1]='b';
-    HPX_TEST_EQ(XPI_Parcel_set_env(parcel,2*sizeof(char),data), XPI_SUCCESS);
-
+    char data[2] = { 'a', 'b' };
+    HPX_TEST_EQ(XPI_Parcel_set_env(parcel, 2*sizeof(char), data), XPI_SUCCESS);
     HPX_TEST_EQ(XPI_Parcel_push(parcel), XPI_SUCCESS);
+
     HPX_TEST_EQ(XPI_Parcel_pop(parcel, XPI_NULL), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_free(parcel), XPI_SUCCESS);
 
     return XPI_SUCCESS;
 }
