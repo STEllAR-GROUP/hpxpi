@@ -1,6 +1,7 @@
 // Copyright (c) 2014 Alexander Duchene
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.
 
 #pragma once
 
@@ -37,6 +38,7 @@ namespace hpxpi
             else {
                 // FIXME: What should we do in this case? XPI does not have a
                 //        way to propagate an error to the waiting LCO.
+                assert(false);
             }
         }
 

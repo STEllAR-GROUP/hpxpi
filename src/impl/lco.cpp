@@ -60,6 +60,7 @@ namespace hpxpi
             else {
                 // FIXME: What should we do in this case? XPI does not have a
                 //        way to propagate an error to the waiting LCO.
+                assert(false);
             }
         }
 

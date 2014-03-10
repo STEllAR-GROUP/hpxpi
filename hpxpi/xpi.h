@@ -159,22 +159,22 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete,
 ///////////////////////////////////////////////////////////////////////////////
 // Native Parcel Interface [5.2]
 ///////////////////////////////////////////////////////////////////////////////
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U8_ACTION(void* args);      // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U16_ACTION(void* args);     // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U32_ACTION(void* args);     // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U64_ACTION(void* args);     // CONT()
-// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U128_ACTION(void* args);    // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S8_ACTION(void* args);      // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S16_ACTION(void* args);     // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S32_ACTION(void* args);     // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S64_ACTION(void* args);     // CONT()
-// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S128_ACTION(void* args);    // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_F_ACTION(void* args);       // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_D_ACTION(void* args);       // CONT()
-// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_FC_ACTION(void* args);      // CONT()
-// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_DC_ACTION(void* args);      // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_ADDR_ACTION(void* args);    // CONT()
-HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_ADDRDIFF_ACTION(void* args);// CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U8_ACTION(uint8_t* args);           // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U16_ACTION(uint16_t* args);         // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U32_ACTION(uint32_t* args);         // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U64_ACTION(uint64_t* args);         // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U128_ACTION(void* args);         // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S8_ACTION(int8_t* args);            // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S16_ACTION(int16_t* args);          // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S32_ACTION(int32_t* args);          // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S64_ACTION(int64_t* args);          // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S128_ACTION(void* args);         // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_F_ACTION(float* args);              // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_D_ACTION(double* args);             // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_FC_ACTION(void* args);           // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_DC_ACTION(void* args);           // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_ADDR_ACTION(XPI_Addr* args);        // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_ADDRDIFF_ACTION(XPI_AddrDiff* args);// CONT()
 
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U8_ACTION(void* args);       // CONT(uint8_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U16_ACTION(void* args);      // CONT(uint16_t val)
@@ -363,9 +363,25 @@ typedef enum XPI_Distribution {
     XPI_CYCLIC = 1      // try to cyclically use localities
 } XPI_Distribution;
 
-// HPXPI_EXPORT XPI_Err XPI_Process_Future_New(XPI_Addr process,
-//     size_t count, size_t bytes, XPI_Distribution distribution,
-//     XPI_Addr future);
+// XPI_PROCESS_FUTURE_NEW_ACTION(count, bytes) CONTINUE(address)
+//   IN count the number of futures to allocate
+//   IN bytes size of the buffer for the LCOs
+//   CONT address the address of the array
+
+// FIXME: name changed from XPI_Process_Future_New
+struct XPI_Process_Future_New_Descriptor
+{
+    size_t count;
+    size_t bytes;
+    XPI_Distribution distribution;
+};
+
+XPI_Err XPI_PROCESS_FUTURE_NEW_ACTION(
+    XPI_Process_Future_New_Descriptor* desc);           // CONT(address)
+
+HPXPI_EXPORT XPI_Err XPI_Process_future_new(XPI_Addr process,
+    size_t count, size_t bytes, XPI_Distribution distribution,
+    XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Process_future_new_sync(XPI_Addr process,
     size_t count, size_t bytes, XPI_Distribution distribution,
     XPI_Addr *address);
@@ -397,10 +413,32 @@ typedef struct XPI_LCO_Descriptor {
     size_t (*get_size) (void const* const lco);
 } XPI_LCO_Descriptor;
 
-// HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc(XPI_Addr process,
-//     size_t count, size_t size, XPI_LCO_Descriptor handlers,
-//     XPI_Distribution distribution, size_t init_data_size,
-//     const void * const init_data, XPI_Addr future);
+
+// XPI_PROCESS_LCO_MALLOC_ACTION(count, size, handlers, distribution)
+//      CONTINUE(address)
+//   IN count the number of LCOs to allocate
+//   IN size number of bytes required for LCO state
+//   IN handlers user LCO event handlers
+//   IN distribution the distribution for the array
+//   CONT address global address of the allocated LCO
+
+struct XPI_Process_LCO_Malloc_Descriptor
+{
+    size_t count;
+    size_t size;
+    XPI_LCO_Descriptor handlers;
+    XPI_Distribution distribution;
+    size_t init_data_size;
+    const void * const init_data;
+};
+
+HPXPI_EXPORT XPI_Err XPI_PROCESS_LCO_MALLOC_ACTION(
+    XPI_Process_LCO_Malloc_Descriptor* args);    // CONT(address)
+
+HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc(XPI_Addr process,
+    size_t count, size_t size, XPI_LCO_Descriptor handlers,
+    XPI_Distribution distribution, size_t init_data_size,
+    const void * const init_data, XPI_Addr future);
 
 HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc_sync(XPI_Addr process,
     size_t count, size_t size, XPI_LCO_Descriptor handlers,
@@ -410,15 +448,36 @@ HPXPI_EXPORT XPI_Err XPI_Process_lco_malloc_sync(XPI_Addr process,
 ///////////////////////////////////////////////////////////////////////////////
 // Memory Management [8.6.1]
 ///////////////////////////////////////////////////////////////////////////////
-// HPXPI_EXPORT XPI_Err XPI_Process_global_malloc(XPI_Addr process,
-//     size_t count, size_t size, XPI_Distribution distribution,
-//     XPI_Addr future);
+
+// XPI_PROCESS_GLOBAL_MALLOC_ACTION(size, count, distribution) CONTINUE(result)
+//  IN size the number of bytes to allocate
+//  IN count the number of array elements to allocate
+//  IN distribution an initial distribution hint
+//  CONT result the global address of the allocation
+
+struct XPI_Global_Malloc_Descriptor
+{
+    size_t count;
+    size_t size;
+    XPI_Distribution distribution;
+};
+
+HPXPI_EXPORT XPI_Err XPI_PROCESS_GLOBAL_MALLOC_ACTION(
+    XPI_Global_Malloc_Descriptor* desc);                    // CONT(address)
+
+HPXPI_EXPORT XPI_Err XPI_Process_global_malloc(XPI_Addr process,
+    size_t count, size_t size, XPI_Distribution distribution,
+    XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Process_global_malloc_sync(XPI_Addr process,
     size_t count, size_t size, XPI_Distribution distribution,
     XPI_Addr* address);
 
-// HPXPI_EXPORT XPI_Err XPI_Process_global_free(XPI_Addr process,
-//     XPI_Addr address, XPI_Addr future);
+// XPI_PROCESS_GLOBAL_FREE_ACTION(address)
+//   IN address the global memory to free
+XPI_Err XPI_PROCESS_GLOBAL_FREE_ACTION(XPI_Addr *address);      // CONT()
+
+HPXPI_EXPORT XPI_Err XPI_Process_global_free(XPI_Addr process,
+    XPI_Addr address, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Process_global_free_sync(XPI_Addr process,
     XPI_Addr address);
 

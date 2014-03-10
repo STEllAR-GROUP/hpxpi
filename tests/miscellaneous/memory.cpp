@@ -46,7 +46,7 @@ void test_load_store_u16()
     HPX_TEST_EQ(XPI_Process_global_malloc_sync(process, 1, sizeof(uint16_t),
         XPI_LOCAL, &mem), XPI_SUCCESS);
 
-    uint16_t src = 0x0123ul;
+    uint16_t src = 0x0123u;
     uint16_t dest = 0ul;
 
     HPX_TEST_EQ(XPI_Agas_store_u16_sync(XPI_NULL, src), XPI_ERR_INV_ADDR);
@@ -144,6 +144,7 @@ void test_load_store_u128()
     HPX_TEST_EQ(XPI_Process_global_free_sync(process, mem), XPI_SUCCESS);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 XPI_Addr create_future()
 {
     XPI_Addr process = XPI_NULL;
@@ -196,6 +197,162 @@ void test_load_store_u8_actions()
     HPX_TEST_EQ(dest, src);
 }
 
+void test_load_store_u16_actions()
+{
+    XPI_Addr lco = create_future();
+
+    // actual test
+    XPI_Parcel p;
+    HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
+
+    uint16_t src = 0x0123u;
+    uint16_t dest = 0ul;
+
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, lco), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_LCO_TRIGGER_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr dest_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_LOAD_U16_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr src_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_data(p, sizeof(uint16_t), &src), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_STORE_U16_ACTION), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+
+    // wait for test to finish
+    HPX_TEST_EQ(XPI_Thread_wait(lco, 0, 0), XPI_SUCCESS);
+
+    // release resources
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_LCO_free_sync(lco), XPI_SUCCESS);
+
+    HPX_TEST_EQ(dest, src);
+}
+
+void test_load_store_u32_actions()
+{
+    XPI_Addr lco = create_future();
+
+    // actual test
+    XPI_Parcel p;
+    HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
+
+    uint32_t src = 0x0123ul;
+    uint32_t dest = 0ul;
+
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, lco), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_LCO_TRIGGER_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr dest_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_LOAD_U32_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr src_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_data(p, sizeof(uint32_t), &src), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_STORE_U32_ACTION), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+
+    // wait for test to finish
+    HPX_TEST_EQ(XPI_Thread_wait(lco, 0, 0), XPI_SUCCESS);
+
+    // release resources
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_LCO_free_sync(lco), XPI_SUCCESS);
+
+    HPX_TEST_EQ(dest, src);
+}
+
+void test_load_store_u64_actions()
+{
+    XPI_Addr lco = create_future();
+
+    // actual test
+    XPI_Parcel p;
+    HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
+
+    uint64_t src = 0x0123456789abcdefull;
+    uint64_t dest = 0ul;
+
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, lco), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_LCO_TRIGGER_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr dest_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_LOAD_U64_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr src_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_data(p, sizeof(uint64_t), &src), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_STORE_U64_ACTION), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+
+    // wait for test to finish
+    HPX_TEST_EQ(XPI_Thread_wait(lco, 0, 0), XPI_SUCCESS);
+
+    // release resources
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_LCO_free_sync(lco), XPI_SUCCESS);
+
+    HPX_TEST_EQ(dest, src);
+}
+
+void test_load_store_u128_actions()
+{
+    XPI_Addr lco = create_future();
+
+    // actual test
+    XPI_Parcel p;
+    HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
+
+    XPI_Addr src = { 0xfedcba9876543210ull, 0x0123456789abcdefull };
+    XPI_Addr dest = XPI_NULL;
+
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, lco), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_LCO_TRIGGER_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr dest_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_LOAD_ADDR_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr src_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_data(p, sizeof(XPI_Addr), &src), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_STORE_ADDR_ACTION), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+
+    // wait for test to finish
+    HPX_TEST_EQ(XPI_Thread_wait(lco, 0, 0), XPI_SUCCESS);
+
+    // release resources
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_LCO_free_sync(lco), XPI_SUCCESS);
+
+    HPX_TEST_EQ(dest, src);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
@@ -206,6 +363,9 @@ XPI_Err XPI_main(size_t nargs, void* args[])
     test_load_store_u128();
 
     test_load_store_u8_actions();
+    test_load_store_u16_actions();
+    test_load_store_u32_actions();
+    test_load_store_u64_actions();
 
     return XPI_SUCCESS;
 }

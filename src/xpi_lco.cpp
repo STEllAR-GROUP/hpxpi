@@ -68,7 +68,6 @@ extern "C"
                 hpxpi::set_lco_value(lco, size, args);
             }
         }
-
         return XPI_SUCCESS;
     }
 
@@ -159,11 +158,9 @@ extern "C"
     ///////////////////////////////////////////////////////////////////////////
     XPI_Err XPI_LCO_free(XPI_Addr lco, XPI_Addr future)
     {
-        if (XPI_NULL == lco)
-            return XPI_SUCCESS;
-
         // create an id, taking ownership, destructor releases credits
-        hpxpi::release_id(lco);
+        if (XPI_NULL != lco)
+            hpxpi::release_id(lco);
 
         return XPI_SUCCESS;
     }

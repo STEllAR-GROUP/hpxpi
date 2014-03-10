@@ -30,12 +30,11 @@ extern "C"
     ///////////////////////////////////////////////////////////////////////////
     // Native Parcel Interface [5.2]
     ///////////////////////////////////////////////////////////////////////////
-    XPI_Err XPI_AGAS_STORE_U8_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_U8_ACTION(uint8_t* val)
     {
-        if (0 == args)
+        if (0 == val)
             return XPI_ERR_BAD_ARG;
 
-        uint8_t* val = reinterpret_cast<uint8_t*>(args);
         XPI_Addr addr = XPI_Thread_get_addr();
 
         using hpx::components::stubs::memory;
@@ -44,12 +43,11 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    XPI_Err XPI_AGAS_STORE_U16_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_U16_ACTION(uint16_t* val)
     {
-        if (0 == args)
+        if (0 == val)
             return XPI_ERR_BAD_ARG;
 
-        uint16_t* val = reinterpret_cast<uint16_t*>(args);
         XPI_Addr addr = XPI_Thread_get_addr();
 
         using hpx::components::stubs::memory;
@@ -58,12 +56,11 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    XPI_Err XPI_AGAS_STORE_U32_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_U32_ACTION(uint32_t* val)
     {
-        if (0 == args)
+        if (0 == val)
             return XPI_ERR_BAD_ARG;
 
-        uint32_t* val = reinterpret_cast<uint32_t*>(args);
         XPI_Addr addr = XPI_Thread_get_addr();
 
         using hpx::components::stubs::memory;
@@ -72,12 +69,11 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    XPI_Err XPI_AGAS_STORE_U64_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_U64_ACTION(uint64_t* val)
     {
-        if (0 == args)
+        if (0 == val)
             return XPI_ERR_BAD_ARG;
 
-        uint64_t* val = reinterpret_cast<uint64_t*>(args);
         XPI_Addr addr = XPI_Thread_get_addr();
 
         using hpx::components::stubs::memory;
@@ -88,42 +84,42 @@ extern "C"
 
 //     XPI_Err XPI_AGAS_STORE_U128_ACTION(void* args);
 
-    XPI_Err XPI_AGAS_STORE_S8_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_S8_ACTION(int8_t* args)
     {
-        return XPI_AGAS_STORE_U8_ACTION(args);
+        return XPI_AGAS_STORE_U8_ACTION((uint8_t*)args);
     }
 
-    XPI_Err XPI_AGAS_STORE_S16_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_S16_ACTION(int16_t* args)
     {
-        return XPI_AGAS_STORE_U16_ACTION(args);
+        return XPI_AGAS_STORE_U16_ACTION((uint16_t*)args);
     }
 
-    XPI_Err XPI_AGAS_STORE_S32_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_S32_ACTION(int32_t* args)
     {
-        return XPI_AGAS_STORE_U32_ACTION(args);
+        return XPI_AGAS_STORE_U32_ACTION((uint32_t*)args);
     }
 
-    XPI_Err XPI_AGAS_STORE_S64_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_S64_ACTION(int64_t* args)
     {
-        return XPI_AGAS_STORE_U64_ACTION(args);
+        return XPI_AGAS_STORE_U64_ACTION((uint64_t*)args);
     }
 
 //     XPI_Err XPI_AGAS_STORE_S128_ACTION(void* args);
 
-    XPI_Err XPI_AGAS_STORE_F_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_F_ACTION(float* args)
     {
-        return XPI_AGAS_STORE_U32_ACTION(args);
+        return XPI_AGAS_STORE_U32_ACTION((uint32_t*)args);
     }
 
-    XPI_Err XPI_AGAS_STORE_D_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_D_ACTION(double* args)
     {
-        return XPI_AGAS_STORE_U64_ACTION(args);
+        return XPI_AGAS_STORE_U64_ACTION((uint64_t*)args);
     }
 
 //     XPI_Err XPI_AGAS_STORE_FC_ACTION(void* args);
 //     XPI_Err XPI_AGAS_STORE_DC_ACTION(void* args);
 
-    XPI_Err XPI_AGAS_STORE_ADDR_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_ADDR_ACTION(XPI_Addr* args)
     {
         if (0 == args)
             return XPI_ERR_BAD_ARG;
@@ -138,9 +134,9 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    XPI_Err XPI_AGAS_STORE_ADDRDIFF_ACTION(void* args)
+    XPI_Err XPI_AGAS_STORE_ADDRDIFF_ACTION(XPI_AddrDiff* args)
     {
-        return XPI_AGAS_STORE_ADDR_ACTION(args);
+        return XPI_AGAS_STORE_ADDR_ACTION((XPI_Addr*)args);
     }
 
     ///////////////////////////////////////////////////////////////////////////

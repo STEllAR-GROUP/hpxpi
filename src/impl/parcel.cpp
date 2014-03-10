@@ -11,35 +11,19 @@
 #include <hpxpi/impl/parcel.hpp>
 #include <hpxpi/impl/thread.hpp>
 #include <hpxpi/impl/addr.hpp>
+#include <hpxpi/impl/process.hpp>
 
 #include <map>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_PLAIN_ACTION(hpxpi::receive_parcel_action, receive_parcel_action);
-HPX_REGISTER_PLAIN_ACTION(hpxpi::receive_parcel_direct_action, receive_parcel_direct_action);
+HPX_REGISTER_PLAIN_ACTION(hpxpi::receive_parcel_action,
+    receive_parcel_action);
+HPX_REGISTER_PLAIN_ACTION(hpxpi::receive_parcel_direct_action,
+    receive_parcel_direct_action);
 
 namespace hpxpi
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        struct thread_data
-        {
-            thread_data(thread* new_thread)
-            {
-                hpx::threads::set_thread_data(
-                    hpx::threads::get_self_id(),
-                    reinterpret_cast<size_t>(new_thread));
-            }
-            ~thread_data()
-            {
-                hpx::threads::set_thread_data(
-                    hpx::threads::get_self_id(), 0);
-            }
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     struct action_registry
     {
@@ -52,6 +36,7 @@ namespace hpxpi
             HPXPI_REGISTER_ACTION(XPI_ACTION_NULL);
             register_agas_actions();
             register_lco_actions();
+            register_process_actions();
         }
 
         void register_action(XPI_Action action, std::string key, bool direct)
@@ -126,6 +111,24 @@ namespace hpxpi
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct thread_data
+        {
+            thread_data(thread* new_thread)
+            {
+                hpx::threads::set_thread_data(
+                    hpx::threads::get_self_id(),
+                    reinterpret_cast<size_t>(new_thread));
+            }
+            ~thread_data()
+            {
+                hpx::threads::set_thread_data(
+                    hpx::threads::get_self_id(), 0);
+            }
+        };
+    }
+
     XPI_Err receive_parcel(parcel ps, XPI_Addr future)
     {
         void const* data = ps.get_argument_data();

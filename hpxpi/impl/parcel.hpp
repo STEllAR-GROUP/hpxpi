@@ -17,13 +17,13 @@
 #include <boost/serialization/list.hpp>
 
 #define HPXPI_REGISTER_ACTION(action)                                         \
-    hpxpi::registry_register_action(action,                                   \
-        BOOST_PP_CAT(BOOST_PP_CAT("__", BOOST_PP_STRINGIZE(action)), "__"))   \
+    hpxpi::registry_register_action(                                          \
+        reinterpret_cast<XPI_Action>(action), BOOST_PP_STRINGIZE(action))     \
 /**/
 
 #define HPXPI_REGISTER_DIRECT_ACTION(action)                                  \
-    hpxpi::registry_register_direct_action(action,                            \
-        BOOST_PP_CAT(BOOST_PP_CAT("__", BOOST_PP_STRINGIZE(action)), "__"))   \
+    hpxpi::registry_register_direct_action(                                   \
+        reinterpret_cast<XPI_Action>(action), BOOST_PP_STRINGIZE(action))     \
 /**/
 
 namespace hpxpi
