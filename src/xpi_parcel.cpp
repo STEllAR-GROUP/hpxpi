@@ -64,6 +64,9 @@ extern "C"
         if (!hpxpi::is_parcel_valid(parcel))
             return XPI_ERR_INV_PARCEL;
 
+        if (XPI_NULL == addr)
+            addr = hpxpi::from_id(hpx::find_here());
+
         hpxpi::get_parcel(parcel)->set_target_address(addr);
         return XPI_SUCCESS;
     }
