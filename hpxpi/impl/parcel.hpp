@@ -40,7 +40,8 @@ namespace hpxpi
     struct parcel_frame
     {
         parcel_frame()
-          : addr_(XPI_NULL)
+          : addr_(XPI_NULL),
+            target_action_("XPI_ACTION_NULL")
         {}
 
         XPI_Addr get_target_address() const
@@ -74,7 +75,7 @@ namespace hpxpi
 
         bool is_empty() const
         {
-            return addr_ == XPI_NULL;
+            return target_action_.empty() || target_action_ == "XPI_ACTION_NULL";
         }
 
     private:
