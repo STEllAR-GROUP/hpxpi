@@ -12,7 +12,6 @@ int executed = 0;
 XPI_Err some_action(void* nothing)
 {
     ++executed;
-    XPI_continue1(0, 0);
     return XPI_SUCCESS;
 }
 

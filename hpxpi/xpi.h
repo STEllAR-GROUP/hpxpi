@@ -295,7 +295,6 @@ HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
 ///////////////////////////////////////////////////////////////////////////////
 
 // the continue primitive
-// HPXPI_EXPORT void XPI_continue(size_t n, size_t sizes[], const void * vals[]);
 HPXPI_EXPORT void XPI_continue1(size_t size, const void *val);
 
 ///////////////////////////////////////////////////////////////////////////////

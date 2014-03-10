@@ -68,6 +68,7 @@ extern "C"
                 hpxpi::set_lco_value(lco, size, args);
             }
         }
+
         return XPI_SUCCESS;
     }
 
@@ -107,6 +108,7 @@ extern "C"
         XPI_Err error = XPI_LCO_get_size_sync(XPI_Thread_get_addr(), &size);
         if (error != XPI_SUCCESS)
             return error;
+
         XPI_continue1(sizeof(size), &size);
         return XPI_SUCCESS;
     }
@@ -191,7 +193,6 @@ extern "C"
         buffer_type b = act(hpxpi::get_id(lco));
 
         XPI_continue1(b.size(), b.data());
-
         return XPI_SUCCESS;
     }
 }

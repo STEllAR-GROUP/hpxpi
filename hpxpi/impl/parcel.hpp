@@ -138,6 +138,10 @@ namespace hpxpi
             argument_data_.resize(0);
             argument_data_.insert(argument_data_.begin(), begin, end);
         }
+        void reset_argument_data()
+        {
+            argument_data_.resize(0);
+        }
 
         std::vector<uint8_t> const& get_environment_data() const
         {

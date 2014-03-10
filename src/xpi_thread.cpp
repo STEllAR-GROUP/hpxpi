@@ -98,11 +98,6 @@ extern "C"
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // FIXME: what is this supposed to do? Append all data blocks into one?
-//     void XPI_continue(size_t n, size_t sizes[], const void * vals[])
-//     {
-//     }
-
     void XPI_continue1(size_t size, const void *val)
     {
         // Send continuation, if one is available
@@ -110,7 +105,6 @@ extern "C"
         {
             XPI_Parcel parcel = XPI_Thread_get_cont();
             XPI_Parcel_set_data(parcel, size, val);
-            XPI_Parcel_send(parcel, XPI_NULL, XPI_NULL);
         }
 
         // We don't terminate this thread as this breaks direct action execution

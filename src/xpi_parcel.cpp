@@ -99,11 +99,17 @@ extern "C"
     {
         if (!hpxpi::is_parcel_valid(parcel))
             return XPI_ERR_INV_PARCEL;
-        if (0 == bytes || 0 == data)
-            return XPI_ERR_BAD_ARG;
 
-        uint8_t const* cast_data = static_cast<uint8_t const*>(data);
-        hpxpi::get_parcel(parcel)->set_argument_data(cast_data, cast_data + bytes);
+        if (0 == bytes || 0 == data)
+        {
+            hpxpi::get_parcel(parcel)->reset_argument_data();
+        }
+        else
+        {
+            uint8_t const* cast_data = static_cast<uint8_t const*>(data);
+            hpxpi::get_parcel(parcel)->set_argument_data(cast_data, cast_data + bytes);
+        }
+
         return XPI_SUCCESS;
     }
 
@@ -136,7 +142,7 @@ extern "C"
 
         hpxpi::parcel* ps = hpxpi::get_parcel(parcel);
         std::string action(ps->get_target_action());
-        if (action == "__XPI_ACTION_NULL__")
+        if (action.empty() || action == "__XPI_ACTION_NULL__")
             return XPI_SUCCESS;
 
         XPI_Addr target = ps->get_target_address();
