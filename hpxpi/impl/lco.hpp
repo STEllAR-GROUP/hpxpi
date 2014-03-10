@@ -62,16 +62,14 @@ namespace hpxpi
     inline void set_lco_value(XPI_Addr lco, T const& data)
     {
         typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
-        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(&data),
-            sizeof(T), buffer_type::copy);
+        buffer_type buffer(reinterpret_cast<uint8_t const*>(&data), sizeof(T));
         hpx::set_lco_value(get_id(lco), buffer);
     }
 
     inline void set_lco_value(XPI_Addr lco, size_t size, void const* data)
     {
         typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
-        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(data),
-            size, buffer_type::copy);
+        buffer_type buffer(reinterpret_cast<uint8_t const*>(data), size);
         hpx::set_lco_value(get_id(lco), buffer);
     }
 
@@ -79,8 +77,7 @@ namespace hpxpi
     inline void set_lco_value(XPI_Addr lco, T const& data, XPI_Addr cont)
     {
         typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
-        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(&data),
-            sizeof(T), buffer_type::copy);
+        buffer_type buffer(reinterpret_cast<uint8_t const*>(&data), sizeof(T));
         hpx::set_lco_value(get_id(lco), buffer, get_id(cont));
     }
 
@@ -88,8 +85,7 @@ namespace hpxpi
         XPI_Addr cont)
     {
         typedef hpx::util::serialize_buffer<uint8_t> buffer_type;
-        buffer_type buffer = buffer_type(reinterpret_cast<uint8_t const*>(data),
-            size, buffer_type::copy);
+        buffer_type buffer(reinterpret_cast<uint8_t const*>(data), size);
         hpx::set_lco_value(get_id(lco), buffer, get_id(cont));
     }
 

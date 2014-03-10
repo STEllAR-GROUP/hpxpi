@@ -84,9 +84,9 @@ namespace hpxpi
             if (!had_get_value_)
             {
                 had_get_value_ = true;
-                boost::uint8_t const* data =
+                boost::uint8_t* data = const_cast<uint8_t*>(
                     reinterpret_cast<boost::uint8_t const*>(
-                        desc_.get_value(lco_));
+                        desc_.get_value(lco_)));
                 data_ = buffer_type(data, get_size(), buffer_type::reference);
             }
 
