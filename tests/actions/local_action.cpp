@@ -18,14 +18,17 @@ XPI_Err some_action(void* nothing)
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
-    XPI_Err registration_success = XPI_register_action_with_key(some_action,"some_action");
-    HPX_TEST_EQ(registration_success, XPI_SUCCESS);
+    HPX_TEST_EQ(
+        XPI_register_action_with_key(some_action,"some_action"),
+        XPI_SUCCESS);
 
     XPI_Parcel p;
     HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
-    HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS); //assume action will be executed locally
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS);
     HPX_TEST_EQ(XPI_Parcel_set_action(p, some_action), XPI_SUCCESS);
-    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL), XPI_SUCCESS); //is null a valid future?
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
 
     return XPI_SUCCESS;
 }

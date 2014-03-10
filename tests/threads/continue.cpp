@@ -6,31 +6,36 @@
 #include <hpxpi/xpi.h>
 #include <hpx/util/lightweight_test.hpp>
 
-const int num_cont=99;
-int counter=0;
-
-XPI_Parcel p;
+const int num_cont = 99;
+int counter = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err count(void* nothing)
 {
-    counter++;
+    ++counter;
     return XPI_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
-    XPI_register_action(count);
+    XPI_Parcel p = XPI_PARCEL_NULL;
+
+    XPI_register_action_with_key(count, "count");
     XPI_Parcel_create(&p);
-    for(int i=0;i<num_cont;i++){
-        XPI_Parcel_set_addr(p, XPI_NULL);
-        XPI_Parcel_set_action(p, count);
-        XPI_Parcel_push(p);
+
+    for (size_t i = 0; i != num_cont; ++i)
+    {
+        HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS);
+        HPX_TEST_EQ(XPI_Parcel_set_action(p, count), XPI_SUCCESS);
+        HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
     }
-    //last push is empty
-    XPI_Parcel_pop(p, XPI_NULL);
-    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL), XPI_SUCCESS); //is null a valid future?
+
+    // last push is empty
+    HPX_TEST_EQ(XPI_Parcel_pop(p, XPI_NULL), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
 
     return XPI_SUCCESS;
 }

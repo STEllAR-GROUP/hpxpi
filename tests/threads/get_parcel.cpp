@@ -8,17 +8,14 @@
 
 const int n=99;
 
-XPI_Parcel p;
-
-struct data{
-    int  number;
+struct data
+{
+    int number;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err some_action(void* nothing)
 {
-    //This will fail because the parcel is copied
-    //HPX_TEST_EQ(XPI_Thread_get_cont(), p);
     data* env = reinterpret_cast<data*>(XPI_Thread_get_env());
     HPX_TEST_EQ(env->number, n);
     return XPI_SUCCESS;
@@ -27,16 +24,20 @@ XPI_Err some_action(void* nothing)
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
-    XPI_Err registration_success = XPI_register_action_with_key(some_action,"some_action");
-    HPX_TEST_EQ(registration_success, XPI_SUCCESS);
+    HPX_TEST_EQ(
+        XPI_register_action_with_key(some_action,"some_action"),
+        XPI_SUCCESS);
 
+    XPI_Parcel p = XPI_PARCEL_NULL;
     HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
-    HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS); //assume action will be executed locally
+
+    data d = { n };
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS);
     HPX_TEST_EQ(XPI_Parcel_set_action(p, some_action), XPI_SUCCESS);
-    data d;
-    d.number=n;
-    HPX_TEST_EQ(XPI_Parcel_set_env(p, sizeof(data),&d), XPI_SUCCESS);
-    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL), XPI_SUCCESS); //is null a valid future?
+    HPX_TEST_EQ(XPI_Parcel_set_env(p, sizeof(data), &d), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
 
     return XPI_SUCCESS;
 }

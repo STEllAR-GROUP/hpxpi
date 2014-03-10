@@ -6,29 +6,49 @@
 #include <hpxpi/xpi.h>
 #include <hpx/util/lightweight_test.hpp>
 
-bool executed=false;
-
-XPI_Parcel p;
+int executed = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err some_action(void* nothing)
 {
-    executed=true;
+    ++executed;
     return XPI_SUCCESS;
+}
+
+void test_simple_target()
+{
+    XPI_Parcel p;
+
+    HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, &some_action), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
+}
+
+void test_empty_continuation()
+{
+    XPI_Parcel p = XPI_PARCEL_NULL;
+
+    HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, &some_action), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_ACTION_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
-    XPI_register_action(some_action);
-    XPI_register_action(XPI_ACTION_NULL); //Shouuldn't need to do this
-    XPI_Parcel_create(&p);
-    XPI_Parcel_set_addr(p, XPI_NULL);
-    XPI_Parcel_set_action(p, some_action);
-    XPI_Parcel_push(p);
-    XPI_Parcel_set_addr(p, XPI_NULL);
-    XPI_Parcel_set_action(p, XPI_ACTION_NULL);
-    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL), XPI_SUCCESS);
+    HPX_TEST_EQ(
+        XPI_register_action_with_key(some_action, "some_action"),
+        XPI_SUCCESS);
+
+    test_simple_target();
+    test_empty_continuation();
 
     return XPI_SUCCESS;
 }
@@ -43,7 +63,7 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ(result, XPI_SUCCESS);
     HPX_TEST_EQ(XPI_finalize(), XPI_SUCCESS);
 
-    HPX_TEST_EQ(executed, false);
+    HPX_TEST_EQ(executed, 2);
 
     return hpx::util::report_errors();
 }
