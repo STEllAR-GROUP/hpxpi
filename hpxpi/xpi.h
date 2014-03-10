@@ -7,20 +7,7 @@
 #if !defined(HPXPI_H_APR_27_2013_1135AM)
 #define HPXPI_H_APR_27_2013_1135AM
 
-#include <hpx/config/defines.hpp>
-
-#ifdef __cplusplus
-#include <cstdint>
-#include <cstddef>
-using std::size_t;
-#include <cstdlib>
-using std::intptr_t;
-#else
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#endif
-
+#include <hpxpi/config/config.h>
 #include <hpxpi/config/version.h>
 #include <hpxpi/config/no_return.h>
 #include <hpxpi/config/export_definitions.h>
@@ -63,7 +50,6 @@ typedef struct XPI_AddrDiff {
 // main process.
 XPI_Err XPI_main(size_t nargs, void* args[]);
 
-
 // XPI_init initializes the XPI runtime, using the passed arguments and the
 // environment. C applications usually simply forward pointers to argc, argv,
 // and envp (if available). XPI specific arguments are removed from argc and
@@ -101,7 +87,8 @@ HPXPI_EXPORT void XPI_version(size_t* major, size_t* minor, size_t* release);
 typedef XPI_Err (*XPI_Action)(void* args) /** CONT(...) **/;
 
 //Register an action with the runtime, must be done at all localities
-HPXPI_EXPORT XPI_Err XPI_register_action_with_key(XPI_Action action,const char* key);
+HPXPI_EXPORT XPI_Err XPI_register_action_with_key(XPI_Action action, const char* key);
+
 #define XPI_register_action(act) XPI_register_action_with_key(act, #act)
 
 ///////////////////////////////////////////////////////////////////////////////
