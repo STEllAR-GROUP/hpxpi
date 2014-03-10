@@ -10,7 +10,7 @@
 #include <hpxpi/impl/lco.hpp>
 #include <hpxpi/impl/parcel.hpp>
 #include <hpxpi/impl/thread.hpp>
-#include <hpxpi/impl/xpi_addr.hpp>
+#include <hpxpi/impl/addr.hpp>
 
 #include <map>
 #include <string>
@@ -50,6 +50,7 @@ namespace hpxpi
         action_registry()
         {
             HPXPI_REGISTER_ACTION(XPI_ACTION_NULL);
+            register_agas_actions();
             register_lco_actions();
         }
 

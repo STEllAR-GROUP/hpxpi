@@ -167,6 +167,43 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete,
     XPI_Addr future);
 
 ///////////////////////////////////////////////////////////////////////////////
+// Native Parcel Interface [5.2]
+///////////////////////////////////////////////////////////////////////////////
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U8_ACTION(void* args);      // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U16_ACTION(void* args);     // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U32_ACTION(void* args);     // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U64_ACTION(void* args);     // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U128_ACTION(void* args);    // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S8_ACTION(void* args);      // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S16_ACTION(void* args);     // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S32_ACTION(void* args);     // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S64_ACTION(void* args);     // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S128_ACTION(void* args);    // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_F_ACTION(void* args);       // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_D_ACTION(void* args);       // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_FC_ACTION(void* args);      // CONT()
+// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_DC_ACTION(void* args);      // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_ADDR_ACTION(void* args);    // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_ADDRDIFF_ACTION(void* args);// CONT()
+
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U8_ACTION(void* args);       // CONT(uint8_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U16_ACTION(void* args);      // CONT(uint16_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U32_ACTION(void* args);      // CONT(uint32_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U64_ACTION(void* args);      // CONT(uint64_t val)
+// HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U128_ACTION(void* args);     // CONT(__uint128_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S8_ACTION(void* args);       // CONT(int8_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S16_ACTION(void* args);      // CONT(int16_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S32_ACTION(void* args);      // CONT(int32_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S64_ACTION(void* args);      // CONT(int64_t val)
+// HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S128_ACTION(void* args);     // CONT(__int128_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_F_ACTION(void* args);        // CONT(float val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_D_ACTION(void* args);        // CONT(double val)
+// HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_FC_ACTION(void* args);       // CONT(float _Complex val)
+// HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_DC_ACTION(void* args);       // CONT(double _Complex val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_ADDR_ACTION(void* args);     // CONT(XPI_Addr val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_ADDRDIFF_ACTION(void* args); // CONT(XPI_AddrDiff val)
+
+///////////////////////////////////////////////////////////////////////////////
 // Asynchronous memory access [5.3.1]
 ///////////////////////////////////////////////////////////////////////////////
 HPXPI_EXPORT XPI_Err XPI_Agas_store_u8(XPI_Addr addr, uint8_t val, XPI_Addr future);

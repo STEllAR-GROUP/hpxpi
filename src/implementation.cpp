@@ -11,7 +11,7 @@
 
 #include <hpxpi/xpi.h>
 #include <hpxpi/impl/thread.hpp>
-#include <hpxpi/impl/xpi_addr.hpp>
+#include <hpxpi/impl/addr.hpp>
 
 namespace hpxpi
 {

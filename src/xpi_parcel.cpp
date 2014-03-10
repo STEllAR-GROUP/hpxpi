@@ -9,7 +9,7 @@
 #include <hpxpi/xpi.h>
 #include <hpxpi/impl/parcel.hpp>
 #include <hpxpi/impl/lco.hpp>
-#include <hpxpi/impl/xpi_addr.hpp>
+#include <hpxpi/impl/addr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 extern "C"

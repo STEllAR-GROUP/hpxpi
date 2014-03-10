@@ -10,20 +10,7 @@
 #include <hpxpi/impl/lco.hpp>
 #include <hpxpi/impl/thread.hpp>
 #include <hpxpi/impl/parcel.hpp>
-#include <hpxpi/impl/xpi_addr.hpp>
-
-namespace hpxpi
-{
-    ///////////////////////////////////////////////////////////////////////////
-    void register_lco_actions()
-    {
-        HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_TRIGGER_ACTION);
-        HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_GET_SIZE_ACTION);
-        HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_HAD_GET_VALUE_ACTION);
-        HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_FREE_ACTION);
-        HPXPI_REGISTER_DIRECT_ACTION(XPI_LCO_GET_VALUE_ACTION);
-    }
-}
+#include <hpxpi/impl/addr.hpp>
 
 extern "C"
 {

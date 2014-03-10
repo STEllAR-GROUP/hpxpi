@@ -13,7 +13,7 @@
 #include <boost/serialization/serialization.hpp>
 
 #include <hpxpi/xpi.h>
-#include <hpxpi/impl/xpi_addr.hpp>
+#include <hpxpi/impl/addr.hpp>
 
 #include <vector>
 

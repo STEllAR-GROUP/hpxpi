@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpxpi/xpi.h>
-#include <hpxpi/impl/xpi_addr.hpp>
+#include <hpxpi/impl/addr.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 

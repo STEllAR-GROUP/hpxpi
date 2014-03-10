@@ -7,7 +7,7 @@
 #include <hpx/runtime/components/stubs/memory.hpp>
 
 #include <hpxpi/xpi.h>
-#include <hpxpi/impl/xpi_addr.hpp>
+#include <hpxpi/impl/addr.hpp>
 #include <hpxpi/impl/lco.hpp>
 
 extern "C"
@@ -15,6 +15,241 @@ extern "C"
     ///////////////////////////////////////////////////////////////////////////
     XPI_Addr XPI_NULL = { 0, 0 };
     XPI_Action XPI_ACTION_NULL = NULL;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Native Parcel Interface [5.2]
+    ///////////////////////////////////////////////////////////////////////////
+    XPI_Err XPI_AGAS_STORE_U8_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        uint8_t* val = reinterpret_cast<uint8_t*>(args);
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        memory::store8_async(hpxpi::get_id(addr), *val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_STORE_U16_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        uint16_t* val = reinterpret_cast<uint16_t*>(args);
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        memory::store16_async(hpxpi::get_id(addr), *val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_STORE_U32_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        uint32_t* val = reinterpret_cast<uint32_t*>(args);
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        memory::store32_async(hpxpi::get_id(addr), *val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_STORE_U64_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        uint64_t* val = reinterpret_cast<uint64_t*>(args);
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        memory::store64_async(hpxpi::get_id(addr), *val);
+
+        return XPI_SUCCESS;
+    }
+
+//     XPI_Err XPI_AGAS_STORE_U128_ACTION(void* args);
+
+    XPI_Err XPI_AGAS_STORE_S8_ACTION(void* args)
+    {
+        return XPI_AGAS_STORE_U8_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_STORE_S16_ACTION(void* args)
+    {
+        return XPI_AGAS_STORE_U16_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_STORE_S32_ACTION(void* args)
+    {
+        return XPI_AGAS_STORE_U32_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_STORE_S64_ACTION(void* args)
+    {
+        return XPI_AGAS_STORE_U64_ACTION(args);
+    }
+
+//     XPI_Err XPI_AGAS_STORE_S128_ACTION(void* args);
+
+    XPI_Err XPI_AGAS_STORE_F_ACTION(void* args)
+    {
+        return XPI_AGAS_STORE_U32_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_STORE_D_ACTION(void* args)
+    {
+        return XPI_AGAS_STORE_U64_ACTION(args);
+    }
+
+//     XPI_Err XPI_AGAS_STORE_FC_ACTION(void* args);
+//     XPI_Err XPI_AGAS_STORE_DC_ACTION(void* args);
+
+    XPI_Err XPI_AGAS_STORE_ADDR_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        hpx::components::server::memory::uint128_t* val =
+            reinterpret_cast<hpx::components::server::memory::uint128_t*>(args);
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        memory::store128_async(hpxpi::get_id(addr), *val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_STORE_ADDRDIFF_ACTION(void* args)
+    {
+        return XPI_AGAS_STORE_ADDR_ACTION(args);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    XPI_Err XPI_AGAS_LOAD_U8_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        uint8_t val = memory::load8_sync(hpxpi::get_id(addr));
+
+        XPI_continue1(sizeof(uint8_t), &val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_LOAD_U16_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        uint16_t val = memory::load16_sync(hpxpi::get_id(addr));
+
+        XPI_continue1(sizeof(uint16_t), &val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_LOAD_U32_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        uint32_t val = memory::load32_sync(hpxpi::get_id(addr));
+
+        XPI_continue1(sizeof(uint32_t), &val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_LOAD_U64_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        uint64_t val = memory::load64_sync(hpxpi::get_id(addr));
+
+        XPI_continue1(sizeof(uint64_t), &val);
+
+        return XPI_SUCCESS;
+    }
+
+//     XPI_Err XPI_AGAS_LOAD_U128_ACTION(void* args);
+
+    XPI_Err XPI_AGAS_LOAD_S8_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_U8_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_LOAD_S16_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_U16_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_LOAD_S32_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_U32_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_LOAD_S64_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_U64_ACTION(args);
+    }
+
+//     XPI_Err XPI_AGAS_LOAD_S128_ACTION(void* args);
+
+    XPI_Err XPI_AGAS_LOAD_F_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_U32_ACTION(args);
+    }
+
+    XPI_Err XPI_AGAS_LOAD_D_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_U64_ACTION(args);
+    }
+
+//     XPI_Err XPI_AGAS_LOAD_FC_ACTION(void* args);
+//     XPI_Err XPI_AGAS_LOAD_DC_ACTION(void* args);
+
+    XPI_Err XPI_AGAS_LOAD_ADDR_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        hpx::components::server::memory::uint128_t val =
+            memory::load128_sync(hpxpi::get_id(addr));
+
+        XPI_continue1(sizeof(hpx::components::server::memory::uint128_t), &val);
+
+        return XPI_SUCCESS;
+    }
+
+    XPI_Err XPI_AGAS_LOAD_ADDRDIFF_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_ADDR_ACTION(args);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Asynchronous memory access [5.3.1]

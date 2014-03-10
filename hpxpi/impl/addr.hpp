@@ -74,6 +74,9 @@ inline std::ostream& operator<< (std::ostream& os, XPI_Addr addr)
 namespace hpxpi
 {
     ///////////////////////////////////////////////////////////////////////////
+    void register_agas_actions();
+
+    ///////////////////////////////////////////////////////////////////////////
     // Return id_type representing given address, this does not take ownership
     // of any of the credits stored in the address
     inline hpx::id_type get_id(XPI_Addr addr)
