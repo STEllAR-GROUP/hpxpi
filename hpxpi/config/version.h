@@ -13,7 +13,7 @@ extern "C" {
 // This is the version of the document currently implemented by HPXPI
 #define XPI_VERSION_MAJOR   1
 #define XPI_VERSION_MINOR   0
-#define XPI_VERSION_RELEASE 310      // document revision
+#define XPI_VERSION_RELEASE 313      // document revision
 
 #if defined(__cplusplus)
 }
