@@ -16,6 +16,17 @@ extern "C"
     XPI_Addr XPI_NULL = { 0, 0 };
     XPI_Action XPI_ACTION_NULL = NULL;
 
+    XPI_Err XPI_Addr_init(uint64_t address, XPI_Addr *result)
+    {
+        if (0 == result)
+            return XPI_ERR_BAD_ARG;
+
+        *result = hpxpi::from_id(hpx::find_here());
+        result->lsb = address;
+
+        return XPI_SUCCESS;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Native Parcel Interface [5.2]
     ///////////////////////////////////////////////////////////////////////////
@@ -29,6 +40,8 @@ extern "C"
 
         using hpx::components::stubs::memory;
         memory::store8_async(hpxpi::get_id(addr), *val);
+
+        XPI_continue1(0, 0);
 
         return XPI_SUCCESS;
     }
@@ -44,6 +57,8 @@ extern "C"
         using hpx::components::stubs::memory;
         memory::store16_async(hpxpi::get_id(addr), *val);
 
+        XPI_continue1(0, 0);
+
         return XPI_SUCCESS;
     }
 
@@ -58,6 +73,8 @@ extern "C"
         using hpx::components::stubs::memory;
         memory::store32_async(hpxpi::get_id(addr), *val);
 
+        XPI_continue1(0, 0);
+
         return XPI_SUCCESS;
     }
 
@@ -71,6 +88,8 @@ extern "C"
 
         using hpx::components::stubs::memory;
         memory::store64_async(hpxpi::get_id(addr), *val);
+
+        XPI_continue1(0, 0);
 
         return XPI_SUCCESS;
     }
@@ -123,6 +142,8 @@ extern "C"
 
         using hpx::components::stubs::memory;
         memory::store128_async(hpxpi::get_id(addr), *val);
+
+        XPI_continue1(0, 0);
 
         return XPI_SUCCESS;
     }

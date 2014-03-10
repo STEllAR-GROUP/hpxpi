@@ -113,7 +113,7 @@ extern "C"
             XPI_Parcel_send(parcel, XPI_NULL, XPI_NULL);
         }
 
-        // stop executing
-        hpx::this_thread::interrupt();
+        // We don't terminate this thread as this breaks direct action execution
+        // hpx::this_thread::interrupt();       // stop executing
     }
 }

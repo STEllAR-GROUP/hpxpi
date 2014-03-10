@@ -144,6 +144,58 @@ void test_load_store_u128()
     HPX_TEST_EQ(XPI_Process_global_free_sync(process, mem), XPI_SUCCESS);
 }
 
+XPI_Addr create_future()
+{
+    XPI_Addr process = XPI_NULL;
+    HPX_TEST_EQ(
+        XPI_Thread_get_process_sync(XPI_Thread_get_self(), &process),
+        XPI_SUCCESS);
+    XPI_Addr lco = XPI_NULL;
+    HPX_TEST_EQ(
+        XPI_Process_future_new_sync(process, 1, 0, XPI_LOCAL, &lco),
+        XPI_SUCCESS);
+    return lco;
+}
+
+void test_load_store_u8_actions()
+{
+    XPI_Addr lco = create_future();
+
+    // actual test
+    XPI_Parcel p;
+    HPX_TEST_EQ(XPI_Parcel_create(&p), XPI_SUCCESS);
+
+    uint8_t src = 0x55ul;
+    uint8_t dest = 0ul;
+
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, lco), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_LCO_TRIGGER_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr dest_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, dest_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_LOAD_U8_ACTION), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_push(p), XPI_SUCCESS);
+
+    XPI_Addr src_addr = XPI_NULL;
+    HPX_TEST_EQ(XPI_Addr_init((uint64_t)&dest, &src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_addr(p, src_addr), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_data(p, sizeof(uint8_t), &src), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_Parcel_set_action(p, XPI_AGAS_STORE_U8_ACTION), XPI_SUCCESS);
+
+    HPX_TEST_EQ(XPI_Parcel_send(p, XPI_NULL, XPI_NULL), XPI_SUCCESS);
+
+    // wait for test to finish
+    HPX_TEST_EQ(XPI_Thread_wait(lco, 0, 0), XPI_SUCCESS);
+
+    // release resources
+    HPX_TEST_EQ(XPI_Parcel_free(p), XPI_SUCCESS);
+    HPX_TEST_EQ(XPI_LCO_free_sync(lco), XPI_SUCCESS);
+
+    HPX_TEST_EQ(dest, src);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 XPI_Err XPI_main(size_t nargs, void* args[])
 {
@@ -152,6 +204,9 @@ XPI_Err XPI_main(size_t nargs, void* args[])
     test_load_store_u32();
     test_load_store_u64();
     test_load_store_u128();
+
+    test_load_store_u8_actions();
+
     return XPI_SUCCESS;
 }
 

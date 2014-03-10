@@ -203,6 +203,9 @@ namespace hpxpi
     // Main action entry point
     XPI_Err receive_parcel(parcel ps, XPI_Addr future);
 
+    HPX_DEFINE_PLAIN_ACTION(receive_parcel, receive_parcel_action);
+    HPX_DEFINE_PLAIN_DIRECT_ACTION(receive_parcel, receive_parcel_direct_action);
+
     ///////////////////////////////////////////////////////////////////////////
     void apply_parcel(hpx::id_type const& targetid, XPI_Parcel p,
         std::string const& action, XPI_Addr complete, XPI_Addr thread_id);
@@ -211,5 +214,57 @@ namespace hpxpi
         std::string const& action, XPI_Addr complete, XPI_Addr thread_id);
 }
 
-HPX_DEFINE_PLAIN_ACTION(hpxpi::receive_parcel, receive_parcel_action);
-HPX_DEFINE_PLAIN_DIRECT_ACTION(hpxpi::receive_parcel, receive_parcel_direct_action);
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct action_is_target_valid<hpxpi::receive_parcel_action>
+    {
+        static bool call(naming::id_type const& id)
+        {
+            return hpx::naming::is_locality(id) ||
+                   hpx::naming::refers_to_virtual_memory(id.get_gid());
+        }
+    };
+
+    template <>
+    struct action_is_target_valid<hpxpi::receive_parcel_direct_action>
+    {
+        static bool call(naming::id_type const& id)
+        {
+            return hpx::naming::is_locality(id) ||
+                   hpx::naming::refers_to_virtual_memory(id.get_gid());
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct component_type_is_compatible<
+        hpxpi::receive_parcel_action::component_type>
+    {
+        static bool call(naming::address const& addr)
+        {
+            return
+                addr.type_ == hpx::components::component_memory ||
+                components::types_are_compatible(
+                    addr.type_, components::get_component_type<
+                        hpxpi::receive_parcel_action::component_type>());
+        }
+    };
+
+    template <>
+    struct component_type_is_compatible<
+        hpxpi::receive_parcel_direct_action::component_type>
+    {
+        static bool call(naming::address const& addr)
+        {
+            return
+                addr.type_ == hpx::components::component_memory ||
+                components::types_are_compatible(
+                    addr.type_, components::get_component_type<
+                        hpxpi::receive_parcel_direct_action::component_type>());
+        }
+    };
+}}
+

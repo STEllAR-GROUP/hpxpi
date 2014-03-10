@@ -143,7 +143,8 @@ extern "C"
         hpx::id_type targetid = (XPI_NULL != target) ?
             hpxpi::get_id(target) : hpx::find_here();
 
-        if (hpx::naming::is_locality(targetid))
+        if (hpx::naming::is_locality(targetid) ||
+            hpx::naming::refers_to_virtual_memory(targetid.get_gid()))
         {
             hpxpi::apply_parcel(targetid, parcel, action, complete, thread_id);
         }

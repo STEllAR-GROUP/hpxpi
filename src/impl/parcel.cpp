@@ -16,8 +16,8 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_PLAIN_ACTION(receive_parcel_action);
-HPX_REGISTER_PLAIN_ACTION(receive_parcel_direct_action);
+HPX_REGISTER_PLAIN_ACTION(hpxpi::receive_parcel_action, receive_parcel_action);
+HPX_REGISTER_PLAIN_ACTION(hpxpi::receive_parcel_direct_action, receive_parcel_direct_action);
 
 namespace hpxpi
 {
