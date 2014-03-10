@@ -105,7 +105,15 @@ extern "C"
 
     void XPI_continue1(size_t size, const void *val)
     {
-        XPI_Parcel p = XPI_Thread_get_cont();
-        XPI_Parcel_set_data(p, size, val);
+        // Send continuation, if one is available
+        if (XPI_NULL != XPI_Thread_get_addr())
+        {
+            XPI_Parcel parcel = XPI_Thread_get_cont();
+            XPI_Parcel_set_data(parcel, size, val);
+            XPI_Parcel_send(parcel, XPI_NULL, XPI_NULL);
+        }
+
+        // stop executing
+        hpx::this_thread::interrupt();
     }
 }

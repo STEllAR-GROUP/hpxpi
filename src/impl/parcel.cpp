@@ -139,21 +139,9 @@ namespace hpxpi
         if (XPI_NULL != future)
             hpxpi::set_lco_value(future, t.get_thread_id());
 
-        // Pass new thread
-        XPI_Err status = XPI_SUCCESS;
-        {
-            detail::thread_data reset(&t);
-            status = action(const_cast<void*>(data));
-        }
-
-        // Send continuation
-        if (XPI_SUCCESS == status && !ps.is_empty())
-        {
-            XPI_Parcel parcel = { reinterpret_cast<intptr_t>(&ps) };
-            XPI_Parcel_send(parcel, XPI_NULL, XPI_NULL);
-        }
-
-        return status;
+        // run the action, note: might not return
+        detail::thread_data reset(&t);
+        return action(const_cast<void*>(data));
     }
 
     ///////////////////////////////////////////////////////////////////////////

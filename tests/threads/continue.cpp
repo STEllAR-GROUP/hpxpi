@@ -13,6 +13,7 @@ int counter = 0;
 XPI_Err count(void* nothing)
 {
     ++counter;
+    XPI_continue1(0, 0);
     return XPI_SUCCESS;
 }
 
