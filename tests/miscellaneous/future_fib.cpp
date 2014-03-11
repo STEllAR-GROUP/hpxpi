@@ -49,7 +49,7 @@ XPI_Err fib_synchronous(void* data)
     }
 
     // Send results
-    XPI_continue1(sizeof(int), &result);
+    XPI_continue(sizeof(int), &result);
 
     return XPI_SUCCESS;
 }
@@ -121,7 +121,7 @@ XPI_Err fib_asynchronous(void* data)
     }
 
     // Send results
-    XPI_continue1(sizeof(int), &result);
+    XPI_continue(sizeof(int), &result);
 
     return XPI_SUCCESS;
 }

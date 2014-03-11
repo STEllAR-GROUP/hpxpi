@@ -108,7 +108,7 @@ extern "C"
         if (error != XPI_SUCCESS)
             return error;
 
-        XPI_continue1(sizeof(size), &size);
+        XPI_continue(sizeof(size), &size);
         return XPI_SUCCESS;
     }
 
@@ -151,7 +151,7 @@ extern "C"
         if (error != XPI_SUCCESS)
             return error;
 
-        XPI_continue1(sizeof(value), &value);
+        XPI_continue(sizeof(value), &value);
         return XPI_SUCCESS;
     }
 
@@ -189,7 +189,7 @@ extern "C"
         hpxpi::detail::custom_lco::get_value_action act;
         buffer_type b = act(hpxpi::get_id(lco));
 
-        XPI_continue1(b.size(), b.data());
+        XPI_continue(b.size(), b.data());
         return XPI_SUCCESS;
     }
 }

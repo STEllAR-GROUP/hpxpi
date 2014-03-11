@@ -98,7 +98,7 @@ extern "C"
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void XPI_continue1(size_t size, const void *val)
+    void XPI_continue(size_t size, const void *val)
     {
         // Send continuation, if one is available
         if (XPI_NULL != XPI_Thread_get_addr())

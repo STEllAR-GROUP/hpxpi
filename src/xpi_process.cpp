@@ -74,7 +74,7 @@ extern "C"
             desc->size, desc->distribution, &address);
         if (error != XPI_SUCCESS) return error;
 
-        XPI_continue1(sizeof(XPI_Addr), &address);
+        XPI_continue(sizeof(XPI_Addr), &address);
         return XPI_SUCCESS;
     }
 
@@ -195,7 +195,7 @@ extern "C"
             desc->init_data, &address);
         if (error != XPI_SUCCESS) return error;
 
-        XPI_continue1(sizeof(XPI_Addr), &address);
+        XPI_continue(sizeof(XPI_Addr), &address);
         return XPI_SUCCESS;
     }
 
@@ -256,7 +256,7 @@ extern "C"
             desc->bytes, desc->distribution, &address);
         if (error != XPI_SUCCESS) return error;
 
-        XPI_continue1(sizeof(XPI_Addr), &address);
+        XPI_continue(sizeof(XPI_Addr), &address);
         return XPI_SUCCESS;
     }
 }

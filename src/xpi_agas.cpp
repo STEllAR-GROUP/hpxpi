@@ -156,7 +156,7 @@ extern "C"
         using hpx::components::stubs::memory;
         uint8_t val = memory::load8_sync(hpxpi::get_id(addr));
 
-        XPI_continue1(sizeof(uint8_t), &val);
+        XPI_continue(sizeof(uint8_t), &val);
         return XPI_SUCCESS;
     }
 
@@ -170,7 +170,7 @@ extern "C"
         using hpx::components::stubs::memory;
         uint16_t val = memory::load16_sync(hpxpi::get_id(addr));
 
-        XPI_continue1(sizeof(uint16_t), &val);
+        XPI_continue(sizeof(uint16_t), &val);
         return XPI_SUCCESS;
     }
 
@@ -184,7 +184,7 @@ extern "C"
         using hpx::components::stubs::memory;
         uint32_t val = memory::load32_sync(hpxpi::get_id(addr));
 
-        XPI_continue1(sizeof(uint32_t), &val);
+        XPI_continue(sizeof(uint32_t), &val);
         return XPI_SUCCESS;
     }
 
@@ -198,7 +198,7 @@ extern "C"
         using hpx::components::stubs::memory;
         uint64_t val = memory::load64_sync(hpxpi::get_id(addr));
 
-        XPI_continue1(sizeof(uint64_t), &val);
+        XPI_continue(sizeof(uint64_t), &val);
         return XPI_SUCCESS;
     }
 
@@ -213,7 +213,7 @@ extern "C"
         hpx::components::server::memory::uint128_t val =
             memory::load128_sync(hpxpi::get_id(addr));
 
-        XPI_continue1(sizeof(hpx::components::server::memory::uint128_t), &val);
+        XPI_continue(sizeof(hpx::components::server::memory::uint128_t), &val);
         return XPI_SUCCESS;
     }
 

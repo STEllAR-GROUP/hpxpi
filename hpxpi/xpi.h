@@ -109,6 +109,10 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_clone(XPI_Parcel parcel, XPI_Parcel *clone);
 // Free an existing parcel
 HPXPI_EXPORT XPI_Err XPI_Parcel_free(XPI_Parcel parcel);
 
+///////////////////////////////////////////////////////////////////////////////
+// Parcel Target Field Accessors [4.2]
+///////////////////////////////////////////////////////////////////////////////
+
 // Set where the parcel action is invoked
 // Can be ignored except for LCO targets
 // XPI_NULL specifies no preferred address
@@ -126,15 +130,6 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_set_env(XPI_Parcel parcel, size_t bytes,
 // FIXME: added const to last argument
 HPXPI_EXPORT XPI_Err XPI_Parcel_set_data(XPI_Parcel parcel, size_t bytes,
     void const* data);
-
-///////////////////////////////////////////////////////////////////////////////
-// High-level function call interface (Apply) [4.5]
-///////////////////////////////////////////////////////////////////////////////
-
-HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
-    size_t bytes, const void *data, XPI_Addr future);
-HPXPI_EXPORT XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
-    size_t data_bytes, void const* data, size_t result_bytes, void* result);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Continuation Stack Management [4.3]
@@ -155,6 +150,35 @@ HPXPI_EXPORT XPI_Err XPI_Parcel_pop(XPI_Parcel parcel, XPI_Addr complete);
 // Sends a parcel, with future signaling completion
 HPXPI_EXPORT XPI_Err XPI_Parcel_send(XPI_Parcel parcel, XPI_Addr complete,
     XPI_Addr future);
+
+///////////////////////////////////////////////////////////////////////////////
+// High-level function call interface (Apply) [4.5]
+///////////////////////////////////////////////////////////////////////////////
+
+HPXPI_EXPORT XPI_Err XPI_Parcel_apply(XPI_Addr target, XPI_Action action,
+    size_t bytes, const void *data, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Parcel_apply_sync(XPI_Addr target, XPI_Action action,
+    size_t data_bytes, void const* data, size_t result_bytes, void* result);
+
+///////////////////////////////////////////////////////////////////////////////
+// Parcel Advanced [4.6]
+///////////////////////////////////////////////////////////////////////////////
+
+// explicitly receive a parcel
+// HPXPI_EXPORT XPI_Err XPI_Parcel_select(char *match, size_t n,
+//     XPI_Parcel parcels[], size_t *matched);
+
+// get a parcel’s target address
+// XPI_Err XPI_Parcel_get_addr(XPI_Parcel parcel, XPI_Addr *addr);
+
+// get a parcel’s target action
+// XPI_Err XPI_Parcel_get_action(XPI_Parcel parcel, XPI_Action *action);
+
+// get a parcel’s target environment data
+// XPI_Err XPI_Parcel_get_env(XPI_Parcel parcel, size_t *bytes, void **data);
+
+// get a parcel’s argument data
+// XPI_Err XPI_Parcel_get_data(XPI_Parcel parcel, size_t *bytes, void **data);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Native Parcel Interface [5.2]
@@ -295,7 +319,35 @@ HPXPI_EXPORT XPI_Parcel XPI_Thread_get_cont();
 ///////////////////////////////////////////////////////////////////////////////
 
 // the continue primitive
-HPXPI_EXPORT void XPI_continue1(size_t size, const void *val);
+HPXPI_EXPORT void XPI_continue(size_t size, const void *val);
+
+///////////////////////////////////////////////////////////////////////////////
+// Thread Scheduling [6.4]
+///////////////////////////////////////////////////////////////////////////////
+
+// XPI_THREAD_SET_PRIORITY_ACTION(priority)
+//   IN priority new priority
+
+// HPXPI_EXPORT XPI_Err XPI_THREAD_SET_PRIORITY_ACTION(size_t *priority); // CONT()
+
+// HPXPI_EXPORT XPI_Err XPI_Thread_set_priority_sync(XPI_Addr address,
+//      size_t priority);
+
+// XPI_THREAD_SET_STATE_ACTION(state)
+//   IN state requested state
+
+typedef enum XPI_Thread_State
+{
+    XPI_THREAD_STATE_ACTIVE,
+    XPI_THREAD_STATE_SUSPENDED,
+    XPI_THREAD_STATE_DEPLETED,
+    XPI_THREAD_STATE_TERMINATED
+} XPI_Thread_State;
+
+// HPXPI_EXPORT XPI_Err XPI_THREAD_SET_STATE_ACTION(XPI_Thread_State *state); // CONT()
+
+// HPXPI_EXPORT XPI_Err XPI_Thread_set_state_sync(XPI_Addr address,
+//      XPI_Thread_State state);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Thread Suspension [6.5]
@@ -314,6 +366,12 @@ HPXPI_EXPORT XPI_Err XPI_Thread_wait_all(size_t n, XPI_Addr lco[],
 // Thread Resources [6.6]
 ///////////////////////////////////////////////////////////////////////////////
 
+// XPI_THREAD_GET_PROCESS_ACTION CONTINUE(process)
+//   CONT
+
+// HPXPI_EXPORT XPI_Err XPI_THREAD_GET_PROCESS_ACTION(); // CONT(process)
+
+// get the global address corresponding to a thread’s process
 // HPXPI_EXPORT XPI_Err XPI_Thread_get_process(XPI_Addr address, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Thread_get_process_sync(XPI_Addr address,
     XPI_Addr *process);
@@ -412,7 +470,6 @@ typedef struct XPI_LCO_Descriptor {
     // This should return the size of the value of the LCO.
     size_t (*get_size) (void const* const lco);
 } XPI_LCO_Descriptor;
-
 
 // XPI_PROCESS_LCO_MALLOC_ACTION(count, size, handlers, distribution)
 //      CONTINUE(address)
