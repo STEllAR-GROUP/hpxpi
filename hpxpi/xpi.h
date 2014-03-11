@@ -30,15 +30,15 @@ typedef int XPI_Err;
 //
 // Corresponds to hpx gid_type
 typedef struct XPI_Addr {
-    uint64_t msb;
     uint64_t lsb;
+    uint64_t msb;
 } XPI_Addr;
 
 HPXPI_EXPORT extern XPI_Addr XPI_NULL;
 
 typedef struct XPI_AddrDiff {
-    int64_t msb;
     uint64_t lsb;
+    int64_t msb;
 } XPI_AddrDiff;
 
 // initialize an address structure
@@ -163,12 +163,12 @@ HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U8_ACTION(uint8_t* args);           // CONT(
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U16_ACTION(uint16_t* args);         // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U32_ACTION(uint32_t* args);         // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U64_ACTION(uint64_t* args);         // CONT()
-// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U128_ACTION(void* args);         // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_U128_ACTION(__uint128_t* args);     // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S8_ACTION(int8_t* args);            // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S16_ACTION(int16_t* args);          // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S32_ACTION(int32_t* args);          // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S64_ACTION(int64_t* args);          // CONT()
-// HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S128_ACTION(void* args);         // CONT()
+HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_S128_ACTION(__int128_t* args);     // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_F_ACTION(float* args);              // CONT()
 HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_D_ACTION(double* args);             // CONT()
 // HPXPI_EXPORT XPI_Err XPI_AGAS_STORE_FC_ACTION(void* args);           // CONT()
@@ -180,12 +180,12 @@ HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U8_ACTION(void* args);       // CONT(uint8_t 
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U16_ACTION(void* args);      // CONT(uint16_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U32_ACTION(void* args);      // CONT(uint32_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U64_ACTION(void* args);      // CONT(uint64_t val)
-// HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U128_ACTION(void* args);     // CONT(__uint128_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_U128_ACTION(void* args);     // CONT(__uint128_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S8_ACTION(void* args);       // CONT(int8_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S16_ACTION(void* args);      // CONT(int16_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S32_ACTION(void* args);      // CONT(int32_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S64_ACTION(void* args);      // CONT(int64_t val)
-// HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S128_ACTION(void* args);     // CONT(__int128_t val)
+HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_S128_ACTION(void* args);     // CONT(__int128_t val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_F_ACTION(void* args);        // CONT(float val)
 HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_D_ACTION(void* args);        // CONT(double val)
 // HPXPI_EXPORT XPI_Err XPI_AGAS_LOAD_FC_ACTION(void* args);       // CONT(float _Complex val)
@@ -200,12 +200,12 @@ HPXPI_EXPORT XPI_Err XPI_Agas_store_u8(XPI_Addr addr, uint8_t val, XPI_Addr futu
 HPXPI_EXPORT XPI_Err XPI_Agas_store_u16(XPI_Addr addr, uint16_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_u32(XPI_Addr addr, uint32_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_u64(XPI_Addr addr, uint64_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_u128(XPI_Addr addr, __uint128_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u128(XPI_Addr addr, __uint128_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s8(XPI_Addr addr, int8_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s16(XPI_Addr addr, int16_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s32(XPI_Addr addr, int32_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s64(XPI_Addr addr, int64_t val, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_s128(XPI_Addr addr, __int128_t val, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s128(XPI_Addr addr, __int128_t val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_f(XPI_Addr addr, float val, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_d(XPI_Addr addr, double val, XPI_Addr future);
 // HPXPI_EXPORT XPI_Err XPI_Agas_store_fc(XPI_Addr addr, float _Complex val, XPI_Addr future);
@@ -217,12 +217,12 @@ HPXPI_EXPORT XPI_Err XPI_Agas_load_u8(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_u16(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_u32(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_u64(XPI_Addr addr, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_load_u128(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u128(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s8(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s16(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s32(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s64(XPI_Addr addr, XPI_Addr future);
-// HPXPI_EXPORT XPI_Err XPI_Agas_load_s128(XPI_Addr addr, XPI_Addr future);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s128(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_f(XPI_Addr addr, XPI_Addr future);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_d(XPI_Addr addr, XPI_Addr future);
 // HPXPI_EXPORT XPI_Err XPI_Agas_load_fc(XPI_Addr addr, XPI_Addr future);
@@ -237,12 +237,12 @@ HPXPI_EXPORT XPI_Err XPI_Agas_store_u8_sync(XPI_Addr addr, uint8_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_u16_sync(XPI_Addr addr, uint16_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_u32_sync(XPI_Addr addr, uint32_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_u64_sync(XPI_Addr addr, uint64_t val);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_u128_sync(XPI_Addr addr, __uint128_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_u128_sync(XPI_Addr addr, __uint128_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s8_sync(XPI_Addr addr, int8_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s16_sync(XPI_Addr addr, int16_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s32_sync(XPI_Addr addr, int32_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_s64_sync(XPI_Addr addr, int64_t val);
-// HPXPI_EXPORT XPI_Err XPI_Agas_store_s128_sync(XPI_Addr addr, __int128_t val);
+HPXPI_EXPORT XPI_Err XPI_Agas_store_s128_sync(XPI_Addr addr, __int128_t val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_f_sync(XPI_Addr addr, float val);
 HPXPI_EXPORT XPI_Err XPI_Agas_store_d_sync(XPI_Addr addr, double val);
 // HPXPI_EXPORT XPI_Err XPI_Agas_store_fc_sync(XPI_Addr addr, float _Complex val);
@@ -254,12 +254,12 @@ HPXPI_EXPORT XPI_Err XPI_Agas_load_u8_sync(XPI_Addr addr, uint8_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_u16_sync(XPI_Addr addr, uint16_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_u32_sync(XPI_Addr addr, uint32_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_u64_sync(XPI_Addr addr, uint64_t *val);
-// HPXPI_EXPORT XPI_Err XPI_Agas_load_u128_sync(XPI_Addr addr, __uint128_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_u128_sync(XPI_Addr addr, __uint128_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s8_sync(XPI_Addr addr, int8_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s16_sync(XPI_Addr addr, int16_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s32_sync(XPI_Addr addr, int32_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_s64_sync(XPI_Addr addr, int64_t *val);
-// HPXPI_EXPORT XPI_Err XPI_Agas_load_s128_sync(XPI_Addr addr, __int128_t *val);
+HPXPI_EXPORT XPI_Err XPI_Agas_load_s128_sync(XPI_Addr addr, __int128_t *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_f_sync(XPI_Addr addr, float *val);
 HPXPI_EXPORT XPI_Err XPI_Agas_load_d_sync(XPI_Addr addr, double *val);
 // HPXPI_EXPORT XPI_Err XPI_Agas_load_fc_sync(XPI_Addr addr, float _Complex *val);

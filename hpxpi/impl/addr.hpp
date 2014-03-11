@@ -99,14 +99,14 @@ namespace hpxpi
     // the returned address.
     inline XPI_Addr from_id(hpx::id_type id)
     {
-        XPI_Addr addr = { id.get_msb(), id.get_lsb() };
+        XPI_Addr addr = { id.get_lsb(), id.get_msb() };
         id.make_unmanaged();        // release ownership
         return addr;
     }
 
     inline XPI_Addr from_id(hpx::naming::gid_type const& gid)
     {
-        XPI_Addr addr = { gid.get_msb(), gid.get_lsb() };
+        XPI_Addr addr = { gid.get_lsb(), gid.get_msb() };
         return addr;
     }
 }

@@ -20,6 +20,11 @@ using std::intptr_t;
 #include <stdlib.h>
 #endif
 
+#if defined(_MSC_VER)
+#include <hpx/util/numerics/int128.hpp>
+#include <hpx/util/numerics/uint128.hpp>
+#endif
+
 #endif
 
 

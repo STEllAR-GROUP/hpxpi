@@ -82,7 +82,20 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-//     XPI_Err XPI_AGAS_STORE_U128_ACTION(void* args);
+    XPI_Err XPI_AGAS_STORE_U128_ACTION(__uint128_t* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        hpx::components::server::memory::uint128_t* val =
+            reinterpret_cast<hpx::components::server::memory::uint128_t*>(args);
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        memory::store128_async(hpxpi::get_id(addr), *val);
+
+        return XPI_SUCCESS;
+    }
 
     XPI_Err XPI_AGAS_STORE_S8_ACTION(int8_t* args)
     {
@@ -104,7 +117,10 @@ extern "C"
         return XPI_AGAS_STORE_U64_ACTION((uint64_t*)args);
     }
 
-//     XPI_Err XPI_AGAS_STORE_S128_ACTION(void* args);
+    XPI_Err XPI_AGAS_STORE_S128_ACTION(__int128_t* args)
+    {
+        return XPI_AGAS_STORE_U128_ACTION((__uint128_t*)args);
+    }
 
     XPI_Err XPI_AGAS_STORE_F_ACTION(float* args)
     {
@@ -121,22 +137,12 @@ extern "C"
 
     XPI_Err XPI_AGAS_STORE_ADDR_ACTION(XPI_Addr* args)
     {
-        if (0 == args)
-            return XPI_ERR_BAD_ARG;
-
-        hpx::components::server::memory::uint128_t* val =
-            reinterpret_cast<hpx::components::server::memory::uint128_t*>(args);
-        XPI_Addr addr = XPI_Thread_get_addr();
-
-        using hpx::components::stubs::memory;
-        memory::store128_async(hpxpi::get_id(addr), *val);
-
-        return XPI_SUCCESS;
+        return XPI_AGAS_STORE_U128_ACTION((__uint128_t*)args);
     }
 
     XPI_Err XPI_AGAS_STORE_ADDRDIFF_ACTION(XPI_AddrDiff* args)
     {
-        return XPI_AGAS_STORE_ADDR_ACTION((XPI_Addr*)args);
+        return XPI_AGAS_STORE_U128_ACTION((__uint128_t*)args);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -196,7 +202,20 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-//     XPI_Err XPI_AGAS_LOAD_U128_ACTION(void* args);
+    XPI_Err XPI_AGAS_LOAD_U128_ACTION(void* args)
+    {
+        if (0 == args)
+            return XPI_ERR_BAD_ARG;
+
+        XPI_Addr addr = XPI_Thread_get_addr();
+
+        using hpx::components::stubs::memory;
+        hpx::components::server::memory::uint128_t val =
+            memory::load128_sync(hpxpi::get_id(addr));
+
+        XPI_continue1(sizeof(hpx::components::server::memory::uint128_t), &val);
+        return XPI_SUCCESS;
+    }
 
     XPI_Err XPI_AGAS_LOAD_S8_ACTION(void* args)
     {
@@ -218,7 +237,10 @@ extern "C"
         return XPI_AGAS_LOAD_U64_ACTION(args);
     }
 
-//     XPI_Err XPI_AGAS_LOAD_S128_ACTION(void* args);
+    XPI_Err XPI_AGAS_LOAD_S128_ACTION(void* args)
+    {
+        return XPI_AGAS_LOAD_U128_ACTION(args);
+    }
 
     XPI_Err XPI_AGAS_LOAD_F_ACTION(void* args)
     {
@@ -235,22 +257,12 @@ extern "C"
 
     XPI_Err XPI_AGAS_LOAD_ADDR_ACTION(void* args)
     {
-        if (0 == args)
-            return XPI_ERR_BAD_ARG;
-
-        XPI_Addr addr = XPI_Thread_get_addr();
-
-        using hpx::components::stubs::memory;
-        hpx::components::server::memory::uint128_t val =
-            memory::load128_sync(hpxpi::get_id(addr));
-
-        XPI_continue1(sizeof(hpx::components::server::memory::uint128_t), &val);
-        return XPI_SUCCESS;
+        return XPI_AGAS_LOAD_U128_ACTION(args);
     }
 
     XPI_Err XPI_AGAS_LOAD_ADDRDIFF_ACTION(void* args)
     {
-        return XPI_AGAS_LOAD_ADDR_ACTION(args);
+        return XPI_AGAS_LOAD_U128_ACTION(args);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -300,7 +312,16 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    // XPI_Err XPI_Agas_store_u128(XPI_Addr addr, __uint128_t val, XPI_Addr future);
+    XPI_Err XPI_Agas_store_u128(XPI_Addr addr, __uint128_t val, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::store128(hpxpi::get_id(addr), val), future);
+
+        return XPI_SUCCESS;
+    }
 
     XPI_Err XPI_Agas_store_s8(XPI_Addr addr, int8_t val, XPI_Addr future)
     {
@@ -322,7 +343,11 @@ extern "C"
         return XPI_Agas_store_u64(addr, val, future);
     }
 
-    // XPI_Err XPI_Agas_store_s128(XPI_Addr addr, __int128_t val, XPI_Addr future);
+    XPI_Err XPI_Agas_store_s128(XPI_Addr addr, __int128_t val, XPI_Addr future)
+    {
+        return XPI_Agas_store_u128(addr,
+            *reinterpret_cast<__uint128_t*>(&val), future);
+    }
 
     XPI_Err XPI_Agas_store_f(XPI_Addr addr, float val, XPI_Addr future)
     {
@@ -339,20 +364,15 @@ extern "C"
 
     XPI_Err XPI_Agas_store_addr(XPI_Addr addr, XPI_Addr val, XPI_Addr future)
     {
-        if (XPI_NULL == addr || XPI_NULL == future)
-            return XPI_ERR_INV_ADDR;
-
-        using hpx::components::stubs::memory;
-        hpx::components::server::memory::uint128_t u128(val.msb, val.lsb);
-        hpxpi::propagate(memory::store128(hpxpi::get_id(addr), u128), future);
-
-        return XPI_SUCCESS;
+        return XPI_Agas_store_u128(addr,
+            *reinterpret_cast<__uint128_t*>(&val), future);
     }
 
     XPI_Err XPI_Agas_store_addrdiff(XPI_Addr addr, XPI_AddrDiff val,
         XPI_Addr future)
     {
-        return XPI_Agas_store_addr(addr, *reinterpret_cast<XPI_Addr*>(&val), future);
+        return XPI_Agas_store_u128(addr,
+            *reinterpret_cast<__uint128_t*>(&val), future);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -400,7 +420,16 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    // XPI_Err XPI_Agas_load_u128(XPI_Addr addr, XPI_Addr future);
+    XPI_Err XPI_Agas_load_u128(XPI_Addr addr, XPI_Addr future)
+    {
+        if (XPI_NULL == addr || XPI_NULL == future)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+        hpxpi::propagate(memory::load128(hpxpi::get_id(addr)), future);
+
+        return XPI_SUCCESS;
+    }
 
     XPI_Err XPI_Agas_load_s8(XPI_Addr addr, XPI_Addr future)
     {
@@ -422,7 +451,10 @@ extern "C"
         return XPI_Agas_load_u64(addr, future);
     }
 
-    // XPI_Err XPI_Agas_load_s128(XPI_Addr addr, XPI_Addr future);
+    XPI_Err XPI_Agas_load_s128(XPI_Addr addr, XPI_Addr future)
+    {
+        return XPI_Agas_load_u128(addr, future);
+    }
 
     XPI_Err XPI_Agas_load_f(XPI_Addr addr, XPI_Addr future)
     {
@@ -439,18 +471,12 @@ extern "C"
 
     XPI_Err XPI_Agas_load_addr(XPI_Addr addr, XPI_Addr future)
     {
-        if (XPI_NULL == addr || XPI_NULL == future)
-            return XPI_ERR_INV_ADDR;
-
-        using hpx::components::stubs::memory;
-        hpxpi::propagate(memory::load128(hpxpi::get_id(addr)), future);
-
-        return XPI_SUCCESS;
+        return XPI_Agas_load_u128(addr, future);
     }
 
     XPI_Err XPI_Agas_load_addrdiff(XPI_Addr addr, XPI_Addr future)
     {
-        return XPI_Agas_load_addr(addr, future);
+        return XPI_Agas_load_u128(addr, future);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -516,7 +542,20 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    // XPI_Err XPI_Agas_store_u128_sync(XPI_Addr addr, __uint128_t val);
+    XPI_Err XPI_Agas_store_u128_sync(XPI_Addr addr, __uint128_t val)
+    {
+        if (XPI_NULL == addr)
+            return XPI_ERR_INV_ADDR;
+
+        using hpx::components::stubs::memory;
+
+        hpx::error_code ec;
+        memory::store128_sync(hpxpi::get_id(addr), val, ec);
+        if (ec)
+            return XPI_ERR_ERROR;
+
+        return XPI_SUCCESS;
+    }
 
     XPI_Err XPI_Agas_store_s8_sync(XPI_Addr addr, int8_t val)
     {
@@ -538,7 +577,11 @@ extern "C"
         return XPI_Agas_store_u64_sync(addr, val);
     }
 
-    // XPI_Err XPI_Agas_store_s128_sync(XPI_Addr addr, __int128_t val);
+    XPI_Err XPI_Agas_store_s128_sync(XPI_Addr addr, __int128_t val)
+    {
+        return XPI_Agas_store_u128_sync(addr,
+            *reinterpret_cast<__uint128_t*>(&val));
+    }
 
     XPI_Err XPI_Agas_store_f_sync(XPI_Addr addr, float val)
     {
@@ -555,23 +598,14 @@ extern "C"
 
     XPI_Err XPI_Agas_store_addr_sync(XPI_Addr addr, XPI_Addr val)
     {
-        if (XPI_NULL == addr)
-            return XPI_ERR_INV_ADDR;
-
-        using hpx::components::stubs::memory;
-
-        hpx::components::server::memory::uint128_t u128(val.msb, val.lsb);
-        hpx::error_code ec;
-        memory::store128_sync(hpxpi::get_id(addr), u128, ec);
-        if (ec)
-            return XPI_ERR_ERROR;
-
-        return XPI_SUCCESS;
+        return XPI_Agas_store_u128_sync(addr,
+            *reinterpret_cast<__uint128_t*>(&val));
     }
 
     XPI_Err XPI_Agas_store_addrdiff_sync(XPI_Addr addr, XPI_AddrDiff val)
     {
-        return XPI_Agas_store_addr_sync(addr, *reinterpret_cast<XPI_Addr*>(&val));
+        return XPI_Agas_store_u128_sync(addr,
+            *reinterpret_cast<__uint128_t*>(&val));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -643,7 +677,21 @@ extern "C"
         return XPI_SUCCESS;
     }
 
-    // XPI_Err XPI_Agas_load_u128_sync(XPI_Addr addr, __uint128_t *val);
+    XPI_Err XPI_Agas_load_u128_sync(XPI_Addr addr, __uint128_t *val)
+    {
+        if (XPI_NULL == addr)
+            return XPI_ERR_INV_ADDR;
+        if (0 == val)
+            return XPI_ERR_BAD_ARG;
+
+        using hpx::components::stubs::memory;
+
+        hpx::error_code ec;
+        *val = memory::load128_sync(hpxpi::get_id(addr), ec);
+        if (ec)
+            return XPI_ERR_ERROR;
+        return XPI_SUCCESS;
+    }
 
     XPI_Err XPI_Agas_load_s8_sync(XPI_Addr addr, int8_t *val)
     {
@@ -665,7 +713,11 @@ extern "C"
         return XPI_Agas_load_u64_sync(addr, reinterpret_cast<uint64_t*>(val));
     }
 
-    // XPI_Err XPI_Agas_load_s128_sync(XPI_Addr addr, __int128_t *val);
+    XPI_Err XPI_Agas_load_s128_sync(XPI_Addr addr, __int128_t *val)
+    {
+        return XPI_Agas_load_u128_sync(addr,
+            reinterpret_cast<__uint128_t*>(val));
+    }
 
     XPI_Err XPI_Agas_load_f_sync(XPI_Addr addr, float *val)
     {
@@ -682,27 +734,13 @@ extern "C"
 
     XPI_Err XPI_Agas_load_addr_sync(XPI_Addr addr, XPI_Addr *val)
     {
-        if (XPI_NULL == addr)
-            return XPI_ERR_INV_ADDR;
-        if (0 == val)
-            return XPI_ERR_BAD_ARG;
-
-        using hpx::components::stubs::memory;
-
-        hpx::error_code ec;
-        hpx::components::server::memory::uint128_t v =
-            memory::load128_sync(hpxpi::get_id(addr), ec);
-        if (ec)
-            return XPI_ERR_ERROR;
-
-        val->msb = v.msb;
-        val->lsb = v.lsb;
-
-        return XPI_SUCCESS;
+        return XPI_Agas_load_u128_sync(addr,
+            reinterpret_cast<__uint128_t*>(val));
     }
 
     XPI_Err XPI_Agas_load_addrdiff_sync(XPI_Addr addr, XPI_AddrDiff *val)
     {
-        return XPI_Agas_load_addr_sync(addr, reinterpret_cast<XPI_Addr*>(val));
+        return XPI_Agas_load_u128_sync(addr,
+            reinterpret_cast<__uint128_t*>(val));
     }
 }
