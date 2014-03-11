@@ -50,6 +50,16 @@ if(NOT MSVC)
   hpx_use_flag_if_available(-pie LANGUAGES C CXX)
 endif()
 
+###############################################################################
+# Other configuration options
+hpx_option(HPXPI_HAVE_NATIVE_INT128 BOOL
+    "Enable int128/uint128 operations in AGAS (default: OFF)"
+    OFF ADVANCED)
+if(HPXPI_HAVE_NATIVE_INT128)
+  add_config_define(HPXPI_HAVE_NATIVE_INT128 1)
+endif()
+
+###############################################################################
 add_subdirectory(src)
 
 ###############################################################################
