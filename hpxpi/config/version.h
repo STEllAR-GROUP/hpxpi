@@ -11,9 +11,14 @@ extern "C" {
 #endif
 
 // This is the version of the document currently implemented by HPXPI
-#define XPI_VERSION_MAJOR   1
-#define XPI_VERSION_MINOR   0
-#define XPI_VERSION_RELEASE 313      // document revision
+#define XPI_VERSION_MAJOR      1
+#define XPI_VERSION_MINOR      0
+#define XPI_VERSION_RELEASE    313      // document revision
+
+// This is the version of the HXPI implementation
+#define HPXPI_VERSION_MAJOR    0
+#define HPXPI_VERSION_MINOR    1
+#define HPXPI_VERSION_SUBMINOR 0
 
 #if defined(__cplusplus)
 }
