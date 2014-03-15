@@ -84,6 +84,11 @@ HPXPI_EXPORT XPI_Err XPI_finalize();
 // implementation conforms to.
 HPXPI_EXPORT void XPI_version(size_t* major, size_t* minor, size_t* release);
 
+#if !defined(HPXPI_NO_EXTENSIONS)
+// Version of the HPXPI implementation
+HPXPI_EXPORT void HPXPI_version(size_t* major, size_t* minor, size_t* release);
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action Management [3.4]
 ///////////////////////////////////////////////////////////////////////////////

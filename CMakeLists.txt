@@ -59,6 +59,13 @@ if(HPXPI_HAVE_NATIVE_INT128)
   add_config_define(HPXPI_HAVE_NATIVE_INT128 1)
 endif()
 
+hpx_option(HPXPI_HAVE_EXTENSIONS BOOL
+    "Enable extensions specific to HPXPI (default: ON)"
+    ON ADVANCED)
+if(NOT HPXPI_HAVE_EXTENSIONS)
+  add_config_define(HPXPI_NO_EXTENSIONS 1)
+endif()
+
 ###############################################################################
 add_subdirectory(src)
 
