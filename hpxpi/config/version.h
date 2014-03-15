@@ -17,7 +17,7 @@ extern "C" {
 
 // This is the version of the HXPI implementation
 #define HPXPI_VERSION_MAJOR    0
-#define HPXPI_VERSION_MINOR    1
+#define HPXPI_VERSION_MINOR    2
 #define HPXPI_VERSION_SUBMINOR 0
 
 #if defined(__cplusplus)
