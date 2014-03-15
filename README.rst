@@ -60,7 +60,7 @@ Linux
     $ cd my_hpxpi_build
 
 3) Invoke CMake from your build directory, pointing the CMake driver to the root
-   of your HPX source tree::
+   of your HPXPI source tree::
 
     $ cmake -DHPX_ROOT=/your_hpx_directory \
          -DCMAKE_INSTALL_PREFIX=/where_hpxpi_should_be_installed \
