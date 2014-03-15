@@ -44,7 +44,6 @@ the lines as they are completed to avoid confusion.
     target. The following files contain version info:
 
         *   ``hpxpi/config/version.h``
-        *   ``docs/hpxpi.qbk``
         *   ``CMakeLists.txt``
 
 #.  Remove the examples and benchmarks that will not go into the release from
