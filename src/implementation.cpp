@@ -33,6 +33,19 @@ extern "C" {
             *release = XPI_VERSION_RELEASE;
     }
 
+#if !defined(HPXPI_NO_EXTENSIONS)
+    // Version of the HPXPI implementation
+    void HPXPI_version(size_t* major, size_t* minor, size_t* release)
+    {
+        if (major)
+            *major = HPXPI_VERSION_MAJOR;
+        if (minor)
+            *minor = HPXPI_VERSION_MINOR;
+        if (release)
+            *release = HPXPI_VERSION_SUBMINOR;
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////////
     // XPI_init initializes the XPI runtime, using the passed arguments and the
     // environment. C applications usually simply forward pointers to argc, argv,
