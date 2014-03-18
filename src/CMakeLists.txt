@@ -3,9 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include_directories(${HPX_INCLUDE_DIR})
-link_directories(${HPX_LIBRARY_DIR})
-
 # Source files
 add_hpx_library_sources(hpxpi
   GLOB_RECURSE GLOBS "${hpxpi_SOURCE_DIR}/src/*.cpp")
@@ -62,5 +59,3 @@ else()
     FOLDER "Core")
 endif()
 
-# Don't cause our applications to link against hpx_init.
-set_target_properties(hpxpi_lib PROPERTIES LINK_INTERFACE_LIBRARIES "")

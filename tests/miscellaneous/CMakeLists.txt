@@ -24,7 +24,8 @@ foreach(miscellaneous ${miscellaneous_tests})
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
                      FOLDER "Tests/Miscellaneous/${miscellaneous}"
-                     DEPENDENCIES hpxpi_lib)
+                     DEPENDENCIES hpxpi_lib
+                     NOHPXINIT)
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.miscellaneous.${miscellaneous})
