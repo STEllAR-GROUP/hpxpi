@@ -42,7 +42,7 @@ namespace hpxpi
             }
         }
 
-        void on_ready(hpx::unique_future<void> f, XPI_Addr cont);
+        void on_ready_void(hpx::unique_future<void> f, XPI_Addr cont);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ namespace hpxpi
     inline void propagate(hpx::unique_future<void> f, XPI_Addr cont)
     {
         using hpx::util::placeholders::_1;
-        f.then(hpx::util::bind(&detail::on_ready, _1, cont));
+        f.then(hpx::util::bind(&detail::on_ready_void, _1, cont));
     }
 
     ///////////////////////////////////////////////////////////////////////////

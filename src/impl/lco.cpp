@@ -48,7 +48,7 @@ namespace hpxpi
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        void on_ready(hpx::unique_future<void> f, XPI_Addr cont)
+        void on_ready_void(hpx::unique_future<void> f, XPI_Addr cont)
         {
             hpx::error_code ec;
             f.get(ec);
