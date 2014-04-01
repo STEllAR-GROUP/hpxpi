@@ -27,7 +27,7 @@ namespace hpxpi
     namespace detail
     {
         template <typename T>
-        void on_ready(hpx::unique_future<T> f, XPI_Addr cont)
+        void on_ready(hpx::future<T> f, XPI_Addr cont)
         {
             hpx::error_code ec;
             T val = f.get(ec);
@@ -42,18 +42,18 @@ namespace hpxpi
             }
         }
 
-        void on_ready_void(hpx::unique_future<void> f, XPI_Addr cont);
+        void on_ready_void(hpx::future<void> f, XPI_Addr cont);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    void propagate(hpx::unique_future<T> f, XPI_Addr cont)
+    void propagate(hpx::future<T> f, XPI_Addr cont)
     {
         using hpx::util::placeholders::_1;
         f.then(hpx::util::bind(&detail::on_ready<T>, _1, cont));
     }
 
-    inline void propagate(hpx::unique_future<void> f, XPI_Addr cont)
+    inline void propagate(hpx::future<void> f, XPI_Addr cont)
     {
         using hpx::util::placeholders::_1;
         f.then(hpx::util::bind(&detail::on_ready_void, _1, cont));
@@ -152,7 +152,7 @@ namespace hpxpi
         size_t size_;
         value_type data_;
         hpx::lcos::local::promise<value_type&> promise_;
-        hpx::unique_future<value_type&> future_;
+        hpx::future<value_type&> future_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -193,7 +193,7 @@ namespace hpxpi
         }
 
         hpx::lcos::local::promise<void> promise_;
-        hpx::unique_future<void> future_;
+        hpx::future<void> future_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

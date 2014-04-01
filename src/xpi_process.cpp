@@ -50,7 +50,7 @@ extern "C"
         size_t count, size_t size, XPI_Distribution distribution,
         XPI_Addr future)
     {
-        hpx::unique_future<XPI_Addr> f = hpx::async(
+        hpx::future<XPI_Addr> f = hpx::async(
             &XPI_Process_global_malloc_helper, process, count, size,
             distribution);
 
@@ -171,7 +171,7 @@ extern "C"
         boost::shared_ptr<XPI_Process_LCO_Malloc_Descriptor> d(
             boost::make_shared<XPI_Process_LCO_Malloc_Descriptor>(data));
 
-        hpx::unique_future<XPI_Addr> f =
+        hpx::future<XPI_Addr> f =
             hpx::async(&XPI_Process_lco_malloc_helper, process, d);
 
         hpxpi::propagate(std::move(f), future);
@@ -231,7 +231,7 @@ extern "C"
         size_t count, size_t bytes, XPI_Distribution distribution,
         XPI_Addr future)
     {
-        hpx::unique_future<XPI_Addr> f = hpx::async(
+        hpx::future<XPI_Addr> f = hpx::async(
             &XPI_Process_future_new_helper, process, count, bytes,
             distribution);
 
