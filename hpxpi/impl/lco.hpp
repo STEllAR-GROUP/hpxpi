@@ -276,6 +276,9 @@ namespace hpxpi
             > base_type;
 
         public:
+            using base_type::decorate_action;
+            using base_type::schedule_thread;
+
             typedef hpx::lcos::base_lco_with_value<
                 hpx::util::serialize_buffer<uint8_t>
             > base_lco_type;
@@ -317,7 +320,6 @@ namespace hpxpi
             {
                 hpx::components::set_component_type<custom_lco>(type);
             }
-            using base_type::wrap_action;
 
             size_t get_size() const;
             buffer_type get_value_() const;
