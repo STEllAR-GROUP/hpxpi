@@ -29,6 +29,11 @@ The specification describes XPI as:
 If you plan to use HPXPI we suggest to start with the latest released version
 (currently HPXPI V0.1.0) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
+In publications this release of HPX can be cited as: |zenodo_doi|.
+
+.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.16399.svg
+     :target: http://dx.doi.org/10.5281/zenodo.16399
+
 If you happen to run into problems we very much encourage and appreciate
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpxpi/issues>`_.
